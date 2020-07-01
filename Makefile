@@ -66,16 +66,15 @@ all: run
 ./out/kern_thornhill.o: ./kernel/main.cpp
 	${CXX} -ffreestanding -c $< -o $@ -O2 -Wall -Wextra -fno-exceptions -fno-rtti
 
-# --oformat binary
 ./out/kern_thornhill.bin: ./out/kern_thornhill_entry.o ./out/kern_thornhill.o
-	${CXX} -o $@ -T linker.ld $^ -Wl,--oformat=binary -ffreestanding -O2 -nostdlib -lgcc -shared -g
+	${CXX} -o $@ -Ttext 0x1000 $^ -Wl,--oformat=binary -ffreestanding -O2 -nostdlib -lgcc -shared -g
 
 ./out/thornhill.bin: ./out/boot_thornhill.bin ./out/kern_thornhill.bin
 	cat $^ > $@
 
 # (for debugging purposes)
 ./out/kern_thornhill.elf: ./out/kern_thornhill_entry.o ${OBJ}
-	${CXX} -o $@ -T linker.ld $^ -ffreestanding -O2 -nostdlib -lgcc -shared -g
+	${CXX} -o $@ -Ttext 0x1000 $^ -ffreestanding -O2 -nostdlib -lgcc -shared -g
 
 
 #

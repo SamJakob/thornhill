@@ -44,6 +44,10 @@ struct position_t {
 class Screen {
 
     private:
+        static uint16_t computeOffset(int x, int y) {
+            return (y * VGA_WIDTH + x);
+        }
+
         static position_t getCursorPosition() {
             uint16_t offset = 0;
 
@@ -62,7 +66,7 @@ class Screen {
         }
 
         static void setCursorPosition(int x, int y) {
-            uint16_t offset = y * VGA_WIDTH + x;
+            uint16_t offset = computeOffset(x, y);
 
             // Write high byte.
             ThornhillIO::writeByteToPort(IO_SCREEN_CTRL, 0x0F);
@@ -78,7 +82,6 @@ class Screen {
         }
 
         static void printAt(const char* message, int x, int y) {
-
             // Sync up the x and y values.
             if (x >= 0 && y >= 0)
                 setCursorPosition(x, y);
@@ -88,19 +91,25 @@ class Screen {
                 y = cursorPosition.y;
             }
 
-            uint8_t* screen = reinterpret_cast<uint8_t*>(VIDEO_ADDRESS);
+            int startAddress = VIDEO_ADDRESS + (computeOffset(x, y) * 2);
+            uint8_t* screen = reinterpret_cast<uint8_t*>(startAddress);
 
             while (*message != 0) {
                 if (*message == '\n') {
                     x = 0;
                     y++;
+                } else {
+                    *screen++ = *message++;
+                    *screen++ = WHITE_ON_BLACK;
+                    x++;
                 }
 
-                *screen++ = *message++;
-                *screen++ = WHITE_ON_BLACK;
-
-                //setCursorPosition(x, y);
+                setCursorPosition(x, y);
             }
+
+            y++;
+            setCursorPosition(0, y);
+
         }
         
         static void clear() {
@@ -112,7 +121,7 @@ class Screen {
                 *screen++ = WHITE_ON_BLACK;
             }
 
-            setCursorPosition(1, 0);
+            setCursorPosition(0, 0);
         }
 
 };
