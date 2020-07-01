@@ -1,0 +1,9 @@
+.vscode
+out/**
+
+**/*.bin
+**/*.dis
+**/*.o
+**/*.elf
+
+**/thornhill.bin
