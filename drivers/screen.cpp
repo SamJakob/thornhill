@@ -1,40 +1,19 @@
 #include <stdint.h>
 #include "io.cpp"
 
+#include "vga.h"
+#include "../kernel/utils.cpp"
+
 #ifndef TH_DRIVER_SCREEN
 #define TH_DRIVER_SCREEN
 
 #define VIDEO_ADDRESS 0xb8000
-#define VGA_HEIGHT 25
 #define VGA_WIDTH 80
-#define WHITE_ON_BLACK 0x0f
-#define RED_ON_BLACK 0x0c
-#define WHITE_ON_RED 0xcf
+#define VGA_HEIGHT 25
 
 /* Screen I/O ports */
 #define IO_SCREEN_CTRL 0x3d4
 #define IO_SCREEN_DATA 0x3d5
-
-// For use when memory management is implemented!
-/*class Position {
-    private:
-        int x;
-        int y;
-    
-    public:
-        Position(int x, int y) {
-            this->x = x;
-            this->y = y;
-        }
-
-        int getX() {
-            return this->x;
-        }
-
-        int getY() {
-            return this->y;
-        }
-};*/
 
 struct position_t {
     int x;
@@ -44,8 +23,12 @@ struct position_t {
 class Screen {
 
     private:
+        static position_t cursor_position;
+        static uint8_t text_color;
+        static uint16_t* terminal_buffer;
+
         static uint16_t computeOffset(int x, int y) {
-            return (y * VGA_WIDTH + x);
+            return (y * VGA_WIDTH) + x;
         }
 
         static position_t getCursorPosition() {
@@ -70,60 +53,103 @@ class Screen {
 
             // Write high byte.
             ThornhillIO::writeByteToPort(IO_SCREEN_CTRL, 0x0F);
-            ThornhillIO::writeByteToPort(IO_SCREEN_DATA, (unsigned) offset & 0xFF);
+            ThornhillIO::writeByteToPort(IO_SCREEN_DATA, (uint8_t) (offset & 0xFF));
             // Write low byte.
             ThornhillIO::writeByteToPort(IO_SCREEN_CTRL, 0x0E);
-            ThornhillIO::writeByteToPort(IO_SCREEN_DATA, (unsigned) (offset >> 8) & 0xFF);
+            ThornhillIO::writeByteToPort(IO_SCREEN_DATA, (uint8_t) ((offset >> 8) & 0xFF));
         }
 
     public:
-        static void print(const char* message) {
-            Screen::printAt(message, -1, -1);
+        //
+        // Initialization
+        //
+
+        static void initializeTTY() {
+            cursor_position.x = 0;
+            cursor_position.y = 0;
+            text_color = vga_character_palette(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+
+            Screen::clear();
         }
 
-        static void printAt(const char* message, int x, int y) {
-            // Sync up the x and y values.
-            if (x >= 0 && y >= 0)
-                setCursorPosition(x, y);
-            else {
-                position_t cursorPosition = getCursorPosition();
-                x = cursorPosition.x;
-                y = cursorPosition.y;
+
+        //
+        // Printing text
+        //
+
+        static void printCharacterAt(unsigned char character, uint8_t color, int x, int y) {
+            uint16_t* screen = reinterpret_cast<uint16_t*>(VIDEO_ADDRESS);
+
+            uint16_t offset = computeOffset(x, y);
+            screen[offset] = vga_character(character, color);
+            setCursorPosition(x + 1, y);
+        }
+
+        static void printCharacter(char character) {
+            unsigned char unsignedCharacter = character;
+
+            if (unsignedCharacter == '\n') {
+                cursor_position.x = 0;
+                cursor_position.y++;
+                
+                if (cursor_position.y >= VGA_HEIGHT) scrollScreen();
+                setCursorPosition(0, cursor_position.y);
+                return;
             }
 
-            int startAddress = VIDEO_ADDRESS + (computeOffset(x, y) * 2);
-            uint8_t* screen = reinterpret_cast<uint8_t*>(startAddress);
-
-            while (*message != 0) {
-                if (*message == '\n') {
-                    x = 0;
-                    y++;
-                } else {
-                    *screen++ = *message++;
-                    *screen++ = WHITE_ON_BLACK;
-                    x++;
+            Screen::printCharacterAt(character, text_color, cursor_position.x, cursor_position.y);
+            if (++cursor_position.x == VGA_WIDTH) {
+                cursor_position.x = 0;
+                if (++cursor_position.y == VGA_HEIGHT) {
+                    cursor_position.y = 0;
                 }
-
-                setCursorPosition(x, y);
             }
+        }
 
-            y++;
-            setCursorPosition(0, y);
+        static void print(const char* data) {
+            for (int i = 0; i < ThornhillUtils::strlen(data); i++) Screen::printCharacter(data[i]);
+        }
 
+        static void println(const char* data) {
+            print(data);
+            printCharacter('\n');
         }
         
+
+        //
+        // Screen manipulation
+        //
+
         static void clear() {
             int screenSize = VGA_WIDTH * VGA_HEIGHT;
             char* screen = reinterpret_cast<char*>(VIDEO_ADDRESS);
 
             for (int i = 0; i < screenSize; i++) {
                 *screen++ = ' ';
-                *screen++ = WHITE_ON_BLACK;
+                *screen++ = text_color;
             }
 
             setCursorPosition(0, 0);
         }
 
+        static void scrollScreen() {
+            char* screen = reinterpret_cast<char*>(VIDEO_ADDRESS);
+
+            for (int y = 0; y < VGA_HEIGHT + 1; y++) {
+                for (int x = 0; x < VGA_WIDTH; x++) {
+                    uint16_t offset = computeOffset(x, y);
+                    screen[offset] = screen[offset + VGA_WIDTH];
+                }
+            }
+
+            cursor_position.y--;
+        }
+
 };
+
+
+position_t Screen::cursor_position;
+uint8_t Screen::text_color;
+uint16_t* Screen::terminal_buffer;
 
 #endif

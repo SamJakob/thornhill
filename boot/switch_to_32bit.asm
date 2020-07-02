@@ -20,4 +20,4 @@ init32Bit:
     MOV ebp, 0x90000
     MOV esp, ebp
 
-    CALL INIT_THORNHILL
+    CALL TH_GDT_CODE_SEG:INIT_THORNHILL

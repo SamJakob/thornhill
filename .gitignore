@@ -7,3 +7,4 @@ out/**
 **/*.elf
 
 **/thornhill.bin
+**/thornhill.raw

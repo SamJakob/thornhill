@@ -1,9 +1,13 @@
 #include "../drivers/screen.cpp"
+#include "utils.cpp"
 
 void main() {
 
-    Screen::clear();
-    Screen::print("Howdy!");
+    Screen::initializeTTY();
+
+    //Screen::println("ThornhillUtils::int_to_ascii(i)");
+
+    Screen::println("Howdy!");
     
 }
 

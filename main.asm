@@ -1,17 +1,32 @@
-; e9 fd ff 00 00 00 00 00 00 00 00 00 00 00 00 00
-; 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-; [ 29 more lines with sixteen zero-bytes each ]
-; 00 00 00 00 00 00 00 00 00 00 00 00 00 00 55 aa
-
 ;
-; -- System code
+; -- Bootstrap
 ;
-MOV ax, 0x0003
-int 10h ; Clear screen
+[bits 16]                   ; Set 16-bit mode for NASM.
+[org 0x7c00]                ; Set origin (bootable code)
+    CLI
+    MOV ax, 0x0000
+    MOV ds, ax
+    MOV es, ax
+    MOV fs, ax
+    MOV gs, ax
 
-MOV ah, 0x0e ; enter tty mode (set register a - higher to: 0x0e).
+    IN al, 0x92
+    OR al, 2
+    OUT 0x92, al
 
-[org 0x7c00]
+    MOV ss, ax
+    MOV sp, 0xFFFF
+    STI
+
+    MOV ax, 0x0003
+    int 10h ; Clear screen
+
+    MOV ah, 0x0e ; enter tty mode (set register a - higher to: 0x0e).
+
+    ;MOV bx, pleaseWaitMessage
+    ;CALL print
+    ;CALL printNewLine
+
     KERNEL_OFFSET equ 0x1000
     MOV [BOOT_DRIVE], dl ; The BIOS sets dl to the BOOT_DRIVE for us.
 
@@ -22,11 +37,14 @@ MOV ah, 0x0e ; enter tty mode (set register a - higher to: 0x0e).
     ; Load Thornhill kernel.
     CALL loadKernel
 
+    MOV ax, 0x0003
+    int 10h ; Clear screen
+
     ; Switch to protected mode.
     CALL switchTo32Bit
 
     ; (unreachable)
-    jmp $
+    JMP $
 
 
 ;
@@ -70,8 +88,9 @@ INIT_THORNHILL:
 ;
 BOOT_DRIVE db 0 ; BOOT_DRIVE is stored before initializing anything so as to prevent losing its value.
 ; switch32BitMessage: db "Switching to 32-bit protected mode...", 0
+;pleaseWaitMessage: db "Please wait...", 0
 loadKernelMessage: db "Loading kernel...", 0
-protectedModeSwitchMessage: db "Initializing Thornhill...", 0
+protectedModeSwitchMessage: db "Starting kernel...", 0
 
 ;
 ; -- Boot sector.
