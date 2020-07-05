@@ -7,7 +7,7 @@
 #include <efivar.h>
 
 #include "handoff.h"
-#include "../drivers/clock.h"
+#include "../drivers/clock.hpp"
 
 int mem_compare(const void *aptr, const void *bptr, size_t n) {
     const unsigned char *a = aptr, *b = bptr;

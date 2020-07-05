@@ -3,7 +3,7 @@
 #include "io.cpp"
 #include "../kernel/utils.cpp"
 
-#include "../font/font8x8/font8x8_basic.h"
+#include "../font/font8x8/font8x8_basic.hpp"
 #define FONT_CHARACTER_WIDTH 8
 #define FONT_CHARACTER_HEIGHT 8
 
