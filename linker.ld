@@ -1,34 +1,29 @@
-OUTPUT_FORMAT("elf32-i386")
-ENTRY(boot)
+ENTRY(kernel_start_phys)
+
+kernel_base = 0xffffffff80000000;
+kernel_base_phys = 0x200000;
+
+kernel_start_phys = kernel_start - kernel_base;
 
 SECTIONS {
-	. = 0x1000;
+	. = kernel_base + kernel_base_phys;
 
-	.text BLOCK(4K) : ALIGN(4K) {
-		_text_start = .;
-        *(.boot)
-        *(.text)
-		_text_end = .;
-	}
+	kernel_start = .;
 
-    .rodata BLOCK(4K) : ALIGN(4K) {
-		__rodata_start = .;
-		*(.rodata)
-		__rodata_end = .;
-	}
+	.text : AT(ADDR(.text) - kernel_base) { KEEP(*(.text.kernel_start)) *(.text.*) }
+	.data : AT(ADDR(.data) - kernel_base) { *(.data.*) *(.rodata.*) }
 
-    .data BLOCK(4K) : ALIGN(4K) {
-		__data_start = .;
-		*(.data)
-		__data_end = .;
-	}
+	.bss : AT(ADDR(.bss) - kernel_base) {
+		bss_start = .;
 
-	.bss BLOCK(4K) : ALIGN(4K) {
-		__bss_start = .;
-        *(COMMON)
 		*(.bss)
-		__bss_end = .;
+		*(.bss.*)
+		*(COMMON)
+
+		bss_end = .;
 	}
 
-	__kernel_end = .;
+	kernel_end = .;
+
+	/DISCARD/ : { *(.eh_frame) *(.comment) }
 }

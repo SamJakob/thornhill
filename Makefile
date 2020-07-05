@@ -25,25 +25,54 @@
 # =========================================================================== #
 
 #
-# Options
+# General Options
 #
-CXX 			= ~/barebones-toolchain/cross/x86_64/bin/i686-elf-g++
-LD 				= ~/barebones-toolchain/cross/x86_64/bin/i686-elf-ld
-#CXX			= /usr/bin/g++
-#LD				= /usr/bin/ld
-GDB 			= gdb
+ARCH				= x86_64
 
-ELF_FORMAT		= elf
+#
+# Bootloader Options
+#
+EFI_ROOT			= /usr/include/efi
+EFI_INCS			= -I$(EFI_ROOT) -I$(EFI_ROOT)/$(ARCH) -I$(EFI_ROOT)/protocol
+EFI_LIB				= /usr/lib
 
-C_SOURCES 		= $(wildcard kernel/*.cpp drivers/*.cpp)
-HEADERS			= $(wildcard kernel/*.h drivers/*.h)
+EFI_CRT_OBJS		= $(EFI_LIB)/crt0-efi-$(ARCH).o
+EFI_LDS				= $(EFI_LIB)/elf_$(ARCH)_efi.lds
 
-OBJ				= ${C_SOURCES:.cpp=.o}
+BOOT_CC				= gcc
+BOOT_LD				= ld
+
+BOOT_CFLAGS			= $(EFI_INCS) -ffreestanding -fno-stack-protector -c -fpic -fshort-wchar -mno-red-zone
+BOOT_LDFLAGS		= -nostdlib -T $(EFI_LDS) -shared -Bsymbolic -L $(EFI_LIB) $(EFI_CRT_OBJS) -lefi -lgnuefi
+
+ifeq ($(ARCH),x86_64)
+	BOOT_CFLAGS += -DHAVE_USE_MS_ABI
+endif
+
+#
+# System Options
+#
+SYSC_CC	 			= ~/barebones-toolchain/cross/x86_64/bin/i686-elf-gcc
+SYSC_CXX 			= ~/barebones-toolchain/cross/x86_64/bin/i686-elf-g++
+GDB		 			= gdb
+
+ELF_FORMAT			= elf
+
+C_SOURCES 			= $(wildcard kernel/*.cpp drivers/*.cpp)
+HEADERS				= $(wildcard kernel/*.h drivers/*.h)
+
+OBJ					= ${C_SOURCES:.cpp=.o}
 
 # (-g = use debugging symbols in GDB)
-CFLAGS			= -g
-#LDFLAGS		= -Ttext 0x1000
-LDFLAGS			= -T linker.ld
+CFLAGS				= -g
+
+# =========================================================================== #
+
+#
+# Output Filepaths
+#
+KERNEL			::= ./out/system/kernel
+BOOT_IMAGE 		::= ./out/bootstrap/boot.img
 
 # =========================================================================== #
 
@@ -54,55 +83,82 @@ LDFLAGS			= -T linker.ld
 # If no parameters are supplied, simply run.
 all: run
 
-# For some reason without .PHONY, targets are not rebuilt and considered
-# 'up-to-date'...
-.PHONY: ./out/thornhill.bin ./out/kern_thornhill.bin ./out/kern_thornhill.o ./out/kern_thornhill_entry.o ./out/boot_thornhill.bin
-
+.PHONY: bootstrap ./out/bootstrap/main.o ./out/bootstrap/data.o ./out/bootstrap/BOOTX64.so ./out/bootstrap/BOOTX64.EFI ${BOOT_IMAGE}
+.PHONY: kernel ./out/system/kern_thornhill.o ${KERNEL}
 
 #
 # Dependencies
 #
+./out/bootstrap/main.o: ./boot/main.c
+	${BOOT_CC} ${BOOT_CFLAGS} -o $@ $<
 
-./out/boot_thornhill.bin: main.asm
-	nasm -f bin $< -o $@
+./out/bootstrap/data.o: ./boot/data.c
+	${BOOT_CC} ${BOOT_CFLAGS} -o $@ $<
 
-./out/kern_thornhill_entry.o: ./boot/kernel_entry.asm
-	nasm $< -f ${ELF_FORMAT} -o $@
+./out/bootstrap/BOOTX64.so: ./out/bootstrap/main.o ./out/bootstrap/data.o
+	${BOOT_LD} $^ ${BOOT_LDFLAGS} -o $@
 
-./out/kern_thornhill.o: ./kernel/main.cpp
-	${CXX} -ffreestanding -c $< -o $@ -O2 -Wall -Wextra -fno-exceptions -fno-rtti
+./out/bootstrap/BOOTX64.EFI: ./out/bootstrap/BOOTX64.so
+	objcopy -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel -j .rela -j .reloc --target=efi-app-$(ARCH) $^ $@
 
-./out/kern_thornhill.bin: ./out/kern_thornhill_entry.o ./out/kern_thornhill.o
-	${CXX} -o $@ ${LDFLAGS} $^ -Wl,--oformat=binary -ffreestanding -O2 -nostdlib -lgcc -shared -g
+${BOOT_IMAGE}:
+	make ./out/bootstrap/BOOTX64.EFI
 
-./out/thornhill.raw: ./out/boot_thornhill.bin ./out/kern_thornhill.bin
-	cat $^ > $@
+	# Make FAT image.
+	dd if=/dev/zero of=${BOOT_IMAGE} bs=512 count=90000
+	mkfs.fat -v -F 32 -S 512 -s 1 ${BOOT_IMAGE} -n THORNHILL
+	mmd -i ${BOOT_IMAGE} ::/EFI
+	mmd -i ${BOOT_IMAGE} ::/EFI/BOOT
+	mcopy -i ${BOOT_IMAGE} ./out/bootstrap/BOOTX64.EFI ::/EFI/BOOT
 
-# (for debugging purposes)
-./out/kern_thornhill.elf: ./out/kern_thornhill_entry.o ./out/kern_thornhill.o
-	${CXX} -o $@ ${LDFLAGS} $^ -ffreestanding -O2 -nostdlib -lgcc -shared -g
+./out/system/kern_thornhill.o: ./kernel/main.cpp
+	${CXX} -ffreestanding -n -Wl,--gc-sections -T linker.ld -c $< -o $@ -O2 -Wall -Wextra -nostdlib
+
+${KERNEL}: ./out/system/kern_thornhill.o
+	${CXX} $^ -nostdlib -Wl,--gc-sections -o $@
+	mcopy -i ${BOOT_IMAGE} $@ ::/
+
+#${KERNEL}: ./out/system/kern_thornhill.so
+#./out/thornhill.raw: ./out/kern_thornhill.bin
+#	cat $^ > $@
+
 
 
 #
 # Targets
 #
 
+bootstrap:
+	make ${BOOT_IMAGE}
+
+kernel:
+	make ${KERNEL}
+
 thornhill:
-	make ./out/thornhill.raw
+	make bootstrap
+	make kernel
 
-run: ./out/thornhill.raw
-	qemu-system-x86_64 -fda $<
+run:
+	qemu-system-x86_64 -bios /usr/share/qemu/OVMF.fd ./out/bootstrap/boot.img
 
-debug: ./out/thornhill.raw ./out/kern_thornhill.elf
-	qemu-system-x86_64 -s -S -fda ./out/thornhill.raw &
-	${GDB} -ex "target remote localhost:1234" -ex "symbol-file ./out/kern_thornhill.elf"
+#debug: ./out/thornhill.raw ./out/kern_thornhill.elf
+#	qemu-system-x86_64 -s -S -fda ./out/thornhill.raw &
+#	${GDB} -ex "target remote localhost:1234" -ex "symbol-file ./out/kern_thornhill.elf"
 
 clean:
 	rm -rf *.bin *.dis *.o thornhill.raw *.elf
 	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o
 
 	rm -rf ./out
+	make _prepareOutputStructure
+
+#
+# Helpers
+#
+_prepareOutputStructure:
 	mkdir ./out
+	mkdir ./out/bootstrap
+	mkdir ./out/system
 
 #
 # Generic Wildcard Rules

@@ -1,18 +1,26 @@
-#include "../drivers/screen.cpp"
-#include "utils.cpp"
-
-void main() {
-
-    Screen::initializeTTY();
-
-    //Screen::println("ThornhillUtils::int_to_ascii(i)");
-
-    Screen::println("Howdy!");
-    
+extern "C" {
+    #include "../boot/handoff.h"
 }
 
-extern "C" void _start() {
+#include "../drivers/graphics.cpp"
+#include "utils.cpp"
+
+void main(ThornhillHandoff* thornhillHandoff) {
+
+    ThornhillGraphics::initialize(thornhillHandoff->screen);
+
+    ThornhillGraphics::drawStatusBar();
+    ThornhillGraphics::drawText("Howdy!", 20, 12, 2);
+
+    // TODO: Implement TTY.
+
+}
+
+extern "C" void _start(
+    ThornhillHandoff* thornhillHandoff
+) {
     
-    main();
+    main(thornhillHandoff);
+    for(;;) {}
 
 }
