@@ -37,9 +37,7 @@ class ThornhillGraphics {
                     uint8_t charX = screenX - x;
                     uint8_t charY = screenY - y;
 
-                    //if (((bool*) font8x8_basic[character][charY])[charX])
-                    //    videoBuffer[screenOffset] = pixel(screen.pixel_format, rgb(255, 255, 255));
-                    if ((font8x8_basic[character][charY / scale] >> (charX / scale)) & 0x01)
+                    if ((font8x8_basic[(uint8_t) character][charY / scale] >> (charX / scale)) & 0x01)
                         videoBuffer[screenOffset] = pixel(screen.pixel_format, rgb(255, 255, 255));
                 }
             }

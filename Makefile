@@ -52,16 +52,17 @@ endif
 #
 # System Options
 #
-SYSC_CC	 			= ~/barebones-toolchain/cross/x86_64/bin/i686-elf-gcc
-SYSC_CXX 			= ~/barebones-toolchain/cross/x86_64/bin/i686-elf-g++
+# CC	 			= ~/barebones-toolchain/cross/x86_64/bin/i686-elf-gcc
+# CXX 				= ~/barebones-toolchain/cross/x86_64/bin/i686-elf-g++
 GDB		 			= gdb
 
-ELF_FORMAT			= elf
+ELF_FORMAT			= elf64
 
-C_SOURCES 			= $(wildcard kernel/*.cpp drivers/*.cpp)
+C_SOURCES 			= $(wildcard kernel/*.cpp drivers/*.cpp cpu/${ARCH}/*.cpp)
 HEADERS				= $(wildcard kernel/*.h drivers/*.h)
 
-OBJ					= ${C_SOURCES:.cpp=.o}
+#OBJ					= ${HEADERS}
+#${C_SOURCES:.cpp=.o}
 
 # (-g = use debugging symbols in GDB)
 CFLAGS				= -g
@@ -87,7 +88,7 @@ all: run
 .PHONY: kernel ./out/system/kern_thornhill.o ${KERNEL}
 
 #
-# Dependencies
+# Bootloader
 #
 ./out/bootstrap/main.o: ./boot/main.c
 	${BOOT_CC} ${BOOT_CFLAGS} -o $@ $<
@@ -111,16 +112,25 @@ ${BOOT_IMAGE}:
 	mmd -i ${BOOT_IMAGE} ::/EFI/BOOT
 	mcopy -i ${BOOT_IMAGE} ./out/bootstrap/BOOTX64.EFI ::/EFI/BOOT
 
+
+#
+# CPU
+#
+CPU_ARCH = ./cpu/${ARCH}
+
+#./out/cpu/interrupt.o: ./cpu/${ARCH}/interrupt.asm
+#	nasm $< -f ${ELF_FORMAT} -o $@
+#OBJ += ./out/cpu/interrupt.o
+
+#
+# Kernel
+#
 ./out/system/kern_thornhill.o: ./kernel/main.cpp
-	${CXX} -ffreestanding -n -Wl,--gc-sections -T linker.ld -c $< -o $@ -O2 -Wall -Wextra -nostdlib
+	${CXX} -ffreestanding -n -Wl,--gc-sections -I${CPU_ARCH} -T linker.ld -c $< -o $@ -O2 -Wall -Wextra -nostdlib -mgeneral-regs-only -mno-red-zone
 
-${KERNEL}: ./out/system/kern_thornhill.o
-	${CXX} $^ -nostdlib -Wl,--gc-sections -o $@
+${KERNEL}: ./out/system/kern_thornhill.o ${OBJ}
+	${CXX} $^ -nostdlib -Wl,--gc-sections -mgeneral-regs-only -mno-red-zone -o $@
 	mcopy -i ${BOOT_IMAGE} $@ ::/
-
-#${KERNEL}: ./out/system/kern_thornhill.so
-#./out/thornhill.raw: ./out/kern_thornhill.bin
-#	cat $^ > $@
 
 
 
@@ -158,6 +168,7 @@ clean:
 _prepareOutputStructure:
 	mkdir ./out
 	mkdir ./out/bootstrap
+	mkdir ./out/cpu
 	mkdir ./out/system
 
 #
@@ -165,13 +176,10 @@ _prepareOutputStructure:
 #
 
 %.o: %.cpp ${HEADERS}
-		${CXX} ${CFLAGS} -ffreestanding -c $< -o $@
+	${CXX} ${CFLAGS} -ffreestanding -c $< -o $@
 
-%.o: %.c ${HEADERS}
-		${CXX} ${CFLAGS} -ffreestanding -c $< -o $@
+#%.o: %.c ${HEADERS}
+#	${CXX} ${CFLAGS} -ffreestanding -c $< -o $@
 
-%.o: %.asm
-		nasm $< -f ${ELF_FORMAT} -o $@
-
-%.bin: %.asm
-		nasm $< -f bin -o $@
+#%.o: %.asm
+#	nasm $< -f ${ELF_FORMAT} -o $@

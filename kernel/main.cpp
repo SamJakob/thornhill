@@ -24,3 +24,11 @@ extern "C" void _start(
     for(;;) {}
 
 }
+
+/*
+struct interrupt_frame;
+__attribute__((interrupt)) void interrupt_handler(struct interrupt_frame* frame) {
+    // TODO: something.
+    ThornhillGraphics::drawText("interrupt", 20, 50, 2);
+}
+*/
