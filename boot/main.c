@@ -310,7 +310,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
     /* ExitBootServices */
     
-    /*Status = SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);
+    Status = SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);
     if (EFI_ERROR(Status)) {
         SystemTable->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
         Status = SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);
@@ -322,7 +322,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
     if (EFI_ERROR(Status)) {
         return ShowThornhillBootError(SystemTable, (CHAR16*) L"Failed to exit boot services after 3 attempts.\r\n", Status);
-    }*/
+    }
 
     /* Prepare handoff data. */
     ThornhillHandoff HOData;
@@ -346,8 +346,8 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
     /* Jump to start of kernel */
     ((__attribute__((sysv_abi)) void (*)(void*)) kernelHeader.e_entry)(
-		(void*) &HOData
-	);
+        (void*) &HOData
+    );
 
     return EFI_SUCCESS;
 
