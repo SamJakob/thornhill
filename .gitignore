@@ -9,3 +9,5 @@ out/**
 **/thornhill.bin
 **/thornhill.raw
 **/notes.txt
+
+.vscode/**
