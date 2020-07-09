@@ -118,9 +118,9 @@ ${BOOT_IMAGE}:
 #
 CPU_ARCH = ./cpu/${ARCH}
 
-./out/system/memory/gdt_loader.o: ./kernel/memory/gdt_loader.s
+./out/system/descriptor/gdt_loader.o: ./kernel/descriptor/gdt_loader.s
 	as $< -o $@
-OBJ += ./out/system/memory/gdt_loader.o
+OBJ += ./out/system/descriptor/gdt_loader.o
 
 
 #
@@ -148,9 +148,10 @@ kernel:
 thornhill:
 	make bootstrap
 	make kernel
+	cp ./out/bootstrap/boot.img ./out/thornhill.img
 
 run:
-	qemu-system-x86_64 -bios /usr/share/qemu/OVMF.fd ./out/bootstrap/boot.img
+	qemu-system-x86_64 -bios /usr/share/qemu/OVMF.fd ./out/thornhill.img
 
 #debug: ./out/thornhill.raw ./out/kern_thornhill.elf
 #	qemu-system-x86_64 -s -S -fda ./out/thornhill.raw &
@@ -171,7 +172,7 @@ _prepareOutputStructure:
 	mkdir ./out/bootstrap
 	mkdir ./out/cpu
 	mkdir ./out/system
-	mkdir ./out/system/memory
+	mkdir ./out/system/descriptor
 
 #
 # Generic Wildcard Rules

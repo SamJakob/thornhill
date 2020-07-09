@@ -3,7 +3,7 @@ extern "C" {
 }
 
 #include "../drivers/graphics.cpp"
-#include "memory/gdt.cpp"
+#include "descriptor/gdt.cpp"
 #include "utils.cpp"
 
 void main(ThornhillHandoff* thornhillHandoff) {
