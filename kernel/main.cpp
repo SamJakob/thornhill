@@ -3,6 +3,7 @@ extern "C" {
 }
 
 #include "../drivers/graphics.cpp"
+#include "memory/gdt.cpp"
 #include "utils.cpp"
 
 void main(ThornhillHandoff* thornhillHandoff) {
@@ -19,6 +20,8 @@ void main(ThornhillHandoff* thornhillHandoff) {
 extern "C" void _start(
     ThornhillHandoff* thornhillHandoff
 ) {
+    
+    ThornhillGDT::setup();
     
     main(thornhillHandoff);
     for(;;) {}

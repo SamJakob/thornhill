@@ -1,4 +1,4 @@
-ENTRY(kernel_start_phys)
+ENTRY(_start)
 
 kernel_base = 0xffffffff80000000;
 kernel_base_phys = 0x200000;

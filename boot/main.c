@@ -324,6 +324,8 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
         return ShowThornhillBootError(SystemTable, (CHAR16*) L"Failed to exit boot services after 3 attempts.\r\n", Status);
     }
 
+    asm("cli");
+
     /* Prepare handoff data. */
     ThornhillHandoff HOData;
 

@@ -118,9 +118,10 @@ ${BOOT_IMAGE}:
 #
 CPU_ARCH = ./cpu/${ARCH}
 
-#./out/cpu/interrupt.o: ./cpu/${ARCH}/interrupt.asm
-#	nasm $< -f ${ELF_FORMAT} -o $@
-#OBJ += ./out/cpu/interrupt.o
+./out/system/memory/gdt_loader.o: ./kernel/memory/gdt_loader.s
+	as $< -o $@
+OBJ += ./out/system/memory/gdt_loader.o
+
 
 #
 # Kernel
@@ -170,6 +171,7 @@ _prepareOutputStructure:
 	mkdir ./out/bootstrap
 	mkdir ./out/cpu
 	mkdir ./out/system
+	mkdir ./out/system/memory
 
 #
 # Generic Wildcard Rules
@@ -180,6 +182,3 @@ _prepareOutputStructure:
 
 #%.o: %.c ${HEADERS}
 #	${CXX} ${CFLAGS} -ffreestanding -c $< -o $@
-
-#%.o: %.asm
-#	nasm $< -f ${ELF_FORMAT} -o $@
