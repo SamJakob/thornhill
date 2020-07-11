@@ -22,6 +22,14 @@ class ThornhillGraphics {
             ThornhillGraphics::clear();
         }
 
+        //
+        // Getters
+        //
+
+        static Screen* getScreen() {
+            return &screen;
+        }
+
 
         //
         // Text
@@ -43,16 +51,29 @@ class ThornhillGraphics {
             }
         }
 
-        static void drawText(char* characters, uint16_t x, uint16_t y, int scale = 1, int padding = 0) {
+        static void drawText(const char* characters, uint16_t x, uint16_t y, int scale = 1, int padding = 0) {
+
+            size_t pointer = 0;
 
             uint16_t deltaX = 0;
-            while (*characters != 0) {
-                drawCharacter(*characters, x + deltaX, y, scale);
+            while (characters[pointer] != 0) {
+                drawCharacter(characters[pointer], x + deltaX, y, scale);
 
                 deltaX += ((FONT_CHARACTER_WIDTH * scale) + padding);
-                *characters++;
+                pointer++;
             }
 
+        }
+
+        static void drawRect(Color color, uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
+            uint32_t* videoBuffer = (uint32_t*) screen.frame_buffer_base;
+
+            for (uint32_t currentY = y; currentY < height; currentY++) {
+                for (uint32_t currentX = x; currentX < width; currentX++) {
+                    uint64_t offset = (currentY * width) + currentX;
+                    videoBuffer[offset] = pixel(screen.pixel_format, color);
+                }
+            }
         }
 
 
@@ -62,15 +83,7 @@ class ThornhillGraphics {
         //
 
         static void drawStatusBar() {
-            uint32_t* videoBuffer = (uint32_t*) screen.frame_buffer_base;
-
-            // Fill top 50px with rgb(29, 29, 29).
-            for (uint32_t y = 0; y < 40; y++) {
-                for (uint32_t x = 0; x < screen.width; x++) {
-                    uint64_t offset = (y * screen.width) + x;
-                    videoBuffer[offset] = pixel(screen.pixel_format, rgb(29, 29, 29));
-                }
-            }
+            drawRect(rgb(29, 29, 29), 0, 0, screen.width, 40);
         }
 
 
@@ -78,13 +91,13 @@ class ThornhillGraphics {
         // Screen manipulation
         //
 
-        static void clear() {
+        static void clear(Color color = rgb(0, 0, 0)) {
             uint32_t* videoBuffer = (uint32_t*) screen.frame_buffer_base;
 
             for (uint32_t y = 0; y < screen.height; y++) {
                 for (uint32_t x = 0; x < screen.width; x++) {
                     uint64_t offset = (y * screen.width) + x;
-                    videoBuffer[offset] = pixel(screen.pixel_format, rgb(0, 0, 0));
+                    videoBuffer[offset] = pixel(screen.pixel_format, color);
                 }
             }
         }

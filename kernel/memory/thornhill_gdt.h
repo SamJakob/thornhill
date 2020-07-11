@@ -1,9 +1,12 @@
+#ifndef TH_KERN_GDT_H
+#define TH_KERN_GDT_H
+
 #define TH_KERNEL_CODE_SEGMENT 0x08
 #define TH_KERNEL_DATA_SEGMENT 0x10
 
 #pragma pack (1)
 
-struct gdt_entry {
+struct gdt_descriptor {
     uint16_t limit15_0;
     uint16_t base15_0;
 
@@ -34,16 +37,16 @@ struct tss {
 
 __attribute__((aligned(4096)))
 struct {
-    struct gdt_entry null;
-    struct gdt_entry kernel_code;
-    struct gdt_entry kernel_data;
-    struct gdt_entry null2;
-    struct gdt_entry user_data;
-    struct gdt_entry user_code;
-    struct gdt_entry ovmf_data;
-    struct gdt_entry ovmf_code;
-    struct gdt_entry tss_low;
-    struct gdt_entry tss_high;
+    struct gdt_descriptor null;
+    struct gdt_descriptor kernel_code;
+    struct gdt_descriptor kernel_data;
+    struct gdt_descriptor null2;
+    struct gdt_descriptor user_data;
+    struct gdt_descriptor user_code;
+    struct gdt_descriptor ovmf_data;
+    struct gdt_descriptor ovmf_code;
+    struct gdt_descriptor tss_low;
+    struct gdt_descriptor tss_high;
 } thornhill_gdt_table = {
     {0, 0, 0, 0x00, 0x00, 0},   /* = (0x00): null */
     {0, 0, 0, 0x9a, 0xa0, 0},   /* = (0x08): kernel code (kernel base selector) */
@@ -63,3 +66,5 @@ struct table_ptr {
 };
 
 #pragma pack ()
+
+#endif

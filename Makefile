@@ -118,9 +118,13 @@ ${BOOT_IMAGE}:
 #
 CPU_ARCH = ./cpu/${ARCH}
 
-./out/system/descriptor/gdt_loader.o: ./kernel/descriptor/gdt_loader.s
+./out/system/memory/gdt_loader.o: ${CPU_ARCH}/gdt_loader.s
 	as $< -o $@
-OBJ += ./out/system/descriptor/gdt_loader.o
+OBJ += ./out/system/memory/gdt_loader.o
+
+./out/system/memory/interrupt_handler.o: ${CPU_ARCH}/interrupt_handler.s
+	as $< -o $@
+OBJ += ./out/system/memory/interrupt_handler.o
 
 
 #
@@ -172,7 +176,7 @@ _prepareOutputStructure:
 	mkdir ./out/bootstrap
 	mkdir ./out/cpu
 	mkdir ./out/system
-	mkdir ./out/system/descriptor
+	mkdir ./out/system/memory
 
 #
 # Generic Wildcard Rules

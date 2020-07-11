@@ -9,15 +9,15 @@ namespace ThornhillUtils {
         return (len);
     }
 
-    char* int_to_ascii(int value, int base) {
+    char* int_to_ascii(int value, int base = 10) {
 
         if (value == 0) return "0";
         
         static char buffer[32] = {0};
         int i = 30;
 
-        //for (; value && i; --i, value /= base)
-        //    buffer[i] = "0123456789abcdef"[value % base];
+        for (; value && i; --i, value /= base)
+            buffer[i] = "0123456789abcdef"[value % base];
 
         return &buffer[i + 1];
 
