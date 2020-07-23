@@ -1,4 +1,4 @@
-#ifndef CTHRON_STRING
+#ifndef CTHORN_STRING
 #define CTHORN_STRING
 
 class String {
