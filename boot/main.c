@@ -7,7 +7,7 @@
 #include <efivar.h>
 
 #include "handoff.h"
-#include "../drivers/clock.hpp"
+#include "clock.h"
 
 int mem_compare(const void *aptr, const void *bptr, size_t n) {
     const unsigned char *a = aptr, *b = bptr;
@@ -70,7 +70,7 @@ uint8_t readCMOSRegister (unsigned short cmosRegister, bool bBinaryMode) {
     const bool NMIDisableBit = 0b1;
     writeByteToPort(0x70, (NMIDisableBit << 7) | cmosRegister);
 
-    if (!bBinaryMode) bcdToBinary(readByteFromPort(0x71));
+    if (!bBinaryMode) return bcdToBinary(readByteFromPort(0x71));
     else return readByteFromPort(0x71);
 
 }
@@ -86,8 +86,8 @@ uint8_t readCMOSRegister (unsigned short cmosRegister, bool bBinaryMode) {
 struct ThornhillSystemTime _performTimeRead() {
 
     uint8_t statusRegisterB = readCMOSRegister(0x0B, true);
-    bool b24HourFormat = (statusRegisterB &= 0b010);
-    bool bBinaryMode   = (statusRegisterB &= 0b100);
+    bool b24HourFormat = (statusRegisterB & 0b010);
+    bool bBinaryMode   = (statusRegisterB & 0b100);
 
     uint16_t century = readCMOSRegister(0x32, bBinaryMode);
     
@@ -123,7 +123,7 @@ struct ThornhillSystemTime _performTimeRead() {
 
 bool isRTCUpdateInProgress() {
     uint8_t statusRegisterA = readCMOSRegister(0x0A, false);
-    bool bRTCUpdateInProgress = statusRegisterA &= 0x40;
+    return statusRegisterA &= 0x40;
 }
 
 /**
@@ -296,10 +296,22 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
     {
         Status = SystemTable->BootServices->LocateProtocol(&gEfiGraphicsOutputProtocolGuid, NULL, (void**) &GOP);
 
-        UINTN sizeOfGraphicsInfo;
-
         // Ensure the current graphics output mode is the maximum.
-        GOP->SetMode(GOP, 10);
+        UINT32 CurrentModeNumber = GOP->Mode->Mode;
+
+        /*
+        UINTN SizeOfModeInfo;
+        EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *ModeInfo;
+
+        while((GOP->QueryMode(GOP, CurrentModeNumber, &SizeOfModeInfo, &ModeInfo)) == EFI_SUCCESS) {
+            Print(L"%d: %dx%d\n", CurrentModeNumber, ModeInfo->HorizontalResolution, ModeInfo->VerticalResolution);
+
+            CurrentModeNumber++;
+        }
+        CurrentModeNumber--;*/
+
+        // GOP->SetMode(GOP, GOP->Mode->MaxMode - 1);
+        GOP->SetMode(GOP, 12);
 
         if (EFI_ERROR(Status)) {
             return ShowThornhillBootError(SystemTable, (CHAR16*) L"Failed to initialize graphics protocol.\r\n", Status);

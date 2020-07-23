@@ -20,7 +20,7 @@ class ThornhillIO {
          * @param  port: The IO port to read data from.
          * @retval The byte that was read.
          */
-        static char readByteFromPort (uint16_t port) {
+        static uint8_t readByteFromPort (uint16_t port) {
             uint8_t result;
 
             __asm__("in %%dx, %%al" : "=a" (result) : "d" (port));
@@ -66,12 +66,12 @@ class ThornhillIO {
          * @param  isBCDEncodedBinaryDecimal: Whether or not the value is BCD encoded.
          * @retval The value of the specified CMOS register, optionally having been converted from BCD format.
          */
-        static uint8_t readCMOSRegister (uint16_t cmosRegister, bool isBCDEncodedBinaryDecimal) {
+        static uint8_t readCMOSRegister (uint16_t cmosRegister, bool isBCDEncodedBinaryDecimal = false) {
             
             const bool NMIDisableBit = 0b1;
             writeByteToPort(0x70, (NMIDisableBit << 7) | cmosRegister);
 
-            if (isBCDEncodedBinaryDecimal) _bcdToBinary(readByteFromPort(0x71));
+            if (isBCDEncodedBinaryDecimal) return _bcdToBinary(readByteFromPort(0x71));
             else return readByteFromPort(0x71);
 
         }

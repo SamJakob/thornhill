@@ -1,9 +1,14 @@
 #include "graphics.h"
 
+#include "clock.hpp"
 #include "io.cpp"
 #include "../kernel/utils.cpp"
 
+#ifndef TH_DRIVER_GRAPHICS
+#define TH_DRIVER_GRAPHICS
+
 #include "../font/font8x8/font8x8_basic.hpp"
+
 #define FONT_CHARACTER_WIDTH 8
 #define FONT_CHARACTER_HEIGHT 8
 
@@ -70,7 +75,7 @@ class ThornhillGraphics {
 
             for (uint32_t currentY = y; currentY < height; currentY++) {
                 for (uint32_t currentX = x; currentX < width; currentX++) {
-                    uint64_t offset = (currentY * width) + currentX;
+                    uint64_t offset = (currentY * screen.width) + currentX;
                     videoBuffer[offset] = pixel(screen.pixel_format, color);
                 }
             }
@@ -82,8 +87,22 @@ class ThornhillGraphics {
         // UI
         //
 
-        static void drawStatusBar() {
+        static void drawStatusBar(ThornhillSystemTime* time) {
             drawRect(rgb(29, 29, 29), 0, 0, screen.width, 40);
+            drawText("Thornhill", 20, 12, 2);
+
+            //drawText(ThornhillUtils::int_to_ascii(time->month), screen.width - 360, 12, 2);
+            //drawCharacter('/', screen.width - 292, 12, 2);
+            //drawText(ThornhillUtils::int_to_ascii(time->day), screen.width - 320, 12, 2);
+            //drawCharacter('/', screen.width - 252, 12, 2);
+            //drawText(ThornhillUtils::int_to_ascii(time->fullYear), screen.width - 240, 12, 2);
+
+            drawText(ThornhillUtils::int_to_ascii(time->hours), screen.width - 180, 12, 2);
+            if(time->seconds % 2 != 0) drawCharacter(':', screen.width - 152, 12, 2);
+            drawText(ThornhillUtils::int_to_ascii(time->minutes), screen.width - 140, 12, 2);
+            if(time->seconds % 2 != 0) drawCharacter(':', screen.width - 112, 12, 2);
+            drawText(ThornhillUtils::int_to_ascii(time->seconds), screen.width - 100, 12, 2);
+            drawText(time->isPM ? "PM" : "AM", screen.width - 60, 12, 2);
         }
 
 
@@ -92,14 +111,7 @@ class ThornhillGraphics {
         //
 
         static void clear(Color color = rgb(0, 0, 0)) {
-            uint32_t* videoBuffer = (uint32_t*) screen.frame_buffer_base;
-
-            for (uint32_t y = 0; y < screen.height; y++) {
-                for (uint32_t x = 0; x < screen.width; x++) {
-                    uint64_t offset = (y * screen.width) + x;
-                    videoBuffer[offset] = pixel(screen.pixel_format, color);
-                }
-            }
+            drawRect(color, 0, 0, screen.width, screen.height);
         }
 
 };
@@ -107,3 +119,4 @@ class ThornhillGraphics {
 
 Screen ThornhillGraphics::screen;
 
+#endif

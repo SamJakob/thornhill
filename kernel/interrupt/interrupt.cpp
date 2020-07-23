@@ -13,6 +13,8 @@ extern "C" {
 
 class ThornhillInterrupt {
     private:
+        static interrupt_handler_t interruptHandlers[256];
+
         /**
          * @brief  Generates the type field for the IDT descriptor in a more readable way.
          * @note   The IDT is in the following format:
@@ -38,7 +40,12 @@ class ThornhillInterrupt {
         };
 
     public:
-        static void setup() {
+        static void setAllowInterrupts(bool allowInterrupts) {
+            if (allowInterrupts) __asm__ __volatile__("sti");
+            else __asm__ __volatile__("cli");
+        }
+
+        static void setupInterrupts() {
             // Setup IDT gates.
             setIdtGate(0, (uint64_t) isr0);
             setIdtGate(1, (uint64_t) isr1);
@@ -73,6 +80,35 @@ class ThornhillInterrupt {
             setIdtGate(30, (uint64_t) isr30);
             setIdtGate(31, (uint64_t) isr31);
 
+            // Remap the PIC.
+            ThornhillIO::writeByteToPort(0x20, 0x11);
+            ThornhillIO::writeByteToPort(0xA0, 0x11);
+            ThornhillIO::writeByteToPort(0x21, 0x20);
+            ThornhillIO::writeByteToPort(0xA1, 0x28);
+            ThornhillIO::writeByteToPort(0x21, 0x04);
+            ThornhillIO::writeByteToPort(0xA1, 0x02);
+            ThornhillIO::writeByteToPort(0x21, 0x01);
+            ThornhillIO::writeByteToPort(0xA1, 0x01);
+            ThornhillIO::writeByteToPort(0x21, 0x00);
+            ThornhillIO::writeByteToPort(0xA1, 0x00);
+
+            // Install the IRQs.
+            setIdtGate(32, (uint64_t) irq0);
+            setIdtGate(33, (uint64_t) irq1);
+            setIdtGate(34, (uint64_t) irq2);
+            setIdtGate(35, (uint64_t) irq3);
+            setIdtGate(36, (uint64_t) irq4);
+            setIdtGate(37, (uint64_t) irq5);
+            setIdtGate(38, (uint64_t) irq6);
+            setIdtGate(39, (uint64_t) irq7);
+            setIdtGate(40, (uint64_t) irq8);
+            setIdtGate(41, (uint64_t) irq9);
+            setIdtGate(42, (uint64_t) irq10);
+            setIdtGate(43, (uint64_t) irq11);
+            setIdtGate(44, (uint64_t) irq12);
+            setIdtGate(45, (uint64_t) irq13);
+            setIdtGate(46, (uint64_t) irq14);
+            setIdtGate(47, (uint64_t) irq15);
 
             // Setup IDT.
             idt_register.base = (uint64_t) &idt;
@@ -90,6 +126,20 @@ class ThornhillInterrupt {
             idt[gateNumber].offset63_32 = offset63_32(handler);
             idt[gateNumber].null2 = 0;
         }
+
+        static void registerInterruptHandler(uint8_t interrupt, interrupt_handler_t handler) {
+            interruptHandlers[interrupt] = handler;
+        }
+
+        static bool hasHandlerFor(uint8_t interrupt) {
+            return interruptHandlers[interrupt] != 0;
+        }
+
+        static interrupt_handler_t getHandlerFor(uint8_t interrupt) {
+            return interruptHandlers[interrupt];
+        }
 };
+
+interrupt_handler_t ThornhillInterrupt::interruptHandlers[256];
 
 #endif

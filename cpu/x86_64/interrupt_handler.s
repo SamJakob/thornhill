@@ -1,4 +1,5 @@
 .extern interrupt_handler
+.extern interrupt_request_handler
 
 # Implement a common handler for each of the ISR gates
 # allowing for reuse of the call back to kernel code.
@@ -47,6 +48,59 @@ interrupt_common:
     add $16, %rsp
     sti
     iretq
+
+
+interrupt_request_common:
+    # Stage 1: Save CPU state.
+    push %rdx
+    push %rcx
+    push %rbx
+    push %rax
+
+    push %rdi
+    push %rsi
+    push %rbp
+
+    mov %cr4, %rax
+    push %rax
+    mov %cr3, %rax
+    push %rax
+    mov %cr2, %rax
+    push %rax
+    mov %cr0, %rax
+    push %rax
+
+    # Stage 2: Call kernel code.
+    call interrupt_request_handler
+    # pop %rbx
+
+    # Stage 3: Restore CPU state.
+    pop %rax
+    mov %rax, %cr0
+    pop %rax
+    mov %rax, %cr2
+    pop %rax
+    mov %rax, %cr3
+    pop %rax
+    mov %rax, %cr4
+
+    pop %rbp
+    pop %rsi
+    pop %rdi
+
+    pop %rax
+    pop %rbx
+    pop %rcx
+    pop %rdx
+
+    add $16, %rsp
+    sti
+    iretq
+
+
+#
+# ISRs
+#
 
 # There is no information on which interrupt was called when
 # the handler is run, so a handler is defined for each interrupt.
@@ -304,3 +358,121 @@ isr31:
     push $0
     push $31
     jmp interrupt_common
+
+
+
+#
+# IRQs
+#
+.global irq0
+.global irq1
+.global irq2
+.global irq3
+.global irq4
+.global irq5
+.global irq6
+.global irq7
+.global irq8
+.global irq9
+.global irq10
+.global irq11
+.global irq12
+.global irq13
+.global irq14
+.global irq15
+
+irq0:
+	cli
+	push $0
+	push $32
+	jmp interrupt_request_common
+
+irq1:
+	cli
+	push $1
+	push $33
+	jmp interrupt_request_common
+
+irq2:
+	cli
+	push $2
+	push $34
+	jmp interrupt_request_common
+
+irq3:
+	cli
+	push $3
+	push $35
+	jmp interrupt_request_common
+
+irq4:
+	cli
+	push $4
+	push $36
+	jmp interrupt_request_common
+
+irq5:
+	cli
+	push $5
+	push $37
+	jmp interrupt_request_common
+
+irq6:
+	cli
+	push $6
+	push $38
+	jmp interrupt_request_common
+
+irq7:
+	cli
+	push $7
+	push $39
+	jmp interrupt_request_common
+
+irq8:
+	cli
+	push $8
+	push $40
+	jmp interrupt_request_common
+
+irq9:
+	cli
+	push $9
+	push $41
+	jmp interrupt_request_common
+
+irq10:
+	cli
+	push $10
+	push $42
+	jmp interrupt_request_common
+
+irq11:
+	cli
+	push $11
+	push $43
+	jmp interrupt_request_common
+
+irq12:
+	cli
+	push $12
+	push $44
+	jmp interrupt_request_common
+
+irq13:
+	cli
+	push $13
+	push $45
+	jmp interrupt_request_common
+
+irq14:
+	cli
+	push $14
+	push $46
+	jmp interrupt_request_common
+
+irq15:
+	cli
+	push $15
+	push $47
+	jmp interrupt_request_common

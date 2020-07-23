@@ -9,7 +9,7 @@ namespace ThornhillUtils {
         return (len);
     }
 
-    char* int_to_ascii(int value, int base = 10) {
+    const char* int_to_ascii(int value, int base = 10) {
 
         if (value == 0) return "0";
         
