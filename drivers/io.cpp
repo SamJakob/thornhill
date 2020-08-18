@@ -69,6 +69,13 @@ class ThornhillIO {
         static uint8_t readCMOSRegister (uint16_t cmosRegister, bool isBCDEncodedBinaryDecimal = false) {
             
             const bool NMIDisableBit = 0b1;
+
+            // this is a rather disgusting way of introducing a delay after
+            // selecting the CMOS register on port 0x70 - as not doing this may
+            // result in reading the previously selected CMOS register from port
+            // 0x71.
+            for (int i = 0; i < 100; i++) 
+            // perform the write.
             writeByteToPort(0x70, (NMIDisableBit << 7) | cmosRegister);
 
             if (isBCDEncodedBinaryDecimal) return _bcdToBinary(readByteFromPort(0x71));

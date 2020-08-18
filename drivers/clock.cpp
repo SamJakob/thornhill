@@ -1,4 +1,6 @@
 #include "io.cpp"
+#include "../kernel/time/timezone.hpp"
+
 #include "clock.hpp"
 
 ThornhillSystemTime ThornhillClock::_performOfflineTimeRead() {
@@ -8,7 +10,7 @@ ThornhillSystemTime ThornhillClock::_performOfflineTimeRead() {
     bool b24HourFormat  =   (statusRegisterB & 0b010);
     bool isBcdEncoded   =  !(statusRegisterB & 0b100);
 
-    uint16_t century = ThornhillIO::readCMOSRegister(0x32, isBcdEncoded);
+    int8_t century = ThornhillIO::readCMOSRegister(0x32, isBcdEncoded);
     
     ThornhillSystemTime time;
 
@@ -22,8 +24,10 @@ ThornhillSystemTime ThornhillClock::_performOfflineTimeRead() {
     time.minutes     =       ThornhillIO::readCMOSRegister(0x02, isBcdEncoded);
     time.seconds     =       ThornhillIO::readCMOSRegister(0x00, isBcdEncoded);
 
+    time.isPM        =       false;
+
     // Handle 24-hour time.
-    if (b24HourFormat && time.hours > 12) {
+    if (b24HourFormat && time.hours >= 12) {
         time.isPM = true;
         time.hours -= 12;
     }
@@ -46,7 +50,15 @@ bool ThornhillClock::isRTCUpdateInProgress() {
 }
 
 ThornhillSystemTime ThornhillClock::readOfflineTime() {
-    return _performOfflineTimeRead();
+    ThornhillSystemTime time = _performOfflineTimeRead();
+
+    // Apply time offset.
+    // ThornhillClock::applyTimeZone(&time, &TH_TIMEZONE_NEW_BRAUNFELS, true);
+    ThornhillClock::applyTimeZone(&time, &TH_TIMEZONE_LONDON, true);
+
+    return time;
+
+    // TODO: Fix RTCUpdateInProgress check.
     /*ThornhillSystemTime time, time2;
 
     while (isRTCUpdateInProgress()) {}
@@ -56,4 +68,43 @@ ThornhillSystemTime ThornhillClock::readOfflineTime() {
 
     if (compareSystemTime(&time, &time2)) return time;
     else return readOfflineTime();*/
+}
+
+void ThornhillClock::applyTimeOffset(ThornhillSystemTime* time, ThornhillTimeOffset offset) {
+    time->minutes += offset.minutes;
+    while (time->minutes > 59) {
+        time->hours++;
+        time->minutes -= 60;
+    }
+    while (time->minutes < 0) {
+        time->hours--;
+        time->minutes += 60;
+    }
+
+    time->hours += offset.hours;
+    while (time->hours > 12) {
+        if (time->isPM) {
+            time->isPM = false;
+            time->day++;
+            time->hours -= 12;
+        } else {
+            time->isPM = true;
+            time->hours -= 12;
+        }
+    }
+    while (time->hours < 0) {
+        if (time->isPM) {
+            //time->isPM = false;
+            time->hours += 12;
+        } else {
+            time->isPM = true;
+            time->day--;
+            time->hours += 12;
+        }
+    }
+}
+
+void ThornhillClock::applyTimeZone(ThornhillSystemTime* time, const ThornhillTimeZone* zone, bool applyDST) {
+    applyTimeOffset(time, zone->utcOffset);
+    if (applyDST) applyTimeOffset(time, zone->dstOffset);
 }

@@ -7,22 +7,17 @@
 
 struct ThornhillSystemTime {
 
-    uint8_t year;
-    uint16_t fullYear;
-    uint8_t month;
-    uint8_t day;
+    int8_t year;
+    int16_t fullYear;
+    int8_t month;
+    int8_t day;
 
-    uint8_t hours;
-    uint8_t minutes;
-    uint8_t seconds;
+    int8_t hours;
+    int8_t minutes;
+    int8_t seconds;
 
     bool isPM;
 
-};
-
-struct ThornhillTimeOffset {
-    uint8_t hours;
-    uint8_t minutes;
 };
 
 bool compareSystemTime(ThornhillSystemTime* timeA, ThornhillSystemTime* timeB) {
@@ -63,6 +58,25 @@ class ThornhillClock {
          * @retval ThornhillSystemTime
          */
         static ThornhillSystemTime readOfflineTime();
+
+        /**
+         * @brief  Calculates the offset from a given time.
+         * @note   
+         * @param  time: A pointer to the time to offset.
+         * @param  offset: A pointer to the offset to apply to the time.
+         * @retval The updated time.
+         */
+        static void applyTimeOffset(ThornhillSystemTime* time, ThornhillTimeOffset offset);
+
+        /**
+         * @brief  Calculates the time in a given time zone, using that time zone's given time offset.
+         * @note   
+         * @param  time: A pointer to the time to offset.
+         * @param  zone: A pointer to the Time Zone to derive offset information from.
+         * @param  applyDST: Whether or not to also apply that Time Zone's DST (Daylight Savings Time) offset.
+         * @retval The updated time.
+         */
+        static void applyTimeZone(ThornhillSystemTime* time, const ThornhillTimeZone* zone, bool applyDST = false);
 
 };
 

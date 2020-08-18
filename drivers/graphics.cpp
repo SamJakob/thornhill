@@ -91,17 +91,20 @@ class ThornhillGraphics {
             drawRect(rgb(29, 29, 29), 0, 0, screen.width, 40);
             drawText("Thornhill", 20, 12, 2);
 
-            //drawText(ThornhillUtils::int_to_ascii(time->month), screen.width - 360, 12, 2);
-            //drawCharacter('/', screen.width - 292, 12, 2);
-            //drawText(ThornhillUtils::int_to_ascii(time->day), screen.width - 320, 12, 2);
-            //drawCharacter('/', screen.width - 252, 12, 2);
-            //drawText(ThornhillUtils::int_to_ascii(time->fullYear), screen.width - 240, 12, 2);
+            drawText(ThornhillUtils::int_to_ascii(time->month), screen.width - 356, 12, 2);
+            drawCharacter('/', screen.width - 340, 12, 2);
+            drawText(ThornhillUtils::int_to_ascii(time->day), screen.width - 320, 12, 2);
+            drawCharacter('/', screen.width - 288, 12, 2);
+            drawText(ThornhillUtils::int_to_ascii(time->fullYear), screen.width - 272, 12, 2);
 
-            drawText(ThornhillUtils::int_to_ascii(time->hours), screen.width - 180, 12, 2);
+            int intendedLength = 2;
+            char output[intendedLength + 1];
+
+            drawText(ThornhillUtils::pad_start(ThornhillUtils::int_to_ascii(time->hours), output, ' ', intendedLength), screen.width - 180, 12, 2);
             if(time->seconds % 2 != 0) drawCharacter(':', screen.width - 152, 12, 2);
-            drawText(ThornhillUtils::int_to_ascii(time->minutes), screen.width - 140, 12, 2);
+            drawText(ThornhillUtils::pad_start(ThornhillUtils::int_to_ascii(time->minutes), output, '0', intendedLength), screen.width - 140, 12, 2);
             if(time->seconds % 2 != 0) drawCharacter(':', screen.width - 112, 12, 2);
-            drawText(ThornhillUtils::int_to_ascii(time->seconds), screen.width - 100, 12, 2);
+            drawText(ThornhillUtils::pad_start(ThornhillUtils::int_to_ascii(time->seconds), output, '0', intendedLength), screen.width - 100, 12, 2);
             drawText(time->isPM ? "PM" : "AM", screen.width - 60, 12, 2);
         }
 
