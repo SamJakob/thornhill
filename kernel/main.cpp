@@ -47,6 +47,7 @@ extern "C" void _start(
 }
 
 extern "C" void interrupt_handler(interrupt_state_t interruptState) {
+
     ThornhillGraphics::clear(rgb(34, 34, 34));
 
     ThornhillGraphics::drawText("Thornhill", 20, 50, 6);
@@ -57,6 +58,7 @@ extern "C" void interrupt_handler(interrupt_state_t interruptState) {
 
     // For now, halt upon getting a CPU interrupt.
     for(;;) {}
+
 }
 
 extern "C" void interrupt_request_handler(interrupt_state_t interruptState) {

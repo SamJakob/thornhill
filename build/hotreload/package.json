@@ -1,0 +1,18 @@
+{
+  "name": "thornhill-build-hr",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sam Jakob Mearns <me@samjakob.com>",
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^3.4.2",
+    "consola": "^2.15.0",
+    "death": "^1.1.0",
+    "ora": "^5.0.0"
+  }
+}

@@ -154,8 +154,12 @@ thornhill:
 	make kernel
 	cp ./out/bootstrap/boot.img ./out/thornhill.img
 
+
+emulator:
+	qemu-system-x86_64 -qmp tcp:localhost:4444,server,nowait -bios /usr/share/qemu/OVMF.fd ./out/thornhill.img
+
 run:
-	qemu-system-x86_64 -bios /usr/share/qemu/OVMF.fd ./out/thornhill.img
+	node build/hotreload
 
 #debug: ./out/thornhill.raw ./out/kern_thornhill.elf
 #	qemu-system-x86_64 -s -S -fda ./out/thornhill.raw &

@@ -1,0 +1,12 @@
+{
+    "watchDirs": [
+        "./boot",
+        "./cpu",
+        "./cthorn",
+        "./drivers",
+        "./font",
+        "./kernel",
+        "linker.ld"
+    ],
+    "watchExec": "make thornhill"
+}

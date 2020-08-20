@@ -28,6 +28,7 @@ class ThornhillTimer {
             }
 
             ThornhillGraphics::drawStatusBar(&currentTime);
+            ThornhillGraphics::drawTTY();
             tick++;
         }
 
