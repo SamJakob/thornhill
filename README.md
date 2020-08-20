@@ -4,6 +4,8 @@
 
 ## Prerequisites
 
+- Node.js
+
 **Microsoft Windows:** you will need to install [Windows Subsystem for Linux 2 (WSL 2)](https://docs.microsoft.com/en-us/windows/wsl/install-win10) **and** the [VcXsrv X server](https://sourceforge.net/projects/vcxsrv/files/latest/download) for Windows. After you’ve installed VcXsrv, double click the `wsl-vcxsrv-config.xlaunch` file in the root of the repository. All of these commands should be executed from the WSL environment (easily accessed by opening a Command Prompt / PowerShell / Windows Terminal window and typing `wsl` at the prompt).
 
 
@@ -34,6 +36,11 @@ source ~/.bashrc
 # Install build dependencies
 sudo apt update
 sudo apt install gnu-efi mtools qemu-system
+
+# Install hot-reload dependencies
+cd build/hotreload
+npm install
+cd ..
 ```
 
 **Step 3: Build the system**
@@ -42,6 +49,13 @@ sudo apt install gnu-efi mtools qemu-system
 # Build the system
 make clean
 make thornhill
+make emulator
+```
+
+**Step 4: Start the hot-reload toolchain**
+
+```bash
+# Start the hot-reload toolchain
 make
 ```
 
@@ -53,8 +67,9 @@ make
 
 - `make thornhill`: Builds the system.
 
-- `make`: Runs QEMU with the built-in QEMU EFI firmware and the system image.
+- `make emulator`: Runs QEMU with the built-in QEMU EFI firmware and the system image.
 
+- `make`: Starts the hot-reload toolchain.
 
 
 ## Troubleshooting
