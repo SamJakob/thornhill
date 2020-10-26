@@ -9,6 +9,8 @@
 #include "handoff.h"
 #include "clock.h"
 
+#include "../config/system.h"
+
 int mem_compare(const void *aptr, const void *bptr, size_t n) {
     const unsigned char *a = aptr, *b = bptr;
 
@@ -293,13 +295,15 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
     LogBootMessage(SystemTable, L"Initializing graphics protocol...");
     EFI_GRAPHICS_OUTPUT_PROTOCOL* GOP;
     EFI_GRAPHICS_OUTPUT_MODE_INFORMATION* GraphicsOutputInfo;
+    UINT32 CurrentModeNumber;
+
     {
         Status = SystemTable->BootServices->LocateProtocol(&gEfiGraphicsOutputProtocolGuid, NULL, (void**) &GOP);
 
-        // Ensure the current graphics output mode is the maximum.
-        UINT32 CurrentModeNumber = GOP->Mode->Mode;
-
+        // TODO: Allow some kind of resolution selection - or auto detection, somehow?
         /*
+        UINT32 CurrentModeNumber = 0;
+
         UINTN SizeOfModeInfo;
         EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *ModeInfo;
 
@@ -308,17 +312,94 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
             CurrentModeNumber++;
         }
-        CurrentModeNumber--;*/
+        CurrentModeNumber--;
+        */
 
-        // GOP->SetMode(GOP, GOP->Mode->MaxMode - 1);
-        GOP->SetMode(GOP, 12);
+        CurrentModeNumber = 21;
 
         if (EFI_ERROR(Status)) {
             return ShowThornhillBootError(SystemTable, (CHAR16*) L"Failed to initialize graphics protocol.\r\n", Status);
         }
     }
-    
+
+    GOP->SetMode(GOP, CurrentModeNumber);
     LogBootMessage(SystemTable, L"Starting...\r\n");
+
+    if (TH_SYSTEM_DEBUG_MODE) {
+        const char* memoryTypes[] = {
+            L"EfiReservedMemoryType",           // (unused)
+            L"EfiLoaderCode",                   // (available)
+            L"EfiLoaderData",                   // (available)
+            L"EfiBootServicesCode",             // (available)
+            L"EfiBootServicesData",             // (available)
+            L"EfiRuntimeServicesCode",          // (reserved)
+            L"EfiRuntimeServicesData",          // (reserved)
+            L"EfiConventionalMemory",           // (available)
+            L"EfiUnusableMemory",               // (bad memory)
+            L"EfiACPIReclaimMemory",            // (reserved until ACPI enabled)
+            L"EfiACPIMemoryNVS",                // (reserved)
+            L"EfiMemoryMappedIO",               // (IO)
+            L"EfiMemoryMappedIOPortSpace",      // (IO)
+            L"EfiPalCode",                      // (reserved)
+            L"EfiMaxMemoryType"
+        };
+
+
+        Print(L"[THORNHILL DEBUG] Dumping entire memory map...\n\n");
+
+        uint8_t *startOfMemoryMap       = (uint8_t*) Map;
+        uint8_t *endOfMemoryMap         = startOfMemoryMap + MapSize;
+
+        uint8_t *offset = startOfMemoryMap;
+        uint32_t counter = 0;
+
+        uint64_t max = 0;
+
+        while (offset < endOfMemoryMap) {
+            EFI_MEMORY_DESCRIPTOR *descriptor = (EFI_MEMORY_DESCRIPTOR*) offset;
+
+/*
+            Print(L"Map %d:\n", counter);
+            Print(L"  Type: %X, %s\n", descriptor->Type, memoryTypes[descriptor->Type]);
+            Print(L"  PhysicalStart: %X\n", descriptor->PhysicalStart);
+            Print(L"  VirtualStart: %X\n", descriptor->VirtualStart);
+            Print(L"  NumberOfPages: %X  (4k)\n", descriptor->NumberOfPages);
+            Print(L"  Attribute: %X\n", descriptor->Attribute);
+*/
+            /* Map N | PhysicalStart | VirtualStart | NumberOfPages (4k) | Attribute | Type */
+            Print(
+                L"#%02d - %X | %X | %X | %X | %s\n",
+                counter,
+                descriptor->PhysicalStart,
+                descriptor->VirtualStart,
+                descriptor->NumberOfPages,
+                descriptor->Attribute,
+                memoryTypes[descriptor->Type]
+            );
+
+            EFI_INPUT_KEY inputKey;
+            SystemTable->ConIn->ReadKeyStroke(SystemTable->ConIn, &inputKey);
+
+            offset += DescriptorSize;
+            counter++;
+
+            max += descriptor->NumberOfPages * 4096;
+
+            if (counter % 15 == 0) {
+                // SystemTable->BootServices->Stall(5000000);
+            }
+
+        }
+
+        // SystemTable->BootServices->Stall(5000000);
+
+        Print(L"\n\n");
+        Print(L"Max Memory: %d MB\n", (max / 1048576));
+        Print(L"\n\n");
+        Print(L"[THORNHILL DEBUG] Stalling 5 seconds before system start...\n");
+        SystemTable->BootServices->Stall(5000000);
+    }
+
 
     /* ExitBootServices */
     
@@ -333,7 +414,8 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
     }
 
     if (EFI_ERROR(Status)) {
-        return ShowThornhillBootError(SystemTable, (CHAR16*) L"Failed to exit boot services after 3 attempts.\r\n", Status);
+        // Boot services could not be exited after 3 attempts.
+        return ShowThornhillBootError(SystemTable, (CHAR16*) L"Failed to exit bootloader after 3 attempts.\r\n", Status);
     }
 
     /* Prepare handoff data. */
@@ -357,7 +439,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
     HOData.screen = screen;
 
     /* Jump to start of kernel */
-    ((__attribute__((sysv_abi)) void (*)(void*)) kernelHeader.e_entry)(
+    ((void (*)(void*)) kernelHeader.e_entry)(
         (void*) &HOData
     );
 

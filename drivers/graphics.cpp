@@ -1,13 +1,13 @@
 #include "graphics.h"
 
 #include "clock.hpp"
-#include "io.cpp"
-#include "../kernel/utils.cpp"
+#include "io.hpp"
+#include "kernel/utils.cpp"
 
 #ifndef TH_DRIVER_GRAPHICS
 #define TH_DRIVER_GRAPHICS
 
-#include "../font/font8x8/font8x8_basic.hpp"
+#include "font/font8x8/font8x8_basic.hpp"
 
 #define FONT_CHARACTER_WIDTH 8
 #define FONT_CHARACTER_HEIGHT 8
@@ -91,36 +91,40 @@ class ThornhillGraphics {
             drawRect(rgb(29, 29, 29), 0, 0, screen.width, 40);
             drawText("Thornhill", 20, 12, 2);
 
-            drawText(ThornhillUtils::int_to_ascii(time->month), screen.width - 356, 12, 2);
+            drawText(THUtils::int_to_ascii(time->month), screen.width - 386, 12, 2);
             drawCharacter('/', screen.width - 340, 12, 2);
-            drawText(ThornhillUtils::int_to_ascii(time->day), screen.width - 320, 12, 2);
+            drawText(THUtils::int_to_ascii(time->day), screen.width - 320, 12, 2);
             drawCharacter('/', screen.width - 288, 12, 2);
-            drawText(ThornhillUtils::int_to_ascii(time->fullYear), screen.width - 272, 12, 2);
+            drawText(THUtils::int_to_ascii(time->fullYear), screen.width - 272, 12, 2);
 
             int intendedLength = 2;
             char output[intendedLength + 1];
 
-            drawText(ThornhillUtils::pad_start(ThornhillUtils::int_to_ascii(time->hours), output, ' ', intendedLength), screen.width - 180, 12, 2);
+            drawText(THUtils::pad_start(THUtils::int_to_ascii(time->hours), output, ' ', intendedLength), screen.width - 180, 12, 2);
             if(time->seconds % 2 != 0) drawCharacter(':', screen.width - 152, 12, 2);
-            drawText(ThornhillUtils::pad_start(ThornhillUtils::int_to_ascii(time->minutes), output, '0', intendedLength), screen.width - 140, 12, 2);
+            drawText(THUtils::pad_start(THUtils::int_to_ascii(time->minutes), output, '0', intendedLength), screen.width - 140, 12, 2);
             if(time->seconds % 2 != 0) drawCharacter(':', screen.width - 112, 12, 2);
-            drawText(ThornhillUtils::pad_start(ThornhillUtils::int_to_ascii(time->seconds), output, '0', intendedLength), screen.width - 100, 12, 2);
+            drawText(THUtils::pad_start(THUtils::int_to_ascii(time->seconds), output, '0', intendedLength), screen.width - 100, 12, 2);
             drawText(time->isPM ? "PM" : "AM", screen.width - 60, 12, 2);
         }
 
         static void drawTTY() {
 
-            // drawRect(rgb(30, 30, 30), 122, 122, screen.width - 118, screen.height - 118);
-            // window background
+            int termWidth = screen.width - 240;
+            int termHeight = screen.height - 240;
+
+            // window border
+            drawRect(rgb(30, 30, 30), 122, 122, termWidth + 4, termHeight + 24);
+            drawRect(rgb(255, 255, 255), 119, 119, termWidth + 2, termHeight + 22);
 
             // title bar
-            drawRect(rgb(192, 192, 192), 120, 120, screen.width - 240, 20);
+            drawRect(rgb(192, 192, 192), 120, 120, termWidth, 20);
 
             // title bar text
-            drawText("Terminal Emulator", 140, 127);
+            drawText("Pasta is straight until it’s wet", 140, 127);
 
             // window content
-            drawRect(rgb(0, 0, 0), 120, 140, screen.width - 240, screen.height - 240);
+            drawRect(rgb(0, 0, 0), 120, 140, termWidth, termHeight);
 
         }
 

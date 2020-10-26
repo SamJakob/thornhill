@@ -18,7 +18,8 @@ const logger = Consola.create();
 //
 const startWatcher = () => {
     const watcher = Chokidar.watch(config.watchDirs, {
-        persistent: true
+        persistent: true,
+        usePolling: true
     });
 
     watcher.on('change', () => {

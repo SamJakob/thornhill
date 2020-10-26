@@ -1,7 +1,7 @@
 #ifndef THORNHILL_UTILS
 #define THORNHILL_UTILS
 
-namespace ThornhillUtils {
+namespace THUtils {
 
     int strlen(const char* str) {
         int len = 0;

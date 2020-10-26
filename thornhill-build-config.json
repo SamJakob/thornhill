@@ -2,7 +2,7 @@
     "watchDirs": [
         "./boot",
         "./cpu",
-        "./cthorn",
+        "./lib",
         "./drivers",
         "./font",
         "./kernel",

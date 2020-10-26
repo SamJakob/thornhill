@@ -87,7 +87,7 @@ if (!($confirmation.ToLower() -eq 'y')) {
 
 #>
 
-Write-Host "If you continue, $($image) will be written to /dev/sdc1.";
+Write-Host "If you continue, $($image) will be written to /dev/sdd1.";
 Write-Host "You may want to cat /proc/partitions first.";
 Write-Host "";
 $confirmation = Read-Host "Do you wish to continue? (y/N)"
@@ -98,5 +98,5 @@ if (!($confirmation.ToLower() -eq 'y')) {
 }
 
 # Perform the actions.
-$ddParameters = "if=$($image)", "of=/dev/sdc1", "bs=102400", "status=progress"
+$ddParameters = "if=$($image)", "of=/dev/sdd1", "bs=102400", "status=progress"
 & $dd $ddParameters

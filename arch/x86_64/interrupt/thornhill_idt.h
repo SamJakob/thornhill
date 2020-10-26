@@ -1,5 +1,3 @@
-#include "../process/thornhill_process.h"
-
 #ifndef TH_KERN_IDT_H
 #define TH_KERN_IDT_H
 

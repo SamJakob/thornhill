@@ -14,17 +14,6 @@
 # =========================================================================== #
 
 #
-# Notes
-#
-
-# The barebones-toolchain used in this project can be found here:
-# https://github.com/rm-hull/barebones-toolchain
-
-
-
-# =========================================================================== #
-
-#
 # General Options
 #
 ARCH				= x86_64
@@ -52,13 +41,11 @@ endif
 #
 # System Options
 #
-# CC	 			= ~/barebones-toolchain/cross/x86_64/bin/i686-elf-gcc
-# CXX 				= ~/barebones-toolchain/cross/x86_64/bin/i686-elf-g++
 GDB		 			= gdb
 
 ELF_FORMAT			= elf64
 
-C_SOURCES 			= $(wildcard kernel/*.cpp drivers/*.cpp cpu/${ARCH}/*.cpp)
+C_SOURCES 			= $(wildcard kernel/*.cpp drivers/*.cpp arch/${ARCH}/*.cpp)
 HEADERS				= $(wildcard kernel/*.h drivers/*.h)
 
 #OBJ					= ${HEADERS}
@@ -106,7 +93,8 @@ ${BOOT_IMAGE}:
 	make ./out/bootstrap/BOOTX64.EFI
 
 	# Make FAT image.
-	dd if=/dev/zero of=${BOOT_IMAGE} bs=512 count=90000
+	dd if=/dev/zero of=/tmp/thornboot.img bs=512 count=90000
+	mv /tmp/thornboot.img ${BOOT_IMAGE}
 	mkfs.fat -v -F 32 -S 512 -s 1 ${BOOT_IMAGE} -n THORNHILL
 	mmd -i ${BOOT_IMAGE} ::/EFI
 	mmd -i ${BOOT_IMAGE} ::/EFI/BOOT
@@ -116,22 +104,22 @@ ${BOOT_IMAGE}:
 #
 # CPU
 #
-CPU_ARCH = ./cpu/${ARCH}
+CPU_ARCH = ./arch/${ARCH}
 
-./out/system/memory/gdt_loader.o: ${CPU_ARCH}/gdt_loader.s
+./out/system/${ARCH}/gdt_loader.o: ${CPU_ARCH}/gdt/gdt_loader.s
 	as $< -o $@
-OBJ += ./out/system/memory/gdt_loader.o
+OBJ += ./out/system/${ARCH}/gdt_loader.o
 
-./out/system/memory/interrupt_handler.o: ${CPU_ARCH}/interrupt_handler.s
+./out/system/${ARCH}/interrupt_handler.o: ${CPU_ARCH}/interrupt/interrupt_handler.s
 	as $< -o $@
-OBJ += ./out/system/memory/interrupt_handler.o
+OBJ += ./out/system/${ARCH}/interrupt_handler.o
 
 
 #
 # Kernel
 #
 ./out/system/kern_thornhill.o: ./kernel/main.cpp
-	${CXX} -ffreestanding -n -Wl,--gc-sections -I${CPU_ARCH} -T linker.ld -c $< -o $@ -O2 -Wall -Wextra -nostdlib -mgeneral-regs-only -mno-red-zone
+	${CXX} -ffreestanding -n -Wl,--gc-sections -I. -I${CPU_ARCH} -T linker.ld -c $< -o $@ -O2 -Wall -Wextra -nostdlib -mgeneral-regs-only -mno-red-zone
 
 ${KERNEL}: ./out/system/kern_thornhill.o ${OBJ}
 	${CXX} $^ -nostdlib -Wl,--gc-sections -mgeneral-regs-only -mno-red-zone -o $@
@@ -156,9 +144,14 @@ thornhill:
 
 
 emulator:
-	qemu-system-x86_64 -qmp tcp:localhost:4444,server,nowait -bios /usr/share/qemu/OVMF.fd ./out/thornhill.img
+	qemu-system-x86_64 -qmp tcp:localhost:4444,server,nowait -bios /usr/share/qemu/OVMF.fd ./out/thornhill.img -monitor stdio
 
 run:
+	$(info Running preliminary build...)
+	make bootstrap
+	make kernel
+	cp ./out/bootstrap/boot.img ./out/thornhill.img
+	$(info Starting hot reload...)
 	node build/hotreload
 
 #debug: ./out/thornhill.raw ./out/kern_thornhill.elf
@@ -178,9 +171,8 @@ clean:
 _prepareOutputStructure:
 	mkdir ./out
 	mkdir ./out/bootstrap
-	mkdir ./out/cpu
 	mkdir ./out/system
-	mkdir ./out/system/memory
+	mkdir ./out/system/${ARCH}
 
 #
 # Generic Wildcard Rules

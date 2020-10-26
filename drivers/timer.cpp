@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include "graphics.cpp"
-#include "io.cpp"
-#include "../kernel/interrupt/interrupt.cpp"
+#include "io.hpp"
 #include "../kernel/utils.cpp"
 
 #ifndef TH_DRIVER_TIMER
@@ -28,7 +27,6 @@ class ThornhillTimer {
             }
 
             ThornhillGraphics::drawStatusBar(&currentTime);
-            ThornhillGraphics::drawTTY();
             tick++;
         }
 

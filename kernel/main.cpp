@@ -1,13 +1,24 @@
 extern "C" {
-    #include "../boot/handoff.h"
+    #include "boot/handoff.h"
 }
 
-#include "../drivers/clock.cpp"
-#include "../drivers/graphics.cpp"
-#include "../drivers/timer.cpp"
-#include "memory/gdt.cpp"
+#include "arch/x86_64/include.cpp"
+
+#include "drivers/io.cpp"
+#include "drivers/clock.cpp"
+#include "drivers/graphics.cpp"
+#include "drivers/timer.cpp"
+#include "drivers/hardware/keyboard.cpp"
+
 #include "interrupt/interrupt.cpp"
 #include "utils.cpp"
+
+#include "memory/physical.cpp"
+
+#include "lib/thornhill.cpp"
+using namespace Thornhill;
+// #include "../lib/posix.cpp"
+// using namespace POSIX;
 
 void main(ThornhillHandoff* thornhillHandoff) {
 
@@ -25,12 +36,29 @@ void main(ThornhillHandoff* thornhillHandoff) {
     // Re-enable interrupts.
     ThornhillInterrupt::setAllowInterrupts(true);
 
+    /*
+    // Test memory.
+    int* pointer = 0;
+
+    for (unsigned int i = 0; i <= 0xBFFFFFFF; i++) {
+        (*pointer)++;
+        pointer++;
+    }
+    */
+
     // Draw the interface.
     ThornhillGraphics::drawStatusBar(&startupTime);
+
+    // Register the keyboard driver.
+    ThornhillKeyboard::initialize();
 
 
     /** KERNEL **/
     ThornhillTimer::initialize(20, startupTime);
+    ThornhillGraphics::drawTTY();
+
+    // sprintf(buf, "%s", "hello");
+    // ThornhillGraphics::drawText(buf, 130, 150);
 
 }
 
@@ -46,18 +74,26 @@ extern "C" void _start(
 
 }
 
-extern "C" void interrupt_handler(interrupt_state_t interruptState) {
+void Kernel::panic(const char* reason, uint64_t interruptNumber) {
 
     ThornhillGraphics::clear(rgb(34, 34, 34));
 
     ThornhillGraphics::drawText("Thornhill", 20, 50, 6);
     ThornhillGraphics::drawText("// Your computer needs to be restarted.", 20, 100, 2);
-    
-    ThornhillGraphics::drawText(ThornhillUtils::int_to_ascii(interruptState.int_no), 20, 150, 2);
-    ThornhillGraphics::drawText(exceptionMessages[interruptState.int_no], 20, 170, 2);
 
-    // For now, halt upon getting a CPU interrupt.
+
+    ThornhillGraphics::drawText(THUtils::int_to_ascii(interruptNumber), 20, 150, 2);
+    ThornhillGraphics::drawText(reason, 20, 170, 2);
+
+
+    // For now, halt upon getting a kernel panic.
     for(;;) {}
+
+}
+
+extern "C" void interrupt_handler(interrupt_state_t interruptState) {
+
+    Kernel::panic(exceptionMessages[interruptState.int_no], interruptState.int_no);
 
 }
 
