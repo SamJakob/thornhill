@@ -54,7 +54,7 @@ ThornhillSystemTime ThornhillClock::readOfflineTime() {
 
     // Apply time offset.
     // ThornhillClock::applyTimeZone(&time, &TH_TIMEZONE_NEW_BRAUNFELS, true);
-    ThornhillClock::applyTimeZone(&time, &TH_TIMEZONE_LONDON, true);
+    ThornhillClock::applyTimeZone(&time, &TH_TIMEZONE_LONDON, false);
 
     return time;
 

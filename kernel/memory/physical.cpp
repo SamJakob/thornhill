@@ -1,4 +1,4 @@
-#include "physical.h"
+#include "physical.hpp"
 #include "lib/thornhill.cpp"
 
 using namespace Thornhill;

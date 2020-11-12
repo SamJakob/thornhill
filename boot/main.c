@@ -6,10 +6,63 @@
 #include <efilib.h>
 #include <efivar.h>
 
-#include "handoff.h"
+#include "handoff/handoff.h"
 #include "clock.h"
 
 #include "../config/system.h"
+
+const char* memoryTypes[] = {
+    L"EfiReservedMemoryType",           // (unused)
+    L"EfiLoaderCode",                   // (available)
+    L"EfiLoaderData",                   // (available)
+    L"EfiBootServicesCode",             // (available)
+    L"EfiBootServicesData",             // (available)
+    L"EfiRuntimeServicesCode",          // (reserved)
+    L"EfiRuntimeServicesData",          // (reserved)
+    L"EfiConventionalMemory",           // (available)
+    L"EfiUnusableMemory",               // (bad memory)
+    L"EfiACPIReclaimMemory",            // (reserved until ACPI enabled)
+    L"EfiACPIMemoryNVS",                // (reserved)
+    L"EfiMemoryMappedIO",               // (IO)
+    L"EfiMemoryMappedIOPortSpace",      // (IO)
+    L"EfiPalCode",                      // (reserved)
+    L"EfiMaxMemoryType"
+};
+
+ThornhillMemoryType uefiToThornhillMemoryType(EFI_MEMORY_TYPE memoryType) {
+
+    switch (memoryType) {
+        case EfiLoaderCode:
+        case EfiLoaderData:
+        case EfiBootServicesCode:
+        case EfiBootServicesData:
+        case EfiConventionalMemory:
+            return THAvailableMemory;
+
+        case EfiRuntimeServicesCode:
+        case EfiRuntimeServicesData:
+        case EfiACPIMemoryNVS:
+        case EfiPalCode:
+            return THReservedMemory;
+
+        case EfiReservedMemoryType:
+            return THUnusedMemory;
+        
+        case EfiUnusableMemory:
+            return THBadMemory;
+        
+        case EfiMemoryMappedIO:
+        case EfiMemoryMappedIOPortSpace:
+            return THIOMemory;
+        
+        case EfiACPIReclaimMemory:
+            return THACPIReclaimMemory;
+        
+        default:
+            return THUnusedMemory;
+    }
+
+}
 
 int mem_compare(const void *aptr, const void *bptr, size_t n) {
     const unsigned char *a = aptr, *b = bptr;
@@ -323,85 +376,46 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
     }
 
     GOP->SetMode(GOP, CurrentModeNumber);
-    LogBootMessage(SystemTable, L"Starting...\r\n");
+    LogBootMessage(SystemTable, L"Reading memory map...\r\n");
 
-    if (TH_SYSTEM_DEBUG_MODE) {
-        const char* memoryTypes[] = {
-            L"EfiReservedMemoryType",           // (unused)
-            L"EfiLoaderCode",                   // (available)
-            L"EfiLoaderData",                   // (available)
-            L"EfiBootServicesCode",             // (available)
-            L"EfiBootServicesData",             // (available)
-            L"EfiRuntimeServicesCode",          // (reserved)
-            L"EfiRuntimeServicesData",          // (reserved)
-            L"EfiConventionalMemory",           // (available)
-            L"EfiUnusableMemory",               // (bad memory)
-            L"EfiACPIReclaimMemory",            // (reserved until ACPI enabled)
-            L"EfiACPIMemoryNVS",                // (reserved)
-            L"EfiMemoryMappedIO",               // (IO)
-            L"EfiMemoryMappedIOPortSpace",      // (IO)
-            L"EfiPalCode",                      // (reserved)
-            L"EfiMaxMemoryType"
-        };
+    HandoffMemoryMap handoffMemoryMap;
 
+    {
+        UINTN *startOfMemoryMap       = (UINTN*) Map;
+        UINTN *endOfMemoryMap         = startOfMemoryMap + MapSize;
 
-        Print(L"[THORNHILL DEBUG] Dumping entire memory map...\n\n");
+        handoffMemoryMap.segmentSize = sizeof(HandoffMemorySegment);
 
-        uint8_t *startOfMemoryMap       = (uint8_t*) Map;
-        uint8_t *endOfMemoryMap         = startOfMemoryMap + MapSize;
+        // The max possible segments of our handoff memory map is that
+        // which is provided by the UEFI.
+        // Though, it is likely less because we will amalgamate all
+        // contigious available memory segments into one segment.
+        size_t maxSegments = (endOfMemoryMap - startOfMemoryMap) / DescriptorSize;
+        HandoffMemorySegment handoffMemorySegments[maxSegments * handoffMemoryMap.segmentSize];
 
-        uint8_t *offset = startOfMemoryMap;
-        uint32_t counter = 0;
-
-        uint64_t max = 0;
+        UINTN *offset = startOfMemoryMap;
+        size_t segmentIndex = 0;
 
         while (offset < endOfMemoryMap) {
             EFI_MEMORY_DESCRIPTOR *descriptor = (EFI_MEMORY_DESCRIPTOR*) offset;
 
-/*
-            Print(L"Map %d:\n", counter);
-            Print(L"  Type: %X, %s\n", descriptor->Type, memoryTypes[descriptor->Type]);
-            Print(L"  PhysicalStart: %X\n", descriptor->PhysicalStart);
-            Print(L"  VirtualStart: %X\n", descriptor->VirtualStart);
-            Print(L"  NumberOfPages: %X  (4k)\n", descriptor->NumberOfPages);
-            Print(L"  Attribute: %X\n", descriptor->Attribute);
-*/
-            /* Map N | PhysicalStart | VirtualStart | NumberOfPages (4k) | Attribute | Type */
-            Print(
-                L"#%02d - %X | %X | %X | %X | %s\n",
-                counter,
-                descriptor->PhysicalStart,
-                descriptor->VirtualStart,
-                descriptor->NumberOfPages,
-                descriptor->Attribute,
-                memoryTypes[descriptor->Type]
-            );
+            // TODO: Merge contiguous available memory. (remember to change mapSize)
 
-            EFI_INPUT_KEY inputKey;
-            SystemTable->ConIn->ReadKeyStroke(SystemTable->ConIn, &inputKey);
+            handoffMemorySegments[segmentIndex].memoryType = uefiToThornhillMemoryType(descriptor->Type);
+            handoffMemorySegments[segmentIndex].physicalBaseAddress = descriptor->PhysicalStart;
+            handoffMemorySegments[segmentIndex].pageCount = descriptor->NumberOfPages;
 
+            segmentIndex++;
             offset += DescriptorSize;
-            counter++;
-
-            max += descriptor->NumberOfPages * 4096;
-
-            if (counter % 15 == 0) {
-                // SystemTable->BootServices->Stall(5000000);
-            }
-
         }
 
-        // SystemTable->BootServices->Stall(5000000);
-
-        Print(L"\n\n");
-        Print(L"Max Memory: %d MB\n", (max / 1048576));
-        Print(L"\n\n");
-        Print(L"[THORNHILL DEBUG] Stalling 5 seconds before system start...\n");
-        SystemTable->BootServices->Stall(5000000);
+        handoffMemoryMap.segments = handoffMemorySegments;
+        handoffMemoryMap.mapSize = maxSegments * handoffMemoryMap.segmentSize;
     }
 
 
     /* ExitBootServices */
+    LogBootMessage(SystemTable, L"Starting...\r\n");
     
     Status = SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);
     if (EFI_ERROR(Status)) {
@@ -421,14 +435,10 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
     /* Prepare handoff data. */
     ThornhillHandoff HOData;
 
-    // Memory Map
-    HandoffEfiMemoryMap* HOMemoryMap;
-    HOMemoryMap->memory_map = Map;
-    HOMemoryMap->map_size = MapSize;
-    HOMemoryMap->desc_size = DescriptorSize;
-    HOData.memoryMap = HOMemoryMap;
+    // -> MemoryMap
+    HOData.memoryMap = handoffMemoryMap;
 
-    // GOP
+    // -> GOP
     Screen screen;
     screen.width = GOP->Mode->Info->HorizontalResolution;
     screen.height = GOP->Mode->Info->VerticalResolution;

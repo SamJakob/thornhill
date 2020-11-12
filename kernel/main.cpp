@@ -1,5 +1,5 @@
 extern "C" {
-    #include "boot/handoff.h"
+    #include "boot/handoff/handoff.h"
 }
 
 #include "arch/x86_64/include.cpp"
@@ -13,7 +13,7 @@ extern "C" {
 #include "interrupt/interrupt.cpp"
 #include "utils.cpp"
 
-#include "memory/physical.cpp"
+#include "memory/manager.cpp"
 
 #include "lib/thornhill.cpp"
 using namespace Thornhill;
@@ -25,6 +25,9 @@ void main(ThornhillHandoff* thornhillHandoff) {
     // Read startup time.
     ThornhillSystemTime startupTime = ThornhillClock::readOfflineTime();
 
+    // Start memory management.
+    ThornhillMemoryManager::initialize(thornhillHandoff->memoryMap);
+
     /** INITIAL SETUP **/
 
     // Initialize the display and timer.
@@ -32,8 +35,6 @@ void main(ThornhillHandoff* thornhillHandoff) {
 
     // Register the new interrupt handlers.
     ThornhillInterrupt::setupInterrupts();
-
-    // Re-enable interrupts.
     ThornhillInterrupt::setAllowInterrupts(true);
 
     /*
@@ -74,7 +75,7 @@ extern "C" void _start(
 
 }
 
-void Kernel::panic(const char* reason, uint64_t interruptNumber) {
+void Kernel::panic(const char* reason, uint64_t interruptNumber = 69) {
 
     ThornhillGraphics::clear(rgb(34, 34, 34));
 
@@ -82,8 +83,12 @@ void Kernel::panic(const char* reason, uint64_t interruptNumber) {
     ThornhillGraphics::drawText("// Your computer needs to be restarted.", 20, 100, 2);
 
 
-    ThornhillGraphics::drawText(THUtils::int_to_ascii(interruptNumber), 20, 150, 2);
-    ThornhillGraphics::drawText(reason, 20, 170, 2);
+    if (interruptNumber != 69) {
+        ThornhillGraphics::drawText(THUtils::int_to_ascii(interruptNumber), 20, 150, 2);
+        ThornhillGraphics::drawText(reason, 20, 170, 2);
+    } else {
+        ThornhillGraphics::drawText(reason, 20, 150, 2);
+    }
 
 
     // For now, halt upon getting a kernel panic.

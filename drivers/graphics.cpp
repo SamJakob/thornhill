@@ -121,7 +121,7 @@ class ThornhillGraphics {
             drawRect(rgb(192, 192, 192), 120, 120, termWidth, 20);
 
             // title bar text
-            drawText("Pasta is straight until it’s wet", 140, 127);
+            drawText("System Window", 140, 127);
 
             // window content
             drawRect(rgb(0, 0, 0), 120, 140, termWidth, termHeight);

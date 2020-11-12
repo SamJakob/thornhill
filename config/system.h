@@ -1,6 +1,6 @@
 #ifndef TH_SYSTEM_CONFIGURATION
 #define TH_SYSTEM_CONFIGURATION
 
-#define TH_SYSTEM_DEBUG_MODE true
+#define TH_SYSTEM_DEBUG_MODE false
 
 #endif
