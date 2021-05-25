@@ -2,7 +2,7 @@
 <project version="4">
   <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="Ubuntu WSL (4e4dbf4f-dd9a-406e-b4ea-27d5029e4b57)">
+      <paths name="WSL (59a55274-1772-448a-bca9-aebd85f58ac4)">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />

@@ -1,5 +1,5 @@
 /*
- * The expected use of this class is to be included in the relevant archiotecture's "include.cpp"
+ * The expected use of this class is to be included in the relevant architecture's "include.hpp"
  * file.
  */
 

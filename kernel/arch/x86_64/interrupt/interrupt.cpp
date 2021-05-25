@@ -1,12 +1,12 @@
-#include <stdbool.h>
-#include <stdint.h>
+#include <drivers/io.hpp>
+#include <cstdint>
 
 #ifndef TH_KERN_IDT
 #define TH_KERN_IDT
 
 extern "C" {
-    #include "../gdt/thornhill_gdt.h"
-    #include "kernel/process/thornhill_process.h"
+    #include "kernel/arch/x86_64/gdt/thornhill_gdt.h"
+#include "kernel/process/thornhill_process.h"
 
     #include "thornhill_idt.h"
     #include "thornhill_isr.h"

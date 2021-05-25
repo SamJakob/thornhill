@@ -66,7 +66,7 @@ ThornhillSystemTime ThornhillClock::readOfflineTime() {
     while (isRTCUpdateInProgress()) {}
     time2 = _performOfflineTimeRead();
 
-    if (compareSystemTime(&time, &time2)) return time;
+    if (THCompareSystemTime(&time, &time2)) return time;
     else return readOfflineTime();*/
 }
 

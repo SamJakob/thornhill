@@ -1,25 +1,28 @@
 # Thornhill
 
-
-
 ## Prerequisites
 
 - Node.js
-
-**Microsoft Windows:** you will need to install [Windows Subsystem for Linux 2 (WSL 2)](https://docs.microsoft.com/en-us/windows/wsl/install-win10) **and** the [VcXsrv X server](https://sourceforge.net/projects/vcxsrv/files/latest/download) for Windows. After you’ve installed VcXsrv, double click the `wsl-vcxsrv-config.xlaunch` file in the root of the repository. All of these commands should be executed from the WSL environment (easily accessed by opening a Command Prompt / PowerShell / Windows Terminal window and typing `wsl` at the prompt).
-
-
+- **(Microsoft Windows only):** you will need to install [Windows Subsystem for Linux 2 (WSL 2)](https://docs.microsoft.com/en-us/windows/wsl/install-win10) **and** the [VcXsrv X server](https://sourceforge.net/projects/vcxsrv/files/latest/download) for Windows. After you’ve installed VcXsrv, double click the `wsl-vcxsrv-config.xlaunch` file in the root of the repository. All of these commands should be executed from the WSL environment (easily accessed by opening a Command Prompt / PowerShell / Windows Terminal window and typing `wsl` at the prompt).
+  
 
 ## Setup
 
-**Step 1: Install [@rm-hull](https://github.com/rm-hull)’s Barebones Toolchain**
+**Step 1: Ensure the necessary compilers/dependencies are installed.**
 
 ```bash
-# Install Barebones Toolchain
-mkdir ~/sdk
-git clone https://github.com/rm-hull/barebones-toolchain ~/sdk/barebones-toolchain
-echo ". ~/sdk/barebones-toolchain/setenv.sh" >> ~/.bashrc
-source ~/.bashrc
+# Install compilers
+sudo apt install gcc g++ buildessentials cmake
+
+# NOTE: cmake must be version >= 3.20, if this is not yet available in your distro, you can build
+# from source. (I recommend checking GitHub releases to ensure you're getting the latest version.)
+sudo apt install libssl-dev
+wget https://github.com/Kitware/CMake/releases/download/v3.20.2/cmake-3.20.2.tar.gz
+tar -zxvf cmake-3.20.2.tar.gz
+cd cmake-3.20.2
+./bootstrap
+make -j 8
+sudo make install
 ```
 
 **(Windows Only): Enable Display Output for WSL**
@@ -34,13 +37,14 @@ source ~/.bashrc
 
 ```bash
 # Install build dependencies
-sudo apt update
+# (qemu-system isn't a build dep, obviously, but it's sure useful to test with.)
+sudo apt update 
 sudo apt install gnu-efi mtools qemu-system
 
 # Install hot-reload dependencies
 cd build/hotreload
-npm install
-cd ..
+yarn                  # (to install dependencies)
+cd ../..
 ```
 
 **Step 3: Build the system**

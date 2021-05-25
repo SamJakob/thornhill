@@ -20,7 +20,7 @@ struct ThornhillSystemTime {
 
 };
 
-bool compareSystemTime(struct ThornhillSystemTime timeA, struct ThornhillSystemTime timeB) {
+bool THCompareSystemTime(struct ThornhillSystemTime timeA, struct ThornhillSystemTime timeB) {
     return timeA.year == timeB.year &&
         timeA.fullYear == timeB.fullYear &&
         timeA.month == timeB.month &&

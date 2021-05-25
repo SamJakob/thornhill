@@ -11,3 +11,4 @@ out/**
 **/notes.txt
 
 .vscode/**
+cmake-build*/**

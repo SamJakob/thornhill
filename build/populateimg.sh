@@ -1,0 +1,1 @@
+mcopy -i thornhill.img kernel ::/

@@ -9,10 +9,17 @@ ENTRY(_start)
 	Thornhill has a higher-half kernel.
 	As the OS is designed for x86_64 architecture, the kernel's sections will be page-aligned to 4KiB pages.
 */
-kernel_base = 0xFFFFFFFF_80000000;
-kernel_base_phys = 0x100000;
+kernel_base = 0xFFFFFFFF80000000;
+kernel_base_phys = 2M;
 
 kernel_start = kernel_base + kernel_base_phys;
+
+PHDRS {
+    headers PT_PHDR FILEHDR PHDRS;
+    /*text PT_LOAD FILEHDR PHDRS;
+    data PT_LOAD;*/
+    code PT_LOAD;
+}
 
 SECTIONS {
 	/*
@@ -30,7 +37,7 @@ SECTIONS {
 	*/
 	.text ALIGN(4K) : {
 		*(.text*)
-	}
+	} :code
 
 	/*
 		Read-only data.

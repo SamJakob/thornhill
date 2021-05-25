@@ -1,36 +1,50 @@
 #include <stddef.h>
 #include <stdint.h>
 
+extern "C" {
+#include "boot/handoff/memory.h"
+}
+
+#pragma once
+
 namespace ThornhillMemory {
 
-    class Physical {
+/*
+struct PhysicalMemorySlab {
+    PhysicalMemorySlab* next;
+    PhysicalMemorySlab* prev;
+    bool allocated;
+    size_t size;
+};
+*/
 
-        private:
-            static uint8_t MEMORY[1024 * 1024 / 8];
+class Physical {
 
-            static size_t totalMemory;
-            static size_t usedMemory;
-        
-        public:
-            //
-            // Getters
-            //
+  private:
+    static bool isPhysicalAllocatorInitialized;
+    static uint8_t MEMORY[1024 * 1024 / 8];
 
-            static size_t getTotalMemory() {
-                return totalMemory;
-            }
+    static size_t totalMemory;
+    static size_t usedMemory;
 
-            static size_t getUsedMemory() {
-                return usedMemory;
-            }
+  public:
+    //
+    // Getters
+    //
+    static bool isInitialized() { return isPhysicalAllocatorInitialized; }
 
+    static size_t getUsedMemory() { return usedMemory; }
 
-            //
-            // Memory Management Functions
-            //
+    static size_t getTotalMemory() { return totalMemory; }
 
-            static void allocate(size_t memorySize);
+    //
+    // Memory Management Functions
+    //
+    static void reset();
 
-    };
+    static void initialize(HandoffMemoryMap handoffMemoryMap);
 
-}
+    static void allocate(size_t memorySize);
+};
+
+} // namespace ThornhillMemory

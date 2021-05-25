@@ -14,35 +14,42 @@ typedef enum {
 
     /**
      * @brief  Memory that is reserved for the UEFI.
-     * @note   
+     * @note
      * @retval None
      */
     THReservedMemory,
 
     /**
+     * @brief  Memory that is retained for the kernel.
+     * @note
+     * @retval None
+     */
+    THKernelMemory,
+
+    /**
      * @brief  Memory that is reserved and which cannot be used by the system.
-     * @note   
+     * @note
      * @retval None
      */
     THUnusedMemory,
 
     /**
      * @brief  Memory that has failed tests and is considered unreliable for use.
-     * @note   
+     * @note
      * @retval None
      */
     THBadMemory,
 
     /**
      * @brief  Memory that is reserved by the UEFI for IO.
-     * @note   
+     * @note
      * @retval None
      */
     THIOMemory,
 
     /**
      * @brief  ACPI Reclaim Memory.
-     * @note   
+     * @note
      * @retval None
      */
     THACPIReclaimMemory
@@ -57,7 +64,7 @@ typedef struct {
 } HandoffMemorySegment;
 
 typedef struct {
-    
+
     HandoffMemorySegment* segments;
     size_t mapSize;
     size_t segmentSize;

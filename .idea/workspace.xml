@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="thornhill" targetName="BOOTX64.so" />
+      <config projectName="thornhill" targetName="thornhill" />
+      <config projectName="thornhill" targetName="gdt_loader.o" />
+      <config projectName="thornhill" targetName="populate-thornhill.img" />
+      <config projectName="thornhill" targetName="interrupt_handler.o" />
+      <config projectName="thornhill" targetName="emulator" />
+      <config projectName="thornhill" targetName="bootloader" />
+      <config projectName="thornhill" targetName="BOOTX64.EFI" />
+      <config projectName="thornhill" targetName="thornhill.img" />
+      <config projectName="thornhill" targetName="kernel" />
+    </generated>
+  </component>
+  <component name="CMakeSettings" AUTO_RELOAD="true">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" ENABLED="true" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7f2185c6-23b3-48e6-ab33-45755c79bb2a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/discord.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/boot/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/boot_old/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/mkimg.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/populateimg.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/startemulator.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/kernel/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/kernel/arch/x86_64/.gitkeep" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/kernel/arch/x86_64/include.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/kernel/cmake_install.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/thornhill.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/thornhill.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/OldMakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arch/memory.h" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/arch/memory.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arch/x86_64/.gitkeep" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arch/x86_64/gdt/gdt.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/arch/x86_64/gdt/gdt.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arch/x86_64/gdt/gdt_loader.s" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/arch/x86_64/gdt/gdt_loader.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arch/x86_64/gdt/thornhill_gdt.h" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/arch/x86_64/gdt/thornhill_gdt.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arch/x86_64/include.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/arch/x86_64/interrupt/interrupt.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/arch/x86_64/interrupt/interrupt.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arch/x86_64/interrupt/interrupt_handler.s" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/arch/x86_64/interrupt/interrupt_handler.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arch/x86_64/interrupt/thornhill_idt.h" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/arch/x86_64/interrupt/thornhill_idt.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arch/x86_64/interrupt/thornhill_isr.h" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/arch/x86_64/interrupt/thornhill_isr.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/clock.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/handoff/handoff.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/handoff/handoff.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/handoff/handoff_memory.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/boot/main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drivers/clock.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/clock.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drivers/clock.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/clock.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drivers/graphics.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/graphics.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drivers/graphics.h" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/graphics.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drivers/io.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/io.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drivers/timer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/drivers/timer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kernel/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kernel/memory/manager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/memory/manager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kernel/memory/manager.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/memory/manager.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kernel/memory/physical.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/memory/physical.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kernel/memory/physical.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/memory/physical.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/thornhill/kernel.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/lib/thornhill/kernel.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linker.ld" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/linker.ld" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CMakeLists.txt" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1t0AWq7UOzKPWa1qNU5Wut2cyAk" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="cf.advertisement.text.overridden" value="true" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="cidr.known.project.marker" value="true" />
+    <property name="cmake.loaded.for.project" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/boot" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\thornhill\boot" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\thornhill\kernel" />
+    </key>
+  </component>
+  <component name="RunManager" selected="CMake Application.thornhill">
+    <configuration name="BOOTX64.EFI" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="BOOTX64.EFI" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BOOTX64.so" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="BOOTX64.so" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="bootloader" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="bootloader" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="emulator" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="emulator" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="gdt_loader.o" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="gdt_loader.o" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="interrupt_handler.o" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="interrupt_handler.o" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="kernel" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="kernel" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="thornhill" RUN_TARGET_NAME="kernel">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="populate-thornhill.img" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="populate-thornhill.img" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="thornhill" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="thornhill" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="thornhill.img" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="thornhill.img" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.emulator" />
+      <item itemvalue="CMake Application.bootloader" />
+      <item itemvalue="CMake Application.BOOTX64.EFI" />
+      <item itemvalue="CMake Application.BOOTX64.so" />
+      <item itemvalue="CMake Application.thornhill.img" />
+      <item itemvalue="CMake Application.gdt_loader.o" />
+      <item itemvalue="CMake Application.interrupt_handler.o" />
+      <item itemvalue="CMake Application.kernel" />
+      <item itemvalue="CMake Application.populate-thornhill.img" />
+      <item itemvalue="CMake Application.thornhill" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7f2185c6-23b3-48e6-ab33-45755c79bb2a" name="Default Changelist" comment="" />
+      <created>1621895667944</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1621895667944</updated>
+      <workItem from="1621895670180" duration="1890000" />
+      <workItem from="1621897591961" duration="8647000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
