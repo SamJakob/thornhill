@@ -1,1 +1,0 @@
-/usr/bin/objcopy -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel -j .rela -j .reloc --target=efi-app-x86_64 BOOTX64.so BOOTX64.EFI

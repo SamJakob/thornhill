@@ -6,14 +6,12 @@ ENTRY(_start)
 
 
 /*
-	Thornhill has a higher-half kernel.
-	As the OS is designed for x86_64 architecture, the kernel's sections will be page-aligned to 4KiB pages.
-*/
-/*
-kernel_base = 0xFFFFFFFF80000000;
-kernel_base_phys = 2M;
-
-kernel_start = kernel_base + kernel_base_phys;
+	Thornhill is written for UEFI systems, which means we boot up in long mode.
+	Thus, the kernel base address is at 2M to ensure it's not accessed in real
+	mode. This also removes any size limits for the kernel.
+	
+	As the OS is designed for x86_64 architecture, the kernel's sections are
+	page-aligned to 4KiB pages.
 */
 
 /*
