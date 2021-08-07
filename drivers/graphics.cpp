@@ -12,6 +12,28 @@
 #define FONT_CHARACTER_WIDTH 8
 #define FONT_CHARACTER_HEIGHT 8
 
+Color rgb(uint8_t r, uint8_t g, uint8_t b) {
+    Color color;
+    color.red = r;
+    color.green = g;
+    color.blue = b;
+    return color;
+};
+
+uint32_t pixel(PixelFormat format, Color color) {
+
+    switch (format) {
+    case THPixelRedGreenBlueReserved8BitPerColor:
+        return (color.blue << 16) | (color.green << 8) | (color.red);
+        break;
+    case THPixelBlueGreenRedReserved8BitPerColor:
+        return (color.red << 16) | (color.green << 8) | (color.blue);
+        break;
+    default:
+        return 0;
+    }
+}
+
 class ThornhillGraphics {
 
   private:
@@ -96,7 +118,7 @@ class ThornhillGraphics {
         }
 
         int intendedLength = 2;
-        char output[intendedLength + 1];
+        char output[3];
 
         drawText(shortMonth, offsetStart, screen.height - 100, 2);
         drawText(THUtils::pad_start(THUtils::int_to_ascii(time->day), output, '0', intendedLength),

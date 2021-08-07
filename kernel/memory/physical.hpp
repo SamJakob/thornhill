@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 extern "C" {
-#include "boot/handoff/memory.h"
+#include "boot/handoff/memory/memory_shared.h"
 }
 
 #pragma once

@@ -1,5 +1,5 @@
 extern "C" {
-#include "boot/handoff/handoff.h"
+#include "boot/handoff/handoff_shared.h"
 }
 
 #include "lib/thornhill.cpp"

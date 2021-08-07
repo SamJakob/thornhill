@@ -5,9 +5,10 @@ project(thornhill)
 
 # Set project configuration.
 set(TH_ARCH "x86_64")
+set(CMAKE_BUILD_TYPE Debug)
 
 # Set global build system filenames and locations.
-get_filename_component(TH_BUILD_SCRIPTS_DIRECTORY   "./build" ABSOLUTE)
+get_filename_component(TH_BUILD_SCRIPTS_DIRECTORY   "./scripts" ABSOLUTE)
 get_filename_component(TH_OUTPUT_DIRECTORY          "./out" ABSOLUTE)
 
 # Set global build system properties.
@@ -39,7 +40,7 @@ endif()
 execute_process(COMMAND "${CMAKE_COMMAND} -E make_directory ${TH_OUTPUT_DIRECTORY}")
 
 # Include components.
-add_subdirectory(boot_old)
+add_subdirectory(boot)
 add_subdirectory(kernel)
 
 # Add `emulator` and `run` pseudo-targets

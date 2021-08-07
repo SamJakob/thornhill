@@ -1,3 +1,8 @@
+const Path = require('path');
+if (Path.dirname(process.cwd()) !== "cmake-build-debug") {
+    process.chdir("cmake-build-debug");
+}
+
 const ON_DEATH = require('death');
 const ChildProcess = require('child_process');
 const Chokidar = require('chokidar');
@@ -37,7 +42,7 @@ const startWatcher = () => {
                 return;
             }
 
-            if (exitCode == 0) {
+            if (exitCode === 0) {
                 restartEmulator();
                 recompiling.succeed(`Recompiled Thornhill. (${compileTime}s)`);
             } else

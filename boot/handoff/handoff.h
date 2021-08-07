@@ -1,17 +1,19 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "memory.h"
-#include "../../drivers/graphics.h"
+#include <efi.h>
+#include <efilib.h>
 
-#ifndef TH_BOOT_HANDOFF
-#define TH_BOOT_HANDOFF
+#include "handoff_shared.h"
 
-typedef struct {
-
-    HandoffMemoryMap memoryMap;
-    Screen screen;
-
-} ThornhillHandoff;
-
-#endif
+/**
+ * @brief Prepares and collects data and pointers in the bootloader for passing
+ * to the OS kernel.
+ * 
+ * @param HandoffData A pointer to the handoff structure in memory.
+ * @param Graphics A pointer to the current Graphics Output Protocol structure.
+ */
+void THBPrepareHandoffData(
+    ThornhillHandoff* HandoffData,
+    EFI_GRAPHICS_OUTPUT_PROTOCOL* Graphics
+);

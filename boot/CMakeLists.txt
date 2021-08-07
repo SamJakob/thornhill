@@ -6,7 +6,7 @@ set(THB_EFI_CRT_OBJECTS "${THB_EFI_LIB_DIR}/crt0-efi-${TH_ARCH}.o")
 set(THB_EFI_LINKER_SCRIPT "${THB_EFI_LIB_DIR}/elf_${TH_ARCH}_efi.lds")
 
 # Load sources and set output directory.
-file(GLOB THB_SOURCES *.c)
+file(GLOB_RECURSE THB_SOURCES *.c)
 
 # Set compiler flags.
 set(CMAKE_C_FLAGS "${THB_EFI_INCLUDES} -ffreestanding -fno-stack-protector -c -fpic -fshort-wchar -mno-red-zone")

@@ -65,9 +65,8 @@ typedef struct {
 
 typedef struct {
 
-    HandoffMemorySegment* segments;
+    HandoffMemorySegment** segments;
     size_t mapSize;
-    size_t segmentSize;
 
 } HandoffMemoryMap;
 

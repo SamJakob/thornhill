@@ -1,32 +1,34 @@
 #include "logging.h"
 
-EFI_STATUS THBPrintBanner(EFI_SYSTEM_TABLE* SystemTable, bool ShouldClearScreen) {
+EFI_STATUS THBPrintBanner(bool ShouldClearScreen) {
 
     EFI_STATUS Status;
 
-    if (ShouldClearScreen) SystemTable->ConOut->ClearScreen(SystemTable->ConOut);
-    Status = SystemTable->ConOut->OutputString(SystemTable->ConOut, (CHAR16*) L"   /$$$$$$$$ /$$                                     /$$       /$$ /$$ /$$   \r\n");
-    Status = SystemTable->ConOut->OutputString(SystemTable->ConOut, (CHAR16*) L"  |__  $$__/| $$                                    | $$      |__/| $$| $$   \r\n");
-    Status = SystemTable->ConOut->OutputString(SystemTable->ConOut, (CHAR16*) L"     | $$   | $$$$$$$   /$$$$$$   /$$$$$$  /$$$$$$$ | $$$$$$$  /$$| $$| $$   \r\n");
-    Status = SystemTable->ConOut->OutputString(SystemTable->ConOut, (CHAR16*) L"     | $$   | $$__  $$ /$$__  $$ /$$__  $$| $$__  $$| $$__  $$| $$| $$| $$   \r\n");
-    Status = SystemTable->ConOut->OutputString(SystemTable->ConOut, (CHAR16*) L"     | $$   | $$  \\ $$| $$  \\ $$| $$  \\__/| $$  \\ $$| $$  \\ $$| $$| $$| $$   \r\n");
-    Status = SystemTable->ConOut->OutputString(SystemTable->ConOut, (CHAR16*) L"     | $$   | $$  | $$| $$  | $$| $$      | $$  | $$| $$  | $$| $$| $$| $$   \r\n");
-    Status = SystemTable->ConOut->OutputString(SystemTable->ConOut, (CHAR16*) L"     | $$   | $$  | $$|  $$$$$$/| $$      | $$  | $$| $$  | $$| $$| $$| $$   \r\n");
-    Status = SystemTable->ConOut->OutputString(SystemTable->ConOut, (CHAR16*) L"     |__/   |__/  |__/ \\______/ |__/      |__/  |__/|__/  |__/|__/|__/|__/   \r\n");
-    Status = SystemTable->ConOut->OutputString(SystemTable->ConOut, (CHAR16*) L"                                                                             \r\n");
-    Status = SystemTable->ConOut->OutputString(SystemTable->ConOut, (CHAR16*) L"                                                                             \r\n");
-    Status = SystemTable->ConOut->OutputString(SystemTable->ConOut, (CHAR16*) L"// Howdy!\r\n\r\n");
+    if (ShouldClearScreen) ST->ConOut->ClearScreen(ST->ConOut);
+    Status = ST->ConOut->OutputString(ST->ConOut, (CHAR16*) L"   /$$$$$$$$ /$$                                     /$$       /$$ /$$ /$$   \r\n");
+    Status = ST->ConOut->OutputString(ST->ConOut, (CHAR16*) L"  |__  $$__/| $$                                    | $$      |__/| $$| $$   \r\n");
+    Status = ST->ConOut->OutputString(ST->ConOut, (CHAR16*) L"     | $$   | $$$$$$$   /$$$$$$   /$$$$$$  /$$$$$$$ | $$$$$$$  /$$| $$| $$   \r\n");
+    Status = ST->ConOut->OutputString(ST->ConOut, (CHAR16*) L"     | $$   | $$__  $$ /$$__  $$ /$$__  $$| $$__  $$| $$__  $$| $$| $$| $$   \r\n");
+    Status = ST->ConOut->OutputString(ST->ConOut, (CHAR16*) L"     | $$   | $$  \\ $$| $$  \\ $$| $$  \\__/| $$  \\ $$| $$  \\ $$| $$| $$| $$   \r\n");
+    Status = ST->ConOut->OutputString(ST->ConOut, (CHAR16*) L"     | $$   | $$  | $$| $$  | $$| $$      | $$  | $$| $$  | $$| $$| $$| $$   \r\n");
+    Status = ST->ConOut->OutputString(ST->ConOut, (CHAR16*) L"     | $$   | $$  | $$|  $$$$$$/| $$      | $$  | $$| $$  | $$| $$| $$| $$   \r\n");
+    Status = ST->ConOut->OutputString(ST->ConOut, (CHAR16*) L"     |__/   |__/  |__/ \\______/ |__/      |__/  |__/|__/  |__/|__/|__/|__/   \r\n");
+    Status = ST->ConOut->OutputString(ST->ConOut, (CHAR16*) L"                                                                             \r\n");
+    Status = ST->ConOut->OutputString(ST->ConOut, (CHAR16*) L"                                                                             \r\n");
+    Status = ST->ConOut->OutputString(ST->ConOut, (CHAR16*) L"// Howdy!\r\n\r\n");
 
     return Status;
 
 }
 
-EFI_STATUS THBPrintMessage(EFI_SYSTEM_TABLE* SystemTable, CHAR16* Message) {
+EFI_STATUS THBPrintMessage(CHAR16* Message) {
+
+    // TODO: fetch time manually from the RTC.
 
     EFI_STATUS Status;
     EFI_TIME CurrentTime;
 
-    Status = SystemTable->RuntimeServices->GetTime(&CurrentTime, NULL);
+    Status = ST->RuntimeServices->GetTime(&CurrentTime, NULL);
     UINT8 CurrentHour = CurrentTime.Hour;
     bool isPM = false;
 
@@ -53,5 +55,39 @@ EFI_STATUS THBPrintMessage(EFI_SYSTEM_TABLE* SystemTable, CHAR16* Message) {
     );
 
     return Status;
+
+}
+
+EFI_STATUS THBErrorMessage(CHAR16* ErrorMessage, EFI_STATUS* StatusCode) {
+
+    EFI_INPUT_KEY Key;
+
+    // Print error message.
+    ST->ConOut->OutputString(ST->ConOut, L"\r\n\r\n");
+    ST->ConOut->OutputString(ST->ConOut, L"(!) ");
+    ST->ConOut->OutputString(ST->ConOut, ErrorMessage);
+    ST->ConOut->OutputString(ST->ConOut, L"\r\n");
+    if (StatusCode != NULL) {
+        Print(L"(!) SYSTEM: %r", *StatusCode);
+        ST->ConOut->OutputString(ST->ConOut, L"\r\n");
+    }
+    ST->ConOut->OutputString(ST->ConOut, L"\r\n");
+
+    ST->ConOut->OutputString(ST->ConOut, L"=============== [ THORNHILL ] ============\r\n");
+    ST->ConOut->OutputString(ST->ConOut, L"An error has occurred that prevented the  \r\n");
+    ST->ConOut->OutputString(ST->ConOut, L"system from loading.                      \r\n");
+    ST->ConOut->OutputString(ST->ConOut, L"==========================================\r\n");
+
+    ST->ConOut->OutputString(ST->ConOut, L"\r\n");
+    ST->ConOut->OutputString(ST->ConOut, L"Press any key to attempt to boot from another device.\r\n");
+
+    
+    // Wait for keypress to continue.
+    EFI_STATUS Status = ST->ConIn->Reset(ST->ConIn, FALSE);
+    if (EFI_ERROR(Status))
+        return Status; // If there's an error doing *that*, just give up lol.
+
+    while ((Status = ST->ConIn->ReadKeyStroke(ST->ConIn, &Key)) == EFI_NOT_READY);
+    return Status; // Otherwise, wait for keystroke to continue.
 
 }

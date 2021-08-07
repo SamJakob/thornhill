@@ -27,27 +27,8 @@ typedef struct {
     uint8_t green;
 } Color;
 
-Color rgb(uint8_t r, uint8_t g, uint8_t b) {
-    Color color;
-    color.red = r;
-    color.green = g;
-    color.blue = b;
-    return color;
-};
+Color rgb(uint8_t r, uint8_t g, uint8_t b);
 
-uint32_t pixel(PixelFormat format, Color color) {
-
-    switch (format) {
-        case THPixelRedGreenBlueReserved8BitPerColor:
-            return (color.blue << 16) | (color.green << 8) | (color.red);
-            break;
-        case THPixelBlueGreenRedReserved8BitPerColor:
-            return (color.red << 16) | (color.green << 8) | (color.blue);
-            break;
-        default:
-            return 0;
-    }
-
-}
+uint32_t pixel(PixelFormat format, Color color);
 
 #endif
