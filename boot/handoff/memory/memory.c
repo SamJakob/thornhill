@@ -1,6 +1,6 @@
 #include "memory.h"
 
-EFI_STATUS THBPrepareHandoffMemoryMap(ThornhillHandoff* HandoffData) {
+// EFI_STATUS THBPrepareHandoffMemoryMap(ThornhillHandoff* HandoffData){
 
     // EFI_STATUS Status;
 
@@ -65,7 +65,8 @@ EFI_STATUS THBPrepareHandoffMemoryMap(ThornhillHandoff* HandoffData) {
 
     // return Status;
 
-}
+    //}
+
 
 ThornhillMemoryType THBUefiToThornhillMemoryType(EFI_MEMORY_TYPE memoryType) {
 
@@ -99,5 +100,4 @@ ThornhillMemoryType THBUefiToThornhillMemoryType(EFI_MEMORY_TYPE memoryType) {
         default:
             return THUnusedMemory;
     }
-    
 }

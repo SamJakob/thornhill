@@ -13,13 +13,3 @@
  * @return ThornhillMemoryType The resulting ThornhillMemoryType.
  */
 ThornhillMemoryType THBUefiToThornhillMemoryType(EFI_MEMORY_TYPE memoryType);
-
-/**
- * @brief Populates the specified ThornhillHandoff structure with
- * the handoff memory map.
- *
- * @param HandoffData The location of the handoff data in memory.
- * @return EFI_STATUS Whether computing the memory map was successful,
- * as determined by the status if internal method calls.
- */
-EFI_STATUS THBPrepareHandoffMemoryMap(ThornhillHandoff* HandoffData);

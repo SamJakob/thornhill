@@ -28,7 +28,6 @@ typedef struct {
 } Color;
 
 Color rgb(uint8_t r, uint8_t g, uint8_t b);
-
 uint32_t pixel(PixelFormat format, Color color);
 
 #endif

@@ -2,6 +2,13 @@
 #include <efidef.h>
 #include <efilib.h>
 
+typedef struct {
+    EFI_MEMORY_DESCRIPTOR* Map;
+    UINTN MapSize, MapKey;
+    UINTN DescriptorSize;
+    UINT32 DescriptorVersion;
+} PreBootMemoryMap;
+
 /**
  * @brief Compares memory of n length starting at aptr to memory of the same
  * length starting at bptr.
@@ -20,7 +27,8 @@ int mem_compare(const void* aptr, const void* bptr, UINTN n);
  * booting should proceed.
  * 
  * @param ImageHandle The EFI_HANDLE that references the current EFI structure.
+ * @param MemoryMap The memory map as it was fetched immediately before boot.
  * @return EFI_STATUS The status as returned from the internal calls to exit
  * boot services.
  */
-EFI_STATUS THBAttemptExitBootServices(EFI_HANDLE* ImageHandle);
+EFI_STATUS THBAttemptExitBootServices(EFI_HANDLE* ImageHandle, PreBootMemoryMap* MemoryMap);

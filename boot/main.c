@@ -74,7 +74,6 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 
     /* Start handoff procedure so we can jump to kernel. */
     Status = THBPrintMessage(L"Bootstrapping kernel...");
-    UINTN MapKey;
     ThornhillHandoff HandoffData;
     THBPrepareHandoffData(&HandoffData, Graphics);
 
@@ -82,12 +81,36 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
         and do this thing! */
     Status = THBPrintMessage(L"Starting...");
 
-    Status = THBAttemptExitBootServices(ImageHandle);
+    PreBootMemoryMap MemoryMap;
+    Status = THBAttemptExitBootServices(ImageHandle, &MemoryMap);
     if (EFI_ERROR(Status)) {
         return THBErrorMessage(L"Failed to boot.", &Status);
     }
 
-    /* Jump to kernel start. */
+    HandoffMemorySegment HandoffMemorySegments[
+        (MemoryMap.MapSize / MemoryMap.DescriptorSize)
+    ];
+    {
+        for (
+            UINTN SegmentIndex = 0;
+            SegmentIndex < (MemoryMap.MapSize / MemoryMap.DescriptorSize);
+            SegmentIndex++
+        ) {
+            EFI_MEMORY_DESCRIPTOR* EfiDescriptor =
+                (EFI_MEMORY_DESCRIPTOR*)(MemoryMap.Map +
+                                         (SegmentIndex * MemoryMap.DescriptorSize));
+
+            HandoffMemorySegments[SegmentIndex].memoryType = THBUefiToThornhillMemoryType(EfiDescriptor->Type);
+            HandoffMemorySegments[SegmentIndex].pageCount = EfiDescriptor->NumberOfPages;
+            HandoffMemorySegments[SegmentIndex].physicalBaseAddress = EfiDescriptor->PhysicalStart;
+        }
+    }
+
+    HandoffData.memoryMap.mapSize =
+        (MemoryMap.MapSize / MemoryMap.DescriptorSize) * sizeof(HandoffMemorySegment);
+    HandoffData.memoryMap.segments = HandoffMemorySegments;
+
+    /* Jump to kernel start! */
     ((void (*)(void*)) KernelHeader.e_entry)(
         (void*) &HandoffData
     );

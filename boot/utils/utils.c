@@ -13,7 +13,7 @@ int mem_compare(const void* aptr, const void* bptr, UINTN n) {
     return 0;
 }
 
-EFI_STATUS THBAttemptExitBootServices(EFI_HANDLE* ImageHandle) {
+EFI_STATUS THBAttemptExitBootServices(EFI_HANDLE* ImageHandle, PreBootMemoryMap* MemoryMap) {
 
     EFI_STATUS Status;
 
@@ -30,6 +30,12 @@ EFI_STATUS THBAttemptExitBootServices(EFI_HANDLE* ImageHandle) {
         return Status;
 
     Status = ST->BootServices->ExitBootServices(ImageHandle, MapKey);
-    return Status;
 
+    MemoryMap->Map = Map;
+    MemoryMap->MapSize = MapSize;
+    MemoryMap->MapKey = MapKey;
+    MemoryMap->DescriptorSize = DescriptorSize;
+    MemoryMap->DescriptorVersion = DescriptorVersion;
+    return Status;
+    
 }
