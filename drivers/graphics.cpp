@@ -12,14 +12,6 @@
 #define FONT_CHARACTER_WIDTH 8
 #define FONT_CHARACTER_HEIGHT 8
 
-Color rgb(uint8_t r, uint8_t g, uint8_t b) {
-    Color color;
-    color.red = r;
-    color.green = g;
-    color.blue = b;
-    return color;
-};
-
 uint32_t pixel(PixelFormat format, Color color) {
 
     switch (format) {

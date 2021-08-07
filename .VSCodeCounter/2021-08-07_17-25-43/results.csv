@@ -1,0 +1,12 @@
+"filename", "language", "CMake Cache", "CMake", "comment", "blank", "total"
+"/mnt/d/thornhill/build/CMakeCache.txt", "CMake Cache", 330, 0, 0, 75, 405
+"/mnt/d/thornhill/build/CMakeFiles/3.20.2/CMakeASMCompiler.cmake", "CMake", 0, 15, 0, 6, 21
+"/mnt/d/thornhill/build/CMakeFiles/3.20.2/CMakeCCompiler.cmake", "CMake", 0, 61, 0, 18, 79
+"/mnt/d/thornhill/build/CMakeFiles/3.20.2/CMakeCXXCompiler.cmake", "CMake", 0, 72, 0, 20, 92
+"/mnt/d/thornhill/build/CMakeFiles/3.20.2/CMakeSystem.cmake", "CMake", 0, 10, 0, 6, 16
+"/mnt/d/thornhill/build/boot/cmake_install.cmake", "CMake", 0, 37, 0, 8, 45
+"/mnt/d/thornhill/build/boot_old/cmake_install.cmake", "CMake", 0, 37, 0, 8, 45
+"/mnt/d/thornhill/build/cmake_install.cmake", "CMake", 0, 54, 0, 11, 65
+"/mnt/d/thornhill/build/kernel/cmake_install.cmake", "CMake", 0, 37, 0, 8, 45
+"/mnt/d/thornhill/kernel/cmake_install.cmake", "CMake", 0, 37, 0, 8, 45
+"Total", "-", 330, 360, 0, 168, 858
