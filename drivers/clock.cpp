@@ -1,7 +1,15 @@
-#include "io.hpp"
-#include "../kernel/time/timezone.hpp"
-
 #include "clock.hpp"
+
+#include "io.hpp"
+
+const char* MONTHS[] = {"January", "February", "March",     "April",   "May",      "June",
+                        "July",    "August",   "September", "October", "November", "December"};
+
+bool THCompareSystemTime(ThornhillSystemTime* timeA, ThornhillSystemTime* timeB) {
+    return timeA->year == timeB->year && timeA->month == timeB->month && timeA->day == timeB->day &&
+           timeA->hours == timeB->hours && timeA->minutes == timeB->minutes &&
+           timeA->seconds == timeB->seconds && timeA->isPM == timeB->isPM;
+}
 
 ThornhillSystemTime ThornhillClock::_performOfflineTimeRead() {
 
@@ -54,7 +62,7 @@ ThornhillSystemTime ThornhillClock::readOfflineTime() {
 
     // Apply time offset.
     // ThornhillClock::applyTimeZone(&time, &TH_TIMEZONE_NEW_BRAUNFELS, true);
-    ThornhillClock::applyTimeZone(&time, &TH_TIMEZONE_LONDON, false);
+    ThornhillClock::applyTimeZone(&time, &TH_TIMEZONE_LONDON, true);
 
     return time;
 

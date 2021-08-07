@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifndef TH_KERN_IDT_H
 #define TH_KERN_IDT_H
 
@@ -23,8 +25,8 @@ typedef struct {
 } idt_pointer_t;
 
 #define IDT_ENTRIES 256
-idt_descriptor_t idt[IDT_ENTRIES];
-idt_pointer_t idt_register;
+extern idt_descriptor_t idt[IDT_ENTRIES];
+extern idt_pointer_t idt_register;
 
 #pragma pack ()
 

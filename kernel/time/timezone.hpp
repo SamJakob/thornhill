@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifndef TH_TIME_TIMEZONES
 #define TH_TIME_TIMEZONES
 
@@ -22,18 +24,7 @@ struct ThornhillTimeZone {
     ThornhillTimeOffset dstOffset;
 };
 
-const ThornhillTimeZone TH_TIMEZONE_LONDON                  = {
-    "London, England",
-    "United Kingdom",
-    {  0, 0 },
-    {  1, 0 }
-};
-
-const ThornhillTimeZone TH_TIMEZONE_NEW_BRAUNFELS           = {
-    "New Braunfels, Texas",
-    "United States of America",
-    { -6, 0 },
-    {  1, 0 }
-};
+extern const ThornhillTimeZone TH_TIMEZONE_LONDON;
+extern const ThornhillTimeZone TH_TIMEZONE_NEW_BRAUNFELS;
 
 #endif

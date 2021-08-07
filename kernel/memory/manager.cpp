@@ -1,4 +1,4 @@
-#include "lib/thornhill.cpp"
+#include "lib/thornhill.hpp"
 
 #include "manager.hpp"
 #include "physical.hpp"

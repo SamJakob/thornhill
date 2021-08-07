@@ -1,5 +1,5 @@
 #include "physical.hpp"
-#include "lib/thornhill.cpp"
+#include "lib/thornhill.hpp"
 #include "kernel/arch/x86_64/include.hpp"
 
 #define THMEM_AVAILABLE 0xFF

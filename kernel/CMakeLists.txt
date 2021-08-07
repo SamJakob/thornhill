@@ -5,7 +5,7 @@ enable_language(ASM)
 # Set source & include directories.
 set(CMAKE_SOURCE_DIR ../)
 include_directories(../)
-file(GLOB_RECURSE THK_SOURCES *.cpp *.c)
+file(GLOB_RECURSE THK_SOURCES *.cpp *.c ../drivers/*.cpp ../drivers/*.c ../lib/*.cpp ../lib/*.c ../font/*.cpp ../font/*.c)
 
 # Set up compiler and linker flags.
 set(CMAKE_CXX_LINK_EXECUTABLE "/usr/bin/g++ <CMAKE_CXX_LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
@@ -18,7 +18,7 @@ add_library(gdt_loader.o OBJECT "arch/${TH_ARCH}/gdt/gdt_loader.s")
 add_library(interrupt_handler.o OBJECT "arch/${TH_ARCH}/interrupt/interrupt_handler.s")
 
 # Produce kernel executable.
-add_executable(kernel main.cpp)
+add_executable(kernel "${THK_SOURCES}")
 add_dependencies(kernel bootloader)
 target_link_libraries(kernel gdt_loader.o)
 target_link_libraries(kernel interrupt_handler.o)

@@ -1,30 +1,15 @@
-#include "kernel/keyboard/keyboard.h"
+#include "keyboard.hpp"
 
-#include "../io.hpp"
-#include "../graphics.cpp"
+void ThornhillKeyboard::initialize() {
+    ThornhillInterrupt::registerInterruptHandler(IRQ1, ThornhillKeyboard::handleInterrupt);
+}
 
-#ifndef THORNHILL_DRIVER_HARDWARE_KEYBOARD
-#define THORNHILL_DRIVER_HARDWARE_KEYBOARD
+void ThornhillKeyboard::handleInterrupt(interrupt_state_t) {
+    uint8_t keycode = ThornhillIO::readByteFromPort(0x60);
 
-class ThornhillKeyboard {
+    if (keycode > KEYCODE_MAX)
+        return;
 
-    // private:
-    //    static char buf[];
-
-    public:
-        static void initialize() {
-            ThornhillInterrupt::registerInterruptHandler(IRQ1, ThornhillKeyboard::handleInterrupt);
-        }
-
-        static void handleInterrupt(interrupt_state_t) {
-            uint8_t keycode = ThornhillIO::readByteFromPort(0x60);
-
-            if (keycode > KEYCODE_MAX) return;
-
-            char letter = THKeyboard::keycode_ascii[(int) keycode];
-            ThornhillGraphics::drawCharacter(letter, 130, 160);
-        }
-
-};
-
-#endif
+    char letter = THKeyboard::keycode_ascii[(int)keycode];
+    ThornhillGraphics::drawCharacter(letter, 130, 160);
+}

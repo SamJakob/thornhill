@@ -1,3 +1,5 @@
+#include "font8x8_basic.h"
+
 /**
  * 8x8 monochrome bitmap fonts for rendering
  * Author: Daniel Hepper <daniel@hepper.net>

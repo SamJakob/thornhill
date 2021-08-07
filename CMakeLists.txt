@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.20)
 # Project details.
 project(thornhill)
 
+# Set build system configuration.
+set(CMAKE_GENERATOR "Unix Makefiles")
+set(CMAKE_EXPORT_COMPILE_COMMANDS true)
+
 # Set project configuration.
 set(TH_ARCH "x86_64")
 set(CMAKE_BUILD_TYPE Debug)

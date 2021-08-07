@@ -27,7 +27,4 @@ typedef struct {
     uint8_t blue;
 } Color;
 
-#define rgb(r, g, b) {r, g, b}
-uint32_t pixel(PixelFormat format, Color color);
-
 #endif

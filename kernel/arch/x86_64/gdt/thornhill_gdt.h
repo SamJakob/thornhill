@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifndef TH_KERN_GDT_H
 #define TH_KERN_GDT_H
 
@@ -33,10 +35,10 @@ struct tss {
     uint64_t reserved2;
     uint16_t reserved3;
     uint16_t iopb_offset;
-} tss;
+};
+extern struct tss tss;
 
-__attribute__((aligned(4096)))
-struct {
+struct __attribute__((aligned(4096))) thornhill_gdt_table {
     struct gdt_descriptor null;
     struct gdt_descriptor kernel_code;
     struct gdt_descriptor kernel_data;
@@ -47,20 +49,10 @@ struct {
     struct gdt_descriptor ovmf_code;
     struct gdt_descriptor tss_low;
     struct gdt_descriptor tss_high;
-} thornhill_gdt_table = {
-    {0, 0, 0, 0x00, 0x00, 0},   /* = (0x00): null */
-    {0, 0, 0, 0x9a, 0xa0, 0},   /* = (0x08): kernel code (kernel base selector) */
-    {0, 0, 0, 0x92, 0xa0, 0},   /* = (0x10): kernel data */
-    {0, 0, 0, 0x00, 0x00, 0},   /* = (0x18): null (user base selector) */
-    {0, 0, 0, 0x92, 0xa0, 0},   /* = (0x20): user data */
-    {0, 0, 0, 0x9a, 0xa0, 0},   /* = (0x28): user code */
-    {0, 0, 0, 0x92, 0xa0, 0},   /* = (0x30): ovmf data */
-    {0, 0, 0, 0x9a, 0xa0, 0},   /* = (0x38): ovmf code */
-    {0, 0, 0, 0x89, 0xa0, 0},   /* = (0x40): tss low */
-    {0, 0, 0, 0x00, 0x00, 0},   /* = (0x48): tss high */
 };
+extern struct thornhill_gdt_table thornhill_gdt_table;
 
-struct table_ptr {
+struct __attribute__((aligned(4096))) table_ptr {
     uint16_t limit;
     uint64_t base;
 };

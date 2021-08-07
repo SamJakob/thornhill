@@ -2,21 +2,19 @@ extern "C" {
 #include "boot/handoff/handoff_shared.h"
 }
 
-#include "lib/thornhill.cpp"
+#include "lib/thornhill.hpp"
 
-#include "arch/x86_64/include.hpp"
+#include "drivers/clock.hpp"
+#include "drivers/graphics.hpp"
+#include "drivers/hardware/keyboard.hpp"
+#include "drivers/io.hpp"
+#include "drivers/timer.hpp"
 
-#include "drivers/clock.cpp"
-#include "drivers/graphics.cpp"
-#include "drivers/hardware/keyboard.cpp"
-#include "drivers/io.cpp"
-#include "drivers/timer.cpp"
-
-#include "memory/manager.cpp"
-#include "memory/physical.cpp"
+#include "memory/manager.hpp"
+#include "memory/physical.hpp"
 
 using namespace Thornhill;
-// #include "../lib/posix.cpp"
+// #include "../lib/posix.hpp"
 // using namespace POSIX;
 
 void main(ThornhillHandoff* thornhillHandoff) {

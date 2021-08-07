@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "../kernel/time/timezone.hpp"
+
 #ifndef TH_DRIVER_CLOCK
 #define TH_DRIVER_CLOCK
 
@@ -19,11 +21,7 @@ struct ThornhillSystemTime {
     bool isPM;
 };
 
-bool THCompareSystemTime(ThornhillSystemTime* timeA, ThornhillSystemTime* timeB) {
-    return timeA->year == timeB->year && timeA->month == timeB->month && timeA->day == timeB->day &&
-           timeA->hours == timeB->hours && timeA->minutes == timeB->minutes &&
-           timeA->seconds == timeB->seconds && timeA->isPM == timeB->isPM;
-}
+bool THCompareSystemTime(ThornhillSystemTime* timeA, ThornhillSystemTime* timeB);
 
 class ThornhillClock {
 
@@ -76,7 +74,6 @@ class ThornhillClock {
                               bool applyDST = false);
 };
 
-const char* MONTHS[] = {"January", "February", "March",     "April",   "May",      "June",
-                        "July",    "August",   "September", "October", "November", "December"};
+extern const char* MONTHS[];
 
 #endif
