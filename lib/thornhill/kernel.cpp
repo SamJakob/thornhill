@@ -10,20 +10,22 @@ using namespace Thornhill;
 namespace Thornhill::Kernel {
 
 void printChar(char c) { ThornhillSerial::writeCharacter(c); }
-void print(const char* message) { ThornhillSerial::write(message); }
+void print(const char* message, bool appendNewline) {
+    ThornhillSerial::write(message, appendNewline);
+}
 
 int vprintf(const char* fmt, va_list arg) {
     int length = 0;
 
     char* strPtr;
-    char buffer[512];
+    char buffer[32];
 
     char c;
     while ((c = *fmt++)) {
 
         if ('%' == c) {
             switch ((c = *fmt++)) {
-                
+
                 /* %% => print a single % symbol (escape) */
                 case '%':
                     printChar('%');
@@ -39,21 +41,21 @@ int vprintf(const char* fmt, va_list arg) {
                 /* %s => print a string */
                 case 's':
                     strPtr = va_arg(arg, char*);
-                    print(strPtr);
+                    print(strPtr, false);
                     length += strlen(strPtr);
                     break;
 
                 /* %d => print number as decimal */
                 case 'd':
-                    itoa(buffer, va_arg(arg, int), 10, 512);
-                    print(buffer);
+                    itoa(buffer, va_arg(arg, int64_t), 10, 32);
+                    print(buffer, false);
                     length += strlen(buffer);
                     break;
 
                 /* %x => print number as hexadecimal */
                 case 'x':
-                    itoa(buffer, va_arg(arg, int), 16, 512);
-                    print(buffer);
+                    itoa(buffer, va_arg(arg, int64_t), 16, 32);
+                    print(buffer, false);
                     length += strlen(buffer);
                     break;
 

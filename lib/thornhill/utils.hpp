@@ -13,7 +13,7 @@ namespace Thornhill {
      * @param a A byte pointer to swap with b.
      * @param b A byte pointer to swap with a.
      */
-    void memswap(char* a, char* b);
+    void memswap(uintptr_t a, uintptr_t b);
 
     /**
      * @brief Converts the specified integer value to an ASCII
@@ -32,7 +32,7 @@ namespace Thornhill {
      * as a precautionary measure.
      * @return A pointer to the output buffer.
      */
-    const char* itoa(char* buffer, int value, int base, int bufferMax = 0);
+    const char* itoa(char* buffer, int64_t value, uint8_t base, int bufferMax = 0);
 
 }     // namespace Thornhill
 

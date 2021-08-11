@@ -7,13 +7,13 @@ using namespace std;
 
 namespace Thornhill {
 
-    void memswap(char* a, char* b) {
-        char temp = *b;
-        *b = *a;
-        *a = temp;
+    void memswap(uintptr_t a, uintptr_t b) {
+        uint8_t temp = *(uint8_t*)b;
+        *(uint8_t*)b = *(uint8_t*)a;
+        *(uint8_t*)a = temp;
     }
 
-    const char* itoa(char* buffer, int value, int base, int bufferMax) {
+    const char* itoa(char* buffer, int64_t value, uint8_t base, int bufferMax) {
         int i = 0;
         bool isNegative = false;
 
@@ -45,8 +45,8 @@ namespace Thornhill {
         // Now perform the conversion.
         // If bufferMax > 0 then we'll check to make sure we don't
         // exceed it.
-        while (value != 0 && (bufferMax == 0 || bufferMax < i)) {
-            int remainder = value % base;
+        while (value != 0 && (bufferMax == 0 || bufferMax > i)) {
+            uint64_t remainder = value % base;
             buffer[i++] = "0123456789abcdef"[remainder];
             value /= base;
         }

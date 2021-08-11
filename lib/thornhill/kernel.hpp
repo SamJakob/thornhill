@@ -23,8 +23,10 @@ namespace Thornhill {
        * console.
        * 
        * @param message The message to print in the serial console.
+       * @param appendNewline Whether a newline should be appended
+       * after printing.
        */
-      void print(const char* message);
+      void print(const char* message, bool appendNewline = true);
 
       /**
        * @brief Prints the specified string format, after applying
