@@ -1,6 +1,8 @@
-.extern interrupt_handler
+.extern interrupt_exception_handler
 .extern interrupt_request_handler
 
+# For CPU interrupts
+# ==================
 # Implement a common handler for each of the ISR gates
 # allowing for reuse of the call back to kernel code.
 interrupt_common:
@@ -24,7 +26,7 @@ interrupt_common:
     push %rax
 
     # Stage 2: Call kernel code.
-    call interrupt_handler
+    call interrupt_exception_handler
 
     # Stage 3: Restore CPU state.
     pop %rax
@@ -50,6 +52,10 @@ interrupt_common:
     iretq
 
 
+# For kernel interrupts.
+# ======================
+# Implement a common handler for each of the ISR gates
+# allowing for reuse of the call back to kernel code.
 interrupt_request_common:
     # Stage 1: Save CPU state.
     push %rdx
@@ -72,7 +78,6 @@ interrupt_request_common:
 
     # Stage 2: Call kernel code.
     call interrupt_request_handler
-    # pop %rbx
 
     # Stage 3: Restore CPU state.
     pop %rax

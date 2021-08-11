@@ -5,8 +5,8 @@
 
 #include "kernel/arch/x86_64/include.hpp"
 
-#ifndef THORNHILL_DRIVER_HARDWARE_KEYBOARD
-#define THORNHILL_DRIVER_HARDWARE_KEYBOARD
+#ifndef TH_DRIVERS_HARDWARE_KEYBOARD
+#define TH_DRIVERS_HARDWARE_KEYBOARD
 
 class ThornhillKeyboard {
 

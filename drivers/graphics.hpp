@@ -2,12 +2,16 @@
 
 #include "clock.hpp"
 #include "io.hpp"
-#include "kernel/utils.hpp"
 
+#include "lib/thornhill.hpp"
+#include "lib/std.hpp"
 #include "font/font8x8/font8x8_basic.h"
 
-#ifndef TH_DRIVER_GRAPHICS
-#define TH_DRIVER_GRAPHICS
+using namespace std;
+using namespace Thornhill;
+
+#ifndef TH_DRIVERS_GRAPHICS
+#define TH_DRIVERS_GRAPHICS
 
 #define FONT_CHARACTER_WIDTH 8
 #define FONT_CHARACTER_HEIGHT 8

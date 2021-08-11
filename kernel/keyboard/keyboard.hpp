@@ -1,5 +1,5 @@
-#ifndef TH_KERN_KEYBOARD
-#define TH_KERN_KEYBOARD
+#ifndef TH_KERNEL_KEYBOARD
+#define TH_KERNEL_KEYBOARD
 
 #define KEY_BACKSPACE   0x0E
 #define KEY_TAB         0x0F

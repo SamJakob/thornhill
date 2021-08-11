@@ -70,32 +70,32 @@ void ThornhillGraphics::drawTime(ThornhillSystemTime* time) {
     drawRect(rgb(0, 0, 0), offsetStart - 5, screen.height - 129, 168, 50);
 
     const char* month = MONTHS[time->month - 1];
-    char shortMonth[4] = {NULL, NULL, NULL, NULL};
+    char shortMonth[4] = {null, null, null, null};
 
     for (int i = 0; i < 3; i++) {
         shortMonth[i] = month[i];
     }
 
     int intendedLength = 2;
-    char output[3];
+    char itoaBuffer[5];
+    char strpadBuffer[3];
 
     drawText(shortMonth, offsetStart, screen.height - 100, 2);
-    drawText(THUtils::pad_start(THUtils::int_to_ascii(time->day), output, '0', intendedLength),
-                offsetStart + 56, screen.height - 100, 2);
-    drawText(THUtils::int_to_ascii(time->fullYear), offsetStart + 96, screen.height - 100, 2);
+    drawText(strpad(itoa(itoaBuffer, time->day, 10, 5), strpadBuffer, '0', intendedLength),
+             offsetStart + 56, screen.height - 100, 2);
+    drawText(itoa(itoaBuffer, time->fullYear, 10, 5), offsetStart + 96, screen.height - 100, 2);
 
-    drawText(
-        THUtils::pad_start(THUtils::int_to_ascii(time->hours), output, '0', intendedLength),
-        offsetStart, screen.height - 124, 2);
+    drawText(strpad(itoa(itoaBuffer, time->hours, 10, 5), strpadBuffer, '0', intendedLength),
+             offsetStart, screen.height - 124, 2);
     if (!blinkSeparators || time->seconds % 2 != 0)
         drawCharacter(':', offsetStart + 28, screen.height - 124, 2);
     drawText(
-        THUtils::pad_start(THUtils::int_to_ascii(time->minutes), output, '0', intendedLength),
+        strpad(itoa(itoaBuffer, time->minutes, 10, 5), strpadBuffer, '0', intendedLength),
         offsetStart + 40, screen.height - 124, 2);
     if (!blinkSeparators || time->seconds % 2 != 0)
         drawCharacter(':', offsetStart + 68, screen.height - 124, 2);
     drawText(
-        THUtils::pad_start(THUtils::int_to_ascii(time->seconds), output, '0', intendedLength),
+        strpad(itoa(itoaBuffer, time->seconds, 10, 5), strpadBuffer, '0', intendedLength),
         offsetStart + 80, screen.height - 124, 2);
     drawText(time->isPM ? "PM" : "AM", offsetStart + 120, screen.height - 124, 2);
 }

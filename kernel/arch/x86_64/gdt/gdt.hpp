@@ -1,10 +1,10 @@
 #include <stdint.h>
 
-#ifndef TH_KERN_GDT
-#define TH_KERN_GDT
+#ifndef TH_KERNEL_ARCH_GDT
+#define TH_KERNEL_ARCH_GDT
 
 extern "C" {
-    #include "thornhill_gdt.h"
+  #include "thornhill_gdt.h"
 }
 
 extern "C" void* load_gdt(void* gdt_ptr);

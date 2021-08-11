@@ -1,7 +1,7 @@
 #include <stdint.h>
 
-#ifndef TH_KERN_ISR_H
-#define TH_KERN_ISR_H
+#ifndef TH_KERNEL_ARCH_ISR_H
+#define TH_KERNEL_ARCH_ISR_H
 
 typedef struct {
     uint64_t cr0, cr2, cr3, cr4, rbp, rsi, rdi, rax, rbx, rcx, rdx;

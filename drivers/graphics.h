@@ -1,7 +1,7 @@
 #include <stdint.h>
 
-#ifndef TH_DRIVER_GRAPHICS_H
-#define TH_DRIVER_GRAPHICS_H
+#ifndef TH_DRIVERS_GRAPHICS_H
+#define TH_DRIVERS_GRAPHICS_H
 
 #define PIXEL_SIZE 32
 

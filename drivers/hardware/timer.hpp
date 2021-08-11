@@ -1,12 +1,11 @@
-#include "../kernel/utils.hpp"
-#include "graphics.hpp"
+#include "drivers/graphics.hpp"
 
 #include "kernel/arch/x86_64/include.hpp"
 
 #include <stdint.h>
 
-#ifndef TH_DRIVER_TIMER
-#define TH_DRIVER_TIMER
+#ifndef TH_DRIVERS_HARDWARE_TIMER
+#define TH_DRIVERS_HARDWARE_TIMER
 
 #define PIT_FREQUENCY 1193180
 

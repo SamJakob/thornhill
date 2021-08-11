@@ -11,7 +11,7 @@
 **Step 1: Ensure the necessary compilers/dependencies are installed.**
 
 ```bash
-# Install compilers
+# Install compilers and build tools.
 sudo apt install gcc g++ buildessentials cmake
 
 # NOTE: cmake must be version >= 3.20, if this is not yet available in your distro, you can build
@@ -42,7 +42,7 @@ sudo apt update
 sudo apt install gnu-efi mtools qemu-system
 
 # Install hot-reload dependencies
-cd build/hotreload
+cd scripts/hotreload
 yarn                  # (to install dependencies)
 cd ../..
 ```
@@ -51,31 +51,30 @@ cd ../..
 
 ```bash
 # Build the system
+mkdir build
+cd build
+
+cmake ../
 make clean
-make thornhill
-make emulator
+
+make emulator # or just `make` to build without starting emulator
 ```
 
 **Step 4: Start the hot-reload toolchain**
 
-```bash
-# Start the hot-reload toolchain
-make
-```
+The hot-reload toolchain is currently unavailable. (Not yet refactored to account for switch to cmake.)  
+It's some simple tweaks (switching out the command and checking it all works - perhaps optimizing the buildchain a little), I'm just focusing on other tasks within the OS at the moment.
 
 
 
 ## Commands
 
 - `make clean`: Cleans the build and creates the initial directory structure, intended for preparation of an initial build.
-
-- `make thornhill`: Builds the system.
-
+- `make`: Builds the system.
 - `make emulator`: Runs QEMU with the built-in QEMU EFI firmware and the system image.
-
-- `make`: Starts the hot-reload toolchain.
+- Hot-reload toolchain is currently unavailable. (Not yet refactored to account for switch to cmake.)
 
 
 ## Troubleshooting
 
-If, on WSL, QEMU returns “`Unable to init server: Could not connect: Connection refused`”, hover over the taskbar icon for VcXsrv to get the precise hostname and then change the value of `DISPLAY` in `~/.bashrc` to that. You can run `source ~/.bashrc` afterwards to apply this change.
+If, on WSL, QEMU returns “`Unable to init server: Could not connect: Connection refused`”, hover over the taskbar icon for VcXsrv to get the precise hostname and then change the value of `DISPLAY` in `~/.bashrc` to that. You can run `source ~/.bashrc` afterwards to apply this change immediately, or just open a new terminal session.

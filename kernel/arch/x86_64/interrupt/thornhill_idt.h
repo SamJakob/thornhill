@@ -1,7 +1,7 @@
 #include <stdint.h>
 
-#ifndef TH_KERN_IDT_H
-#define TH_KERN_IDT_H
+#ifndef TH_KERNEL_ARCH_IDT_H
+#define TH_KERNEL_ARCH_IDT_H
 
 #pragma pack (1)
 
@@ -12,11 +12,11 @@
 typedef struct {
     uint16_t offset15_0;
     uint16_t selector;
-    uint8_t null;
+    uint8_t null_descriptor;
     uint8_t type;
     uint16_t offset31_16;
     uint32_t offset63_32;
-    uint32_t null2;
+    uint32_t null_descriptor_2;
 } idt_descriptor_t;
 
 typedef struct {

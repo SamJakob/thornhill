@@ -1,6 +1,6 @@
 #include "timer.hpp"
 
-#include "io.hpp"
+#include "../io.hpp"
 
 void ThornhillTimer::timerCallback(interrupt_state_t) {
     if (updating)

@@ -4,8 +4,8 @@
 
 #include "../kernel/time/timezone.hpp"
 
-#ifndef TH_DRIVER_CLOCK
-#define TH_DRIVER_CLOCK
+#ifndef TH_DRIVERS_CLOCK
+#define TH_DRIVERS_CLOCK
 
 struct ThornhillSystemTime {
 

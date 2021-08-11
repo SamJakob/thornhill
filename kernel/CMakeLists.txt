@@ -9,7 +9,7 @@ file(GLOB_RECURSE THK_SOURCES *.cpp *.c ../drivers/*.cpp ../drivers/*.c ../lib/*
 
 # Set up compiler and linker flags.
 set(CMAKE_CXX_LINK_EXECUTABLE "/usr/bin/g++ <CMAKE_CXX_LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
-set(CMAKE_CXX_FLAGS "-ffreestanding -n -Wl,--gc-sections -I. -Iarch/ -Iarch/${TH_ARCH} -O2 -Wall -Wextra -nostdlib -mgeneral-regs-only -mno-red-zone")
+set(CMAKE_CXX_FLAGS "-ffreestanding -n -Wl,--gc-sections -I. -Iarch/ -Iarch/${TH_ARCH} -O3 -Wall -Wextra -nostdlib -mgeneral-regs-only -mno-red-zone -fstack-protector-all")
 set(CMAKE_CXX_LINK_FLAGS "-nostdlib -Wl,--gc-sections -mgeneral-regs-only -mno-red-zone -T linker.ld")
 configure_file(linker.ld linker.ld COPYONLY)
 

@@ -55,8 +55,8 @@ SECTIONS {
 	} :text
 
 
-	/* Move to a new page in memory. */
-	. = . + 0x1000;
+	/* Move to the data boundary. */
+	. = 4M;
 
 	/*
 		Read-Write Initialized Data.

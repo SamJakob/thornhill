@@ -1,7 +1,7 @@
 #include <stdint.h>
 
-#ifndef TH_DRIVER_IO
-#define TH_DRIVER_IO
+#ifndef TH_DRIVERS_IO
+#define TH_DRIVERS_IO
 
 class ThornhillIO {
 

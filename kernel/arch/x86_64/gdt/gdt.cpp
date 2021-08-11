@@ -1,4 +1,5 @@
 #include "gdt.hpp"
+#include "drivers/hardware/serial.hpp"
 
 void ThornhillGDT::memzero(void* memory, uint64_t length) {
     for (uint64_t i = 0; i < length; i++)
@@ -15,6 +16,10 @@ void ThornhillGDT::setup() {
     thornhill_gdt_table.tss_low.limit15_0 = sizeof(tss);
     thornhill_gdt_table.tss_high.limit15_0 = (tss_base >> 32) & 0xffff;
 
-    table_ptr gdt_ptr = {sizeof(thornhill_gdt_table) - 1, (uint64_t)&thornhill_gdt_table};
+    table_ptr gdt_ptr = {
+        .limit = sizeof(thornhill_gdt_table) - 1,
+        .base = (uint64_t)&thornhill_gdt_table
+    };
+
     load_gdt(&gdt_ptr);
 }

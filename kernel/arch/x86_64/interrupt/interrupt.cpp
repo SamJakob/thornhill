@@ -88,11 +88,11 @@ void ThornhillInterrupt::setupInterrupts() {
 void ThornhillInterrupt::setIdtGate(int gateNumber, uint64_t handler) {
     idt[gateNumber].offset15_0 = offset15_0(handler);
     idt[gateNumber].selector = TH_KERNEL_CODE_SEGMENT;
-    idt[gateNumber].null = 0;
+    idt[gateNumber].null_descriptor = 0;
     idt[gateNumber].type = generateIdtDescriptorType(IDT_GATE_32BIT_INT);
     idt[gateNumber].offset31_16 = offset31_16(handler);
     idt[gateNumber].offset63_32 = offset63_32(handler);
-    idt[gateNumber].null2 = 0;
+    idt[gateNumber].null_descriptor_2 = 0;
 }
 
 void ThornhillInterrupt::registerInterruptHandler(uint8_t interrupt, interrupt_handler_t handler) {

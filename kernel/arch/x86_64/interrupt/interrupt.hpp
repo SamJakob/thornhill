@@ -1,16 +1,22 @@
 #include <drivers/io.hpp>
 #include <cstdint>
 
-#ifndef TH_KERN_IDT
-#define TH_KERN_IDT
+#ifndef TH_KERNEL_ARCH_INTERRUPT
+#define TH_KERNEL_ARCH_INTERRUPT
 
 extern "C" {
     #include "kernel/arch/x86_64/gdt/thornhill_gdt.h"
-    #include "kernel/process/thornhill_process.h"
 
     #include "thornhill_idt.h"
     #include "thornhill_isr.h"
 }
+
+typedef enum {
+    CPU_PRIV_LEVEL_KERNEL = 0,
+    CPU_PRIV_LEVEL_HIGH = 1,
+    CPU_PRIV_LEVEL_LOW = 2,
+    CPU_PRIV_LEVEL_USER = 3
+} CpuPrivilegeLevel;
 
 class ThornhillInterrupt {
     private:

@@ -6,13 +6,16 @@ extern "C" {
 
 #include "drivers/clock.hpp"
 #include "drivers/graphics.hpp"
-#include "drivers/hardware/keyboard.hpp"
 #include "drivers/io.hpp"
-#include "drivers/timer.hpp"
+#include "drivers/hardware/keyboard.hpp"
+#include "drivers/hardware/timer.hpp"
+#include "drivers/hardware/serial.hpp"
 
 #include "memory/manager.hpp"
 #include "memory/physical.hpp"
+#include "memory/paging.hpp"
 
+using namespace ThornhillKernel;
 using namespace Thornhill;
 // #include "../lib/posix.hpp"
 // using namespace POSIX;
@@ -45,13 +48,21 @@ void main(ThornhillHandoff* thornhillHandoff) {
     // ThornhillGraphics::drawText(buf, 130, 150);
 
     ThornhillGraphics::drawTime(&startupTime);
+
+    TLB::flush();
+
+    uintptr_t badptr = 0xdeadbeef00;
+    int x = *((int*)badptr);
+
+    Kernel::printf("%x", x);
 }
 
 extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
 
     ThornhillInterrupt::setAllowInterrupts(false);
-    ThornhillGDT::setup();
+    ThornhillSerial::initialize();
 
+    ThornhillGDT::setup();
     ThornhillMemory::Physical::reset();
 
     main(thornhillHandoff);
@@ -61,26 +72,44 @@ extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
 
 void Kernel::panic(const char* reason, uint64_t interruptNumber) {
 
+    ThornhillInterrupt::setAllowInterrupts(false);
+
+    ThornhillSerial::write("!!! THORNHILL KERNEL PANIC !!!");
+    ThornhillSerial::write(reason);
+    ThornhillSerial::write("!!! THORNHILL KERNEL PANIC !!!");
+
     ThornhillGraphics::clear(rgb(34, 34, 34));
 
     ThornhillGraphics::drawText("Thornhill", 20, 50, 6);
     ThornhillGraphics::drawText("// The system needs to be restarted.", 20, 100, 2);
 
     if (interruptNumber != 69) {
-        ThornhillGraphics::drawText(THUtils::int_to_ascii(interruptNumber), 20, 150, 2);
+        char itoaBuffer[6];
+        ThornhillGraphics::drawText(itoa(itoaBuffer, interruptNumber, 10, 6), 20, 150, 2);
         ThornhillGraphics::drawText(reason, 20, 170, 2);
     } else {
         ThornhillGraphics::drawText(reason, 20, 150, 2);
     }
 
     // For now, halt upon getting a kernel panic.
-    for (;;) {
-    }
+    for (;;) {}
+
 }
 
-extern "C" void interrupt_handler(interrupt_state_t interruptState) {
+extern "C" void interrupt_exception_handler(interrupt_state_t interruptState) {
+    switch (interruptState.int_no) {
+        // Page Fault
+        case 14:
+            Kernel::print("Page fault occurred.");
+            // kprint(itoa(interruptState.cr2, 16));
+            Kernel::printf("Accessed address: %x%n", interruptState.cr2);
 
-    Kernel::panic(exceptionMessages[interruptState.int_no], interruptState.int_no);
+            [[fallthrough]];
+
+        default:
+            Kernel::panic(exceptionMessages[interruptState.int_no], interruptState.int_no);
+            break;
+    }
 }
 
 extern "C" void interrupt_request_handler(interrupt_state_t interruptState) {
@@ -94,4 +123,12 @@ extern "C" void interrupt_request_handler(interrupt_state_t interruptState) {
         interrupt_handler_t handler = ThornhillInterrupt::getHandlerFor(interruptState.int_no);
         handler(interruptState);
     }
+}
+
+// Not currently randomized. Just implemented for bug checking.
+#define STACK_CHK_GUARD 0x5fbb6beef86cd9f4
+uintptr_t __stack_chk_guard = STACK_CHK_GUARD;
+
+extern "C" [[noreturn]] void __stack_chk_fail(void) {
+    Kernel::panic("Stack check failure.");
 }

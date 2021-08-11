@@ -1,7 +1,7 @@
 #include <stdint.h>
 
-#ifndef TH_TIME_TIMEZONES
-#define TH_TIME_TIMEZONES
+#ifndef TH_KERNEL_TIME_TIMEZONE
+#define TH_KERNEL_TIME_TIMEZONE
 
 struct ThornhillTimeOffset {
     int8_t hours;

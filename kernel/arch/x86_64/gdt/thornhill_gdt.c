@@ -4,17 +4,38 @@
 
 struct tss tss;
 
+// struct thornhill_gdt_table thornhill_gdt_table = {
+//                               /* = (offset in table): purpose */
+//     {0, 0, 0, 0x00, 0x00, 0}, /* = (0x00): null */
+//     {0, 0, 0, 0x9a, 0xa0, 0}, /* = (0x08): kernel code (kernel base selector) */
+//     {0, 0, 0, 0x92, 0xa0, 0}, /* = (0x10): kernel data */
+//     {0, 0, 0, 0x00, 0x00, 0}, /* = (0x18): null (user base selector) */
+//     {0, 0, 0, 0x92, 0xa0, 0}, /* = (0x20): user data */
+//     {0, 0, 0, 0x9a, 0xa0, 0}, /* = (0x28): user code */
+//     {0, 0, 0, 0x92, 0xa0, 0}, /* = (0x30): ovmf data */
+//     {0, 0, 0, 0x9a, 0xa0, 0}, /* = (0x38): ovmf code */
+//     {0, 0, 0, 0x89, 0xa0, 0}, /* = (0x40): tss low */
+//     {0, 0, 0, 0x00, 0x00, 0}, /* = (0x48): tss high */
+// };
+
 struct thornhill_gdt_table thornhill_gdt_table = {
-    {0, 0, 0, 0x00, 0x00, 0}, /* = (0x00): null */
-    {0, 0, 0, 0x9a, 0xa0, 0}, /* = (0x08): kernel code (kernel base selector) */
-    {0, 0, 0, 0x92, 0xa0, 0}, /* = (0x10): kernel data */
-    {0, 0, 0, 0x00, 0x00, 0}, /* = (0x18): null (user base selector) */
-    {0, 0, 0, 0x92, 0xa0, 0}, /* = (0x20): user data */
-    {0, 0, 0, 0x9a, 0xa0, 0}, /* = (0x28): user code */
-    {0, 0, 0, 0x92, 0xa0, 0}, /* = (0x30): ovmf data */
-    {0, 0, 0, 0x9a, 0xa0, 0}, /* = (0x38): ovmf code */
-    {0, 0, 0, 0x89, 0xa0, 0}, /* = (0x40): tss low */
-    {0, 0, 0, 0x00, 0x00, 0}, /* = (0x48): tss high */
+    /*   base,                      limit,                 flag */                  // table offset: purpose
+    /*----------------------------------------------------------*/                  // ---------------------
+    gdtd(0,                         0,                     0),                      // 0x00:         null
+    gdtd(0,                         0,                     TH_GDTD_CODE),           // 0x08:         kernel code
+    gdtd(0,                         0,                     TH_GDTD_DATA),           // 0x10:         kernel data
+    gdtd(0,                         0,                     0),                      // 0x18:         null (user base selector)
+    gdtd(0,                         0,                     TH_GDTD_DATA),           // 0x20:         user data
+    gdtd(0,                         0,                     TH_GDTD_CODE),           // 0x28:         user code
+    gdtd(0,                         0,                     TH_GDTD_DATA),           // 0x30:         firmware data
+    gdtd(0,                         0,                     TH_GDTD_CODE),           // 0x38:         firmware code
+    gdtd(0,                         0,                     TH_GDTD_TSS),            // 0x40:         tss low
+    gdtd(0,                         0,                     0),                      // 0x48:         tss high
 };
+
+// Reminder:
+// We're in long mode, so limit is ignored for all segments and base is
+// ignored for all except fs and gs. Where ignored, it's expected these
+// values be initialized to 0.
 
 #pragma pack()
