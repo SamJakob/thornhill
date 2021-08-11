@@ -23,6 +23,7 @@ int vprintf(const char* fmt, va_list arg) {
 
         if ('%' == c) {
             switch ((c = *fmt++)) {
+                
                 /* %% => print a single % symbol (escape) */
                 case '%':
                     printChar('%');
@@ -42,21 +43,28 @@ int vprintf(const char* fmt, va_list arg) {
                     length += strlen(strPtr);
                     break;
 
+                /* %d => print number as decimal */
                 case 'd':
                     itoa(buffer, va_arg(arg, int), 10, 512);
                     print(buffer);
                     length += strlen(buffer);
                     break;
 
+                /* %x => print number as hexadecimal */
                 case 'x':
+                    itoa(buffer, va_arg(arg, int), 16, 512);
+                    print(buffer);
+                    length += strlen(buffer);
                     break;
-                
+
+                /* %n => print newline */
                 case 'n':
                     printChar('\r');
                     printChar('\n');
                     length += 2;
                     break;
-                }
+
+            }
         } else {
             printChar(c);
             length++;
