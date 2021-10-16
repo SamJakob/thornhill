@@ -1,5 +1,5 @@
 #include <drivers/io.hpp>
-#include <cstdint>
+#include <stdint.h>
 
 #ifndef TH_KERNEL_ARCH_INTERRUPT
 #define TH_KERNEL_ARCH_INTERRUPT

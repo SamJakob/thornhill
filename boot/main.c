@@ -82,7 +82,30 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     Status = THBPrintMessage(L"Starting...");
 
     PreBootMemoryMap MemoryMap;
-    Status = THBAttemptExitBootServices(ImageHandle, &MemoryMap);
+
+    /* Exit boot services. */
+    EFI_MEMORY_DESCRIPTOR* Map = NULL;
+    UINTN MapSize, MapKey;
+    UINTN DescriptorSize;
+    UINT32 DescriptorVersion;
+
+    Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
+    Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
+    Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
+    Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
+    Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
+
+    if (EFI_ERROR(Status))
+        return Status;
+
+    Status = ST->BootServices->ExitBootServices(ImageHandle, MapKey);
+
+    MemoryMap.Map = Map;
+    MemoryMap.MapSize = MapSize;
+    MemoryMap.MapKey = MapKey;
+    MemoryMap.DescriptorSize = DescriptorSize;
+    MemoryMap.DescriptorVersion = DescriptorVersion;
+
     if (EFI_ERROR(Status)) {
         return THBErrorMessage(L"Failed to boot.", &Status);
     }
@@ -111,7 +134,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     HandoffData.memoryMap.segments = HandoffMemorySegments;
 
     /* Jump to kernel start! */
-    ((void (*)(void*)) KernelHeader.e_entry)(
+    ((void (*)(void*)) (KernelHeader.e_entry))(
         (void*) &HandoffData
     );
 

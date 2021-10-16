@@ -12,30 +12,3 @@ int mem_compare(const void* aptr, const void* bptr, UINTN n) {
 
     return 0;
 }
-
-EFI_STATUS THBAttemptExitBootServices(EFI_HANDLE* ImageHandle, PreBootMemoryMap* MemoryMap) {
-
-    EFI_STATUS Status;
-
-    EFI_MEMORY_DESCRIPTOR* Map = NULL;
-    UINTN MapSize, MapKey;
-    UINTN DescriptorSize;
-    UINT32 DescriptorVersion;
-
-    Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
-    Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
-    Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
-
-    if (EFI_ERROR(Status))
-        return Status;
-
-    Status = ST->BootServices->ExitBootServices(ImageHandle, MapKey);
-
-    MemoryMap->Map = Map;
-    MemoryMap->MapSize = MapSize;
-    MemoryMap->MapKey = MapKey;
-    MemoryMap->DescriptorSize = DescriptorSize;
-    MemoryMap->DescriptorVersion = DescriptorVersion;
-    return Status;
-    
-}

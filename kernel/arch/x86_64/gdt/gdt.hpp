@@ -1,5 +1,3 @@
-#include <stdint.h>
-
 #ifndef TH_KERNEL_ARCH_GDT
 #define TH_KERNEL_ARCH_GDT
 

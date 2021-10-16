@@ -1,7 +1,6 @@
 #include <stdint.h>
 
-#ifndef TH_DRIVERS_IO
-#define TH_DRIVERS_IO
+#pragma once
 
 class ThornhillIO {
 
@@ -47,5 +46,3 @@ class ThornhillIO {
         static uint8_t readCMOSRegister (uint16_t cmosRegister, bool isBCDEncodedBinaryDecimal = false);
 
 };
-
-#endif

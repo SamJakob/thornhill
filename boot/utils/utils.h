@@ -20,15 +20,3 @@ typedef struct {
  * were identical.
  */
 int mem_compare(const void* aptr, const void* bptr, UINTN n);
-
-/**
- * @brief Makes three attempts to exit boot services, returning the EFI_STATUS
- * from the internal calls which can then be checked to determine how or if
- * booting should proceed.
- * 
- * @param ImageHandle The EFI_HANDLE that references the current EFI structure.
- * @param MemoryMap The memory map as it was fetched immediately before boot.
- * @return EFI_STATUS The status as returned from the internal calls to exit
- * boot services.
- */
-EFI_STATUS THBAttemptExitBootServices(EFI_HANDLE* ImageHandle, PreBootMemoryMap* MemoryMap);

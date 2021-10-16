@@ -51,10 +51,10 @@ void main(ThornhillHandoff* thornhillHandoff) {
 
     TLB::flush();
 
-    uintptr_t badptr = 0xdeadbeef00;
-    int x = *((int*)badptr);
-
-    Kernel::printf("%x", x);
+//    uintptr_t badptr = 0xdeadbeef00;
+//    int x = *((int*)badptr);
+//
+//    Kernel::printf("%x", x);
 }
 
 extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
@@ -64,10 +64,9 @@ extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
 
     ThornhillGDT::setup();
     ThornhillMemory::Physical::reset();
-
     main(thornhillHandoff);
     for (;;) {}
-    
+
 }
 
 void Kernel::panic(const char* reason, uint64_t interruptNumber) {

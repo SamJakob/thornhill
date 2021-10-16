@@ -2,8 +2,6 @@
 
 #include "kernel/arch/x86_64/include.hpp"
 
-#include <stdint.h>
-
 #ifndef TH_DRIVERS_HARDWARE_TIMER
 #define TH_DRIVERS_HARDWARE_TIMER
 

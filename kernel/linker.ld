@@ -14,18 +14,6 @@ ENTRY(_start)
 	page-aligned to 4KiB pages.
 */
 
-/*
-	Set the program headers.
-
-	This is a useful overview of how PHDRS works:
-	https://doc.ecoscentric.com/gnutools/doc/ld/PHDRS.html
-*/
-PHDRS {
-	headers PT_PHDR PHDRS;
-	text PT_LOAD FILEHDR PHDRS;
-	data PT_LOAD;
-}
-
 SECTIONS {
 	/*
 		Set the location counter to our kernel start address.
@@ -43,7 +31,7 @@ SECTIONS {
 	*/
 	.text ALIGN(4K) : {
 		*(.text*)
-	} :text
+	}
 
 	/*
 		Read-only data.
@@ -52,11 +40,11 @@ SECTIONS {
 	*/
 	.rodata ALIGN(4K) : {
 		*(.rodata*)
-	} :text
+	}
 
 
 	/* Move to the data boundary. */
-	. = 4M;
+	. = . + 2M;
 
 	/*
 		Read-Write Initialized Data.
@@ -65,7 +53,7 @@ SECTIONS {
 	*/
 	.data ALIGN(4K) : {
 		*(.data*)
-	} :data
+	}
 
 	/*
 		Read-Write Zero-Initialized Data.

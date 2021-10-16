@@ -1,5 +1,7 @@
 #include "graphics.hpp"
 
+#include <stddef.h>
+
 uint32_t pixel(PixelFormat format, Color color) {
 
     switch (format) {
@@ -22,7 +24,7 @@ void ThornhillGraphics::initialize(Screen screen) {
 Screen* ThornhillGraphics::getScreen() { return &screen; }
 
 void ThornhillGraphics::drawCharacter(char character, uint16_t x, uint16_t y, int scale) {
-    uint32_t* videoBuffer = (uint32_t*)screen.frame_buffer_base;
+    auto* videoBuffer = (uint32_t*)screen.frame_buffer_base;
 
     for (int screenY = y; screenY < y + (FONT_CHARACTER_HEIGHT * scale); screenY++) {
         for (int screenX = x; screenX < x + (FONT_CHARACTER_WIDTH * scale); screenX++) {

@@ -1,5 +1,4 @@
 # Enable Assembly.
-set(CMAKE_ASM_LINK_EXECUTABLE "/usr/bin/as")
 enable_language(ASM)
 
 # Set source & include directories.
@@ -8,9 +7,10 @@ include_directories(../)
 file(GLOB_RECURSE THK_SOURCES *.cpp *.c ../drivers/*.cpp ../drivers/*.c ../lib/*.cpp ../lib/*.c ../font/*.cpp ../font/*.c)
 
 # Set up compiler and linker flags.
-set(CMAKE_CXX_LINK_EXECUTABLE "/usr/bin/g++ <CMAKE_CXX_LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
-set(CMAKE_CXX_FLAGS "-ffreestanding -n -Wl,--gc-sections -I. -Iarch/ -Iarch/${TH_ARCH} -O3 -Wall -Wextra -nostdlib -mgeneral-regs-only -mno-red-zone -fstack-protector-all")
-set(CMAKE_CXX_LINK_FLAGS "-nostdlib -Wl,--gc-sections -mgeneral-regs-only -mno-red-zone -T linker.ld")
+set(CMAKE_C_FLAGS "-mcmodel=large -ffreestanding")
+set(CMAKE_CXX_FLAGS "-mcmodel=large -ffreestanding -n -Wl,--gc-sections -I. -Iarch/ -Iarch/${TH_ARCH} -O3 -Wall -Wextra -nostdlib -mgeneral-regs-only -mno-red-zone -fstack-protector-all -fPIC")
+set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE_NAME} <CMAKE_CXX_LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_CXX_LINK_FLAGS "-nostdlib -lgcc -Wl,--gc-sections -mgeneral-regs-only -mno-red-zone -T linker.ld -fPIC")
 configure_file(linker.ld linker.ld COPYONLY)
 
 # Load architecture-specific libraries.

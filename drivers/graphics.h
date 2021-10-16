@@ -1,7 +1,6 @@
-#include <stdint.h>
+#include "stdint.h"
 
-#ifndef TH_DRIVERS_GRAPHICS_H
-#define TH_DRIVERS_GRAPHICS_H
+#pragma once
 
 #define PIXEL_SIZE 32
 
@@ -26,5 +25,3 @@ typedef struct {
     uint8_t green;
     uint8_t blue;
 } Color;
-
-#endif

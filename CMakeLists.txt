@@ -18,26 +18,70 @@ get_filename_component(TH_OUTPUT_DIRECTORY          "./out" ABSOLUTE)
 # Set global build system properties.
 set(TH_OUTPUT_IMG "thornhill.img")
 
-# Check dependencies and prerequisites.
-if (NOT EXISTS /usr/include/efi)
-    message(FATAL_ERROR "You must install gnu-efi. On Debian/Ubuntu, this can be done with `sudo apt install gnu-efi`.")
+# Use cross-compilers where necessary.
+if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Darwin")
+    message("Non-native executable environment detected. Using cross-compilers.")
+    set(CMAKE_ASM_LINK_EXECUTABLE x86_64-elf-as)
+    set(CMAKE_C_COMPILER x86_64-elf-gcc)
+    set(CMAKE_CXX_COMPILER x86_64-elf-g++)
+    set(CMAKE_C_LINK_EXECUTABLE_NAME x86_64-elf-ld)
+    set(CMAKE_CXX_LINK_EXECUTABLE_NAME x86_64-elf-g++)
+
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 endif()
 
-find_program(OBJCOPY NAMES "objcopy")
+if (NOT DEFINED CMAKE_ASM_LINK_EXECUTABLE)
+    set(CMAKE_ASM_LINK_EXECUTABLE "/usr/bin/as")
+endif()
+if (NOT DEFINED CMAKE_C_LINK_EXECUTABLE_NAME)
+    set(CMAKE_C_LINK_EXECUTABLE_NAME /usr/bin/ld)
+endif ()
+if (NOT DEFINED CMAKE_CXX_LINK_EXECUTABLE_NAME)
+    set(CMAKE_CXX_LINK_EXECUTABLE_NAME /usr/bin/ld)
+endif ()
+
+# Check dependencies and prerequisites.
+if (NOT EXISTS /usr/include/efi AND NOT EXISTS /usr/local/include/efi)
+    message(FATAL_ERROR
+        "You must install gnu-efi. \
+        On macOS, this can be done by following the guide in the wiki.
+        On Debian/Ubuntu, this can be done with `sudo apt install gnu-efi`."
+    )
+else()
+    if (EXISTS /usr/include/efi)
+        set(EFI_INCLUDE_ROOT /usr/include/efi)
+        set(EFI_INCLUDE_LIB /usr/lib)
+    elseif(EXISTS /usr/local/include/efi)
+        set(EFI_INCLUDE_ROOT /usr/local/include/efi)
+        set(EFI_INCLUDE_LIB /usr/local/lib)
+    endif()
+endif()
+
+find_program(OBJCOPY NAMES "objcopy" "x86_64-elf-objcopy")
 if (NOT OBJCOPY)
     message(FATAL_ERROR "Failed to find objcopy. If you're on Debian/Ubuntu, you might need to install binutils which"
             " can be done with `sudo apt install binutils` or `sudo apt install binutils-common` depending on your"
-            " system version.")
+            " system version. On macOS, this can be done with `brew install x86_64-elf-binutils`.")
 endif()
 
 find_program(MKFSFAT NAMES "mkfs.fat")
 if (NOT MKFSFAT)
-    message(FATAL_ERROR "You must install dosfstools. On Debian/Ubuntu, this can be done with `sudo apt install dosfstools`.")
+    message(FATAL_ERROR
+        "You must install dosfstools. \
+        On macOS, this can be done with `brew install dosfstools`. \
+        On Debian/Ubuntu, this can be done with `sudo apt install dosfstools`."
+    )
 endif()
 
 find_program(MTOOLS NAMES "mtools")
 if (NOT MTOOLS)
-    message(FATAL_ERROR "You must install mtools. On Debian/Ubuntu, this can be done with `sudo apt install mtools`.")
+    message(FATAL_ERROR
+        "You must install mtools. \
+        On macOS, this can be done with `brew install mtools`. \
+        On Debian/Ubuntu, this can be done with `sudo apt install mtools`."
+    )
 endif()
 
 # Ensure output directory is ready.

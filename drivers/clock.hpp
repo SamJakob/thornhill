@@ -1,5 +1,3 @@
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 
 #include "../kernel/time/timezone.hpp"

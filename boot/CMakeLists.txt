@@ -1,7 +1,7 @@
 # EFI Library Options
-set(THB_EFI_ROOT /usr/include/efi)
-set(THB_EFI_INCLUDES "-I${THB_EFI_ROOT} -I${THB_EFI_ROOT}/${TH_ARCH} -I${THB_EFI_ROOT}/protocol")
-set(THB_EFI_LIB_DIR /usr/lib)
+set(THB_EFI_ROOT "${EFI_INCLUDE_ROOT}")
+set(THB_EFI_INCLUDES "-I${THB_EFI_ROOT}/.. -I${THB_EFI_ROOT} -I${THB_EFI_ROOT}/${TH_ARCH} -I${THB_EFI_ROOT}/protocol")
+set(THB_EFI_LIB_DIR "${EFI_INCLUDE_LIB}")
 set(THB_EFI_CRT_OBJECTS "${THB_EFI_LIB_DIR}/crt0-efi-${TH_ARCH}.o")
 set(THB_EFI_LINKER_SCRIPT "${THB_EFI_LIB_DIR}/elf_${TH_ARCH}_efi.lds")
 
@@ -15,8 +15,8 @@ if (${TH_ARCH} MATCHES "x86_64")
 endif ()
 
 # Set linker flags and command.
-set(CMAKE_C_LINK_EXECUTABLE "/usr/bin/ld <OBJECTS> <CMAKE_C_LINK_FLAGS> -o <TARGET> <LINK_LIBRARIES>")
-set(CMAKE_C_LINK_FLAGS "-nostdlib -T ${THB_EFI_LINKER_SCRIPT} -shared -Bsymbolic -L ${THB_EFI_LIB_DIR} ${THB_EFI_CRT_OBJECTS} -lefi -lgnuefi")
+set(CMAKE_C_LINK_EXECUTABLE "${CMAKE_C_LINK_EXECUTABLE_NAME} <OBJECTS> <CMAKE_C_LINK_FLAGS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_C_LINK_FLAGS "${THB_EFI_CRT_OBJECTS} -nostdlib -shared -Bsymbolic -lefi -lgnuefi -L${THB_EFI_LIB_DIR} -T${THB_EFI_LINKER_SCRIPT}")
 
 # Build executable from sources.
 add_executable(BOOTX64.so ${THB_SOURCES})

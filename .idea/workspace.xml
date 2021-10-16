@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
     <generated>
       <config projectName="thornhill" targetName="BOOTX64.so" />
       <config projectName="thornhill" targetName="thornhill" />
       <config projectName="thornhill" targetName="gdt_loader.o" />
       <config projectName="thornhill" targetName="populate-thornhill.img" />
-      <config projectName="thornhill" targetName="interrupt_handler.o" />
       <config projectName="thornhill" targetName="emulator" />
       <config projectName="thornhill" targetName="bootloader" />
       <config projectName="thornhill" targetName="BOOTX64.EFI" />
       <config projectName="thornhill" targetName="thornhill.img" />
+      <config projectName="thornhill" targetName="interrupt_handler.o" />
       <config projectName="thornhill" targetName="kernel" />
     </generated>
   </component>
   <component name="CMakeSettings" AUTO_RELOAD="true">
     <configurations>
-      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" ENABLED="true" />
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_SYSTEM_NAME=&quot;Generic&quot;" />
     </configurations>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7f2185c6-23b3-48e6-ab33-45755c79bb2a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/starthotreload.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/hotreload/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/build/hotreload/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +42,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JsbtTreeLayoutManager">
+    <layout place="tools.popupGrunt">
+      <scroll-view-position x="0" y="0" />
+    </layout>
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="jmr268u5" />
   </component>
   <component name="ProjectId" id="1t0AWq7UOzKPWa1qNU5Wut2cyAk" />
   <component name="ProjectViewState">
@@ -60,23 +68,24 @@
     <property name="cmake.loaded.for.project" value="true" />
     <property name="javascript.nodejs.core.library.configured.version" value="14.17.0" />
     <property name="javascript.nodejs.core.library.typings.version" value="14.17.0" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/boot" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="yarn" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\thornhill\boot" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lib/std" />
       <recent name="D:\thornhill\kernel" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.thornhill">
+  <component name="RunManager" selected="CMake Application.emulator">
     <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
@@ -87,7 +96,7 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="BOOTX64.so" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="BOOTX64.so" CONFIG_NAME="Debug">
+    <configuration name="BOOTX64.so" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="BOOTX64.so" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="thornhill" RUN_TARGET_NAME="BOOTX64.so">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -161,10 +170,33 @@
       <workItem from="1621895670180" duration="1890000" />
       <workItem from="1621897591961" duration="10177000" />
       <workItem from="1622055218618" duration="427000" />
+      <workItem from="1629754143634" duration="10460000" />
+      <workItem from="1629844700546" duration="673000" />
+      <workItem from="1629847478959" duration="28000" />
+      <workItem from="1629847520505" duration="29000" />
+      <workItem from="1629847565173" duration="14814000" />
+      <workItem from="1631812312928" duration="6000" />
+      <workItem from="1634400421170" duration="16506000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

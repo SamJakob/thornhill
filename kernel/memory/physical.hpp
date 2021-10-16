@@ -1,6 +1,3 @@
-#include <stddef.h>
-#include <stdint.h>
-
 extern "C" {
 #include "boot/handoff/memory/memory_shared.h"
 }

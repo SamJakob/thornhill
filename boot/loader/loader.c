@@ -20,8 +20,8 @@ EFI_FILE* THBLoadKernelFile(EFI_HANDLE* Handle, CHAR16* FileName) {
 
     if (EFI_ERROR(Status))
         return NULL;
-        else
-            return Kernel;
+    else
+        return Kernel;
 }
 
 CHAR16* THBCheckKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader) {
@@ -61,11 +61,8 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader) {
     // Allocate a memory pool for each of the program sections of the
     // kernel file.
     UINTN KernelProgramHeaderTableSize = KernelHeader->e_phnum * KernelHeader->e_phentsize;
-    ST->BootServices->AllocatePool(
-        EfiLoaderData,
-        KernelProgramHeaderTableSize,
-        (void**) &KernelProgramHeaders
-    );
+    ST->BootServices->AllocatePool(EfiLoaderData, KernelProgramHeaderTableSize,
+                                   (void**)&KernelProgramHeaders);
     Status = Kernel->Read(Kernel, &KernelProgramHeaderTableSize, KernelProgramHeaders);
     if (EFI_ERROR(Status))
         return Status;
@@ -86,14 +83,22 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader) {
             // Loop over the segments until we find a loadable program
             // segment.
             case PT_LOAD: {
-                // Determine how many pages of EFI_PAGE_SIZE are needed for the
-                // section we're currently allocating.
+                // Determine how many pages of EFI_PAGE_SIZE are needed for the section we're
+                // currently allocating.
                 UINTN Pages = ((KernelProgramHeaderEntry->p_memsz + EFI_PAGE_SIZE) - 1) / EFI_PAGE_SIZE;
-                // Identify the desired physical memory address of the section
-                // we're allocating. (Determined by the linker.)
-                Elf64_Addr Segment = KernelProgramHeaderEntry->p_paddr;
-                // Allocate the pages at the desired memory address.
-                Status = ST->BootServices->AllocatePages(AllocateAddress, EfiLoaderData, Pages, &Segment);
+
+                // Once our pages have been allocated in memory, this will be the contiguous base
+                // address of the newly allocated memory pages.
+                Elf64_Addr Segment = KernelProgramHeaderEntry->p_vaddr;
+
+                // Allocate the required number of pages.
+                EFI_MEMORY_TYPE Type =
+                    // If the segment is executable and not writeable, mark it as EfiLoaderCode,
+                    // otherwise mark it as EfiLoaderData.
+                    (KernelProgramHeaderEntry->p_flags & PF_X) != 0 && (KernelProgramHeaderEntry->p_flags & PF_W) == 0
+                        ? EfiLoaderCode : EfiLoaderData;
+                Status = ST->BootServices->AllocatePages(AllocateAddress, Type, Pages, &Segment);
+
                 if (EFI_ERROR(Status))
                     return Status;
 
@@ -107,8 +112,7 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader) {
                 if (EFI_ERROR(Status))
                     return Status;
 
-                // TODO: is there only ever one loadable program segment?
-                // break;
+                break;
             }
         }
     }

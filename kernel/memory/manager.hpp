@@ -1,6 +1,3 @@
-#include <stddef.h>
-#include <stdint.h>
-
 #pragma once
 
 extern "C" {
