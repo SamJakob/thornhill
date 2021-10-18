@@ -5,6 +5,8 @@
 #include "../handoff_shared.h"
 #include "memory_shared.h"
 
+#pragma once
+
 /**
  * @brief Converts an EFI_MEMORY_TYPE to a ThornhillMemoryType for the handoff
  * memory map.

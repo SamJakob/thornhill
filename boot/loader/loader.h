@@ -4,6 +4,43 @@
 #include <efidef.h>
 #include <efilib.h>
 
+#pragma once
+
+/**
+ * @brief Holds the relevant kernel symbols, as extracted by the kernel
+ * binary loader.
+ */
+typedef struct {
+    /**
+     * @brief The virtual memory base address for the kernel.
+     */
+    UINTN KernelBaseAddress;
+    /**
+     * @brief The start address for the kernel.
+     */
+    UINTN KernelStartAddress;
+    /**
+     * @brief The start address for the code segment of the kernel.
+     */
+    UINTN KernelCodeStartAddress;
+    /**
+     * @brief The end address for the code segment of the kernel.
+     */
+    UINTN KernelCodeEndAddress;
+    /**
+     * @brief The start address for the data segment of the kernel.
+     */
+    UINTN KernelDataStartAddress;
+    /**
+     * @brief The end address for the data segment of the kernel.
+     */
+    UINTN KernelDataEndAddress;
+    /**
+     * @brief The end address for the kernel.
+     */
+    UINTN KernelEndAddress;
+} THBKernelSymbols;
+
 /**
  * @brief Loads the specified kernel file from the same device the UEFI
  * bootloader was loaded from.
@@ -45,4 +82,4 @@ CHAR16* THBCheckKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader);
  * THBCheckKernel.
  * @return EFI_STATUS The status as it was passed through from internal calls.
  */
-EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader);
+EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSymbols* KernelSymbols);

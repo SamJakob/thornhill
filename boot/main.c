@@ -10,12 +10,13 @@
 
 #include "display/logging.h"
 #include "loader/loader.h"
+#include "loader/paging.h"
 #include "utils/utils.h"
 
 #include "handoff/handoff.h"
 #include "handoff/memory/memory.h"
 
-#define KERNEL_FILENAME L"kernel"
+#include "config.h"
 
 EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 
@@ -46,8 +47,9 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     }
 
     /* Load the kernel into memory. */
+    THBKernelSymbols KernelSymbols;
     Status = THBPrintMessage(L"Loading kernel...");
-    Status = THBLoadKernel(Kernel, &KernelHeader);
+    Status = THBLoadKernel(Kernel, &KernelHeader, &KernelSymbols);
     if (EFI_ERROR(Status)) {
         return THBErrorMessage(L"Failed to load kernel.", &Status);
     }
@@ -73,15 +75,17 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     }
 
     /* Start handoff procedure so we can jump to kernel. */
-    Status = THBPrintMessage(L"Bootstrapping kernel...");
+    Status = THBPrintMessage(L"Setting up kernel environment...");
     ThornhillHandoff HandoffData;
     THBPrepareHandoffData(&HandoffData, Graphics);
 
+    /* Add page table entry for kernel base address */
+    THBSetupPaging(&KernelSymbols);
+
     /* We're ready! Let's exit boot services, grab the new memory map
         and do this thing! */
-    Status = THBPrintMessage(L"Starting...");
-
     PreBootMemoryMap MemoryMap;
+    Status = THBPrintMessage(L"Starting...");
 
     /* Exit boot services. */
     EFI_MEMORY_DESCRIPTOR* Map = NULL;

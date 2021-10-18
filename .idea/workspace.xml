@@ -24,8 +24,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7f2185c6-23b3-48e6-ab33-45755c79bb2a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/boot/config.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/boot/loader/paging.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/boot/loader/paging.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/display/logging.c" beforeDir="false" afterPath="$PROJECT_DIR$/boot/display/logging.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/display/logging.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/display/logging.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/handoff/handoff.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/handoff/handoff.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/handoff/handoff_shared.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/handoff/handoff_shared.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/handoff/memory/memory.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/handoff/memory/memory.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/handoff/memory/memory_shared.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/handoff/memory/memory_shared.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/loader/loader.c" beforeDir="false" afterPath="$PROJECT_DIR$/boot/loader/loader.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/loader/loader.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/loader/loader.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/boot/main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/utils/utils.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/utils/utils.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kernel/linker.ld" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/linker.ld" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kernel/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +88,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="yarn" />
-    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.textmate.bundles" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -86,11 +100,6 @@
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.emulator">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="BOOTX64.EFI" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="BOOTX64.EFI" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -147,16 +156,16 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="CMake Application.emulator" />
-      <item itemvalue="CMake Application.bootloader" />
       <item itemvalue="CMake Application.BOOTX64.EFI" />
       <item itemvalue="CMake Application.BOOTX64.so" />
-      <item itemvalue="CMake Application.thornhill.img" />
+      <item itemvalue="CMake Application.bootloader" />
+      <item itemvalue="CMake Application.emulator" />
       <item itemvalue="CMake Application.gdt_loader.o" />
       <item itemvalue="CMake Application.interrupt_handler.o" />
       <item itemvalue="CMake Application.kernel" />
       <item itemvalue="CMake Application.populate-thornhill.img" />
       <item itemvalue="CMake Application.thornhill" />
+      <item itemvalue="CMake Application.thornhill.img" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -176,7 +185,10 @@
       <workItem from="1629847520505" duration="29000" />
       <workItem from="1629847565173" duration="14814000" />
       <workItem from="1631812312928" duration="6000" />
-      <workItem from="1634400421170" duration="16506000" />
+      <workItem from="1634400421170" duration="27804000" />
+      <workItem from="1634480270241" duration="10581000" />
+      <workItem from="1634491023714" duration="6475000" />
+      <workItem from="1634569326744" duration="2700000" />
     </task>
     <servers />
   </component>
