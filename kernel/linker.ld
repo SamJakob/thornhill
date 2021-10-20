@@ -49,7 +49,7 @@ SECTIONS {
 		*(.rodata*)
 	}
 
-    kernel_code_end = .;
+	kernel_code_end = .;
 
 	/* Move to the data boundary. */
 	. = . + 2M;
@@ -58,7 +58,8 @@ SECTIONS {
 	/*
 		Read-Write Initialized Data.
 
-		This section will be placed immediately after the previous section (.rodata).
+		This section will be placed immediately after the start of the kernel data boundary
+		(kernel_data_start).
 	*/
 	.data ALIGN(4K) : AT(ADDR(.data) - KERNEL_VIRTUAL_BASE) {
 		*(.data*)
@@ -82,7 +83,7 @@ SECTIONS {
 	}
 	
 
-    kernel_data_end = .;
+	kernel_data_end = .;
 	kernel_end = .;
 
 	/*
