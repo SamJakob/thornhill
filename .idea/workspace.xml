@@ -26,10 +26,7 @@
     <list default="true" id="7f2185c6-23b3-48e6-ab33-45755c79bb2a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/boot/loader/paging.c" beforeDir="false" afterPath="$PROJECT_DIR$/boot/loader/paging.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/loader/paging.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/loader/paging.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/boot/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/boot/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kernel/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kernel/memory/paging.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/memory/paging.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -189,7 +186,7 @@
       <workItem from="1634569326744" duration="9446000" />
       <workItem from="1634672150806" duration="95000" />
       <workItem from="1634672271329" duration="596000" />
-      <workItem from="1634673237689" duration="19519000" />
+      <workItem from="1634673237689" duration="20278000" />
     </task>
     <servers />
   </component>

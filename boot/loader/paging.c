@@ -45,13 +45,17 @@ EFI_STATUS THBSetupPaging(THBKernelSymbols* KernelSymbols) {
     // ...finally, update the P4 to include our copied P3 table.
     Level4PageTable[0] = ((uint64_t) Level3PageTable) | 0b11;
 
+    // Update the CR3 register to replace the previous page table
+    // with our page table. This also has the effect of flushing the
+    // TLB, but we'll do it again explicitly after making our
+    // modifications.
     __asm__ __volatile__ (
         "movq %0,    %%cr3 \n\t"
         : /* no output */
         :  "r" ((uint64_t) Level4PageTable)
     );
 
-    // Allocate space for the P2 and P1 page tables.
+    // Allocate space for the P2 tables.
     uint64_t* Level2PageTable;
     Status = ST->BootServices->AllocatePages(
         AllocateAnyPages,
@@ -60,6 +64,7 @@ EFI_STATUS THBSetupPaging(THBKernelSymbols* KernelSymbols) {
         (EFI_PHYSICAL_ADDRESS*) &Level2PageTable);
     if (EFI_ERROR(Status)) return Status;
 
+    // Allocate space for the P1 tables.
     uint64_t* Level1PageTable;
     Status = ST->BootServices->AllocatePages(
         AllocateAnyPages,
@@ -85,37 +90,19 @@ EFI_STATUS THBSetupPaging(THBKernelSymbols* KernelSymbols) {
                       | 0b11;
     }
 
-//    // Load the P4 page table entry for the kernel's base address,
-//    // then, load the P3 table base address.
-//    uint64_t p3_base = MASK_PAGE_ENTRY_ADDR((*cr3 + MASK_VADDR_P4_ADDR(KernelSymbols->KernelBaseAddress)));
-//
-//    // Load the P3 table entry for the kernel's base address.
-//    uint64_t* p3_entry_addr = (uint64_t*) (p3_base + MASK_VADDR_P3_ADDR(KernelSymbols->KernelBaseAddress));
-//
-//    Print(L"CR3: %x\n", cr3);
-//    Print(L"%x\n", p3_base);
-//    Print(L"%x\n", p3_entry_addr);
-//    Print(L"%x\n", *p3_entry_addr);
-//    Print(L"%x\n", (uint64_t) p3_entry_addr);
-
-    // Write our P2 and P1 tables into P3.
+    // Write our P2 table into our P3 table.
     Level3PageTable[
         MASK_VADDR_P3_ADDR(KernelSymbols->KernelBaseAddress)
     ] = ((uint64_t)Level2PageTable)
                      /* P3 flags: writeable, present. */
                      | 0b11;
 
+    // Apply our changes:
     // Flush the Transatlantic Lobster Buffet.
     __asm__ __volatile__("movq %cr3, %rax \n\t"
                          "movq %rax, %cr3 \n\t");
 
-//    uint64_t* myPVal = (uint64_t*) 0x200000; // 0x7360bb49
-//    Print(L"0x%016lx\n", *myPVal);
-//
-//    uint64_t* myVVal = (uint64_t*) 0x1000200000; // 0x7360bb49
-//    Print(L"0x%016lx\n", *myVVal);
-
-//    for (;;) ;
+    // ...and we're good to go!
     return Status;
 
 }

@@ -96,8 +96,14 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     UINTN DescriptorSize;
     UINT32 DescriptorVersion;
 
+    // It is recommended to get the memory map a few (3-4) times, because there's
+    // a catch-22 scenario, with respect to allocating the memory to store the
+    // memory map (allocating memory for GetMemoryMap, can sometimes change the
+    // memory map meaning it needs to be called again.)
+    // To solve this, the solution is apparently just to call the method a few
+    // times and kinda just hope for the best. So here we are.
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
-    Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize + (8 * 512 * 512), (void**)&Map);
+    Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
     Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
@@ -119,6 +125,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
         return THBErrorMessage(L"Failed to exit pre-boot.", &Status);
     }
 
+    /* Prepare hand-off data based on the memory map that we just fetched. */
     HandoffMemorySegment HandoffMemorySegments[
         (MemoryMap.MapSize / MemoryMap.DescriptorSize)
     ];
