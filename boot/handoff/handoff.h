@@ -6,6 +6,8 @@
 
 #include "handoff_shared.h"
 
+#pragma once
+
 /**
  * @brief Prepares and collects data and pointers in the bootloader for passing
  * to the OS kernel.

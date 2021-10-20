@@ -49,8 +49,8 @@ void main(ThornhillHandoff* thornhillHandoff) {
 
     ThornhillGraphics::drawTime(&startupTime);
 
-    TLB::flush();
-
+//    TLB::flush();
+//
 //    uintptr_t badptr = 0xdeadbeef00;
 //    int x = *((int*)badptr);
 //
@@ -100,14 +100,12 @@ extern "C" void interrupt_exception_handler(interrupt_state_t interruptState) {
         // Page Fault
         case 14:
             Kernel::print("Page fault occurred.");
-            // kprint(itoa(interruptState.cr2, 16));
             Kernel::printf("Accessed address: %x%n", interruptState.cr2);
 
             [[fallthrough]];
 
         default:
             Kernel::panic(exceptionMessages[interruptState.int_no], interruptState.int_no);
-            break;
     }
 }
 

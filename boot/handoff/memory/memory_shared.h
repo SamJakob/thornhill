@@ -1,8 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifndef TH_BOOT_HANDOFF_MEM
-#define TH_BOOT_HANDOFF_MEM
+#pragma once
 
 typedef enum {
     /**
@@ -69,5 +68,3 @@ typedef struct {
     HandoffMemorySegment* segments;
 
 } HandoffMemoryMap;
-
-#endif
