@@ -4,8 +4,7 @@
 #include <efidef.h>
 #include <efilib.h>
 
-#ifndef TH_BOOT_DISPLAY_LOGGING_H
-#define TH_BOOT_DISPLAY_LOGGING_H
+#pragma once
 
 /**
  * @brief Prints the system banner message. This is also used by the bootloader
@@ -46,5 +45,3 @@ EFI_STATUS THBPrintMessage(CHAR16* Message);
  * @return EFI_STATUS The status as it was passed through from internal calls.
  */
 EFI_STATUS THBErrorMessage(CHAR16* ErrorMessage, EFI_STATUS* StatusCode);
-
-#endif

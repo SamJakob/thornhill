@@ -1,8 +1,7 @@
 #include "../../drivers/graphics.h"
 #include "./memory/memory_shared.h"
 
-#ifndef TH_BOOT_HANDOFF
-#define TH_BOOT_HANDOFF
+#pragma once
 
 typedef struct {
 
@@ -10,5 +9,3 @@ typedef struct {
     Screen screen;
 
 } ThornhillHandoff;
-
-#endif

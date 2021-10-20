@@ -8,11 +8,14 @@ ENTRY(_start)
 /*
 	Thornhill is written for UEFI systems, which means we boot up in long mode.
 	Thus, the kernel base address is at 2M to ensure it's not accessed in real
-	mode. This also removes any size limits for the kernel.
+	mode. This also removes any size limits for the kernel. The virtual memory
+	base address is set to 64GiB.
 	
 	As the OS is designed for x86_64 architecture, the kernel's sections are
 	page-aligned to 4KiB pages.
 */
+
+KERNEL_VIRTUAL_BASE = 0x1000000000; /* 64 GiB */
 
 SECTIONS {
 	/*
@@ -22,14 +25,18 @@ SECTIONS {
 		the current value of the location counter, which is then incremented by the size of the
 		outputted section.
 	*/
-	. = 2M;
-	kernel_base = .;
+	. = KERNEL_VIRTUAL_BASE;
+	kernel_virtual_base = .;
+
+	. = KERNEL_VIRTUAL_BASE + 2M;
+	kernel_start = .;
+	kernel_code_start = .;
 
 
 	/*
 		Program code.
 	*/
-	.text ALIGN(4K) : {
+	.text ALIGN(4K) : AT(ADDR(.text) - KERNEL_VIRTUAL_BASE) {
 		*(.text*)
 	}
 
@@ -38,20 +45,23 @@ SECTIONS {
 
 		This section will be placed immediately after the previous section (.text).
 	*/
-	.rodata ALIGN(4K) : {
+	.rodata ALIGN(4K) : AT(ADDR(.rodata) - KERNEL_VIRTUAL_BASE) {
 		*(.rodata*)
 	}
 
+	kernel_code_end = .;
 
 	/* Move to the data boundary. */
 	. = . + 2M;
+	kernel_data_start = .;
 
 	/*
 		Read-Write Initialized Data.
 
-		This section will be placed immediately after the previous section (.rodata).
+		This section will be placed immediately after the start of the kernel data boundary
+		(kernel_data_start).
 	*/
-	.data ALIGN(4K) : {
+	.data ALIGN(4K) : AT(ADDR(.data) - KERNEL_VIRTUAL_BASE) {
 		*(.data*)
 	}
 
@@ -63,7 +73,7 @@ SECTIONS {
 
 		As with before, this will be placed immediately after the previous section (.data).
 	*/
-	.bss ALIGN(4K) : {
+	.bss ALIGN(4K) : AT(ADDR(.bss) - KERNEL_VIRTUAL_BASE) {
 		bss_start = .;
 
 		*(COMMON)
@@ -73,6 +83,7 @@ SECTIONS {
 	}
 	
 
+	kernel_data_end = .;
 	kernel_end = .;
 
 	/*

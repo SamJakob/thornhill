@@ -10,12 +10,13 @@
 
 #include "display/logging.h"
 #include "loader/loader.h"
+#include "loader/paging.h"
 #include "utils/utils.h"
 
 #include "handoff/handoff.h"
 #include "handoff/memory/memory.h"
 
-#define KERNEL_FILENAME L"kernel"
+#include "config.h"
 
 EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 
@@ -46,8 +47,9 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     }
 
     /* Load the kernel into memory. */
+    THBKernelSymbols KernelSymbols;
     Status = THBPrintMessage(L"Loading kernel...");
-    Status = THBLoadKernel(Kernel, &KernelHeader);
+    Status = THBLoadKernel(Kernel, &KernelHeader, &KernelSymbols);
     if (EFI_ERROR(Status)) {
         return THBErrorMessage(L"Failed to load kernel.", &Status);
     }
@@ -73,15 +75,20 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     }
 
     /* Start handoff procedure so we can jump to kernel. */
-    Status = THBPrintMessage(L"Bootstrapping kernel...");
+    Status = THBPrintMessage(L"Setting up kernel environment...");
     ThornhillHandoff HandoffData;
     THBPrepareHandoffData(&HandoffData, Graphics);
 
+    /* Add page table entry for kernel base address */
+    Status = THBSetupPaging(&KernelSymbols);
+    if (EFI_ERROR(Status)) {
+        return THBErrorMessage(L"Failed to set up kernel environment.", &Status);
+    }
+
     /* We're ready! Let's exit boot services, grab the new memory map
         and do this thing! */
-    Status = THBPrintMessage(L"Starting...");
-
     PreBootMemoryMap MemoryMap;
+    Status = THBPrintMessage(L"Starting...");
 
     /* Exit boot services. */
     EFI_MEMORY_DESCRIPTOR* Map = NULL;
@@ -89,6 +96,14 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     UINTN DescriptorSize;
     UINT32 DescriptorVersion;
 
+    // It is recommended to get the memory map a few (3-4) times, because there's
+    // a catch-22 scenario, with respect to allocating the memory to store the
+    // memory map (allocating memory for GetMemoryMap, can sometimes change the
+    // memory map meaning it needs to be called again.)
+    // To solve this, the solution is apparently just to call the method a few
+    // times and kinda just hope for the best. So here we are.
+    Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
+    Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
     Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
@@ -96,7 +111,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
 
     if (EFI_ERROR(Status))
-        return Status;
+        return THBErrorMessage(L"An error occurred whilst preparing to exit pre-boot.", &Status);
 
     Status = ST->BootServices->ExitBootServices(ImageHandle, MapKey);
 
@@ -107,9 +122,10 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     MemoryMap.DescriptorVersion = DescriptorVersion;
 
     if (EFI_ERROR(Status)) {
-        return THBErrorMessage(L"Failed to boot.", &Status);
+        return THBErrorMessage(L"Failed to exit pre-boot.", &Status);
     }
 
+    /* Prepare hand-off data based on the memory map that we just fetched. */
     HandoffMemorySegment HandoffMemorySegments[
         (MemoryMap.MapSize / MemoryMap.DescriptorSize)
     ];

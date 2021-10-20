@@ -1,6 +1,9 @@
+#include "../config.h"
 #include "logging.h"
 
 EFI_STATUS THBPrintBanner(bool ShouldClearScreen) {
+
+#if SHOW_INFO_MESSAGES
 
     EFI_STATUS Status;
 
@@ -19,9 +22,17 @@ EFI_STATUS THBPrintBanner(bool ShouldClearScreen) {
 
     return Status;
 
+#else
+
+    return EFI_SUCCESS;
+
+#endif
+
 }
 
 EFI_STATUS THBPrintMessage(CHAR16* Message) {
+
+#if SHOW_INFO_MESSAGES
 
     // TODO: fetch time manually from the RTC.
 
@@ -55,6 +66,12 @@ EFI_STATUS THBPrintMessage(CHAR16* Message) {
     );
 
     return Status;
+
+#else
+
+    return EFI_SUCCESS;
+
+#endif
 
 }
 
