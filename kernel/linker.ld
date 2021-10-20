@@ -49,6 +49,9 @@ SECTIONS {
 		*(.rodata*)
 	}
 
+	.ctors : { *(.ctors) }
+    .dtors : { *(.dtors) }
+
 	kernel_code_end = .;
 
 	/* Move to the data boundary. */

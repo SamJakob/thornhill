@@ -6,26 +6,12 @@ set(CMAKE_SOURCE_DIR ../)
 include_directories(../)
 file(GLOB_RECURSE THK_SOURCES *.cpp *.c ../drivers/*.cpp ../drivers/*.c ../lib/*.cpp ../lib/*.c ../font/*.cpp ../font/*.c)
 
-# Locate relevant crt*.o files.
-execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=crtbegin.o
-        OUTPUT_VARIABLE CRT_BEGIN_OBJ
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=crtend.o
-        OUTPUT_VARIABLE CRT_END_OBJ
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
 # Set up compiler and linker flags.
 set(CMAKE_C_FLAGS "-mcmodel=large -ffreestanding")
 set(CMAKE_CXX_FLAGS "-mcmodel=large -ffreestanding -n -Wl,--gc-sections -I. -Iarch/ -Iarch/${TH_ARCH} -O3 -Wall -Wextra -nostdlib -mgeneral-regs-only -mno-red-zone -fstack-protector-all -fPIC")
 set(CMAKE_CXX_LINK_FLAGS "-nostdlib -lgcc -Wl,--gc-sections -mgeneral-regs-only -mno-red-zone -T linker.ld -fPIC")
-set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE_NAME} <CMAKE_CXX_LINK_FLAGS> <OBJECTS> -o <TARGET> crti.o ${CRT_BEGIN_OBJ} <LINK_LIBRARIES> ${CRT_END_OBJ} crtn.o")
+set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE_NAME} <CMAKE_CXX_LINK_FLAGS> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
 configure_file(linker.ld linker.ld COPYONLY)
-configure_file(arch/${TH_ARCH}/abi/crti.o crti.o COPYONLY)
-configure_file(arch/${TH_ARCH}/abi/crtn.o crtn.o COPYONLY)
 
 # Load architecture-specific libraries.
 add_library(gdt_loader.o OBJECT "arch/${TH_ARCH}/gdt/gdt_loader.s")

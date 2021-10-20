@@ -64,6 +64,10 @@ extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
 
     ThornhillGDT::setup();
     ThornhillMemory::Physical::reset();
+
+    //char buf[512] = {};
+    //ThornhillSerial::write(itoa(buf, (int64_t) &_init, 16, 512));
+
     main(thornhillHandoff);
     for (;;) {}
 
