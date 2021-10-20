@@ -49,12 +49,12 @@ void main(ThornhillHandoff* thornhillHandoff) {
 
     ThornhillGraphics::drawTime(&startupTime);
 
-    TLB::flush();
-
-    uintptr_t badptr = 0xdeadbeef00;
-    int x = *((int*)badptr);
-
-    Kernel::printf("%x", x);
+//    TLB::flush();
+//
+//    uintptr_t badptr = 0xdeadbeef00;
+//    int x = *((int*)badptr);
+//
+//    Kernel::printf("%x", x);
 }
 
 extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {

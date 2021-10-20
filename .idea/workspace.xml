@@ -24,22 +24,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7f2185c6-23b3-48e6-ab33-45755c79bb2a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/boot/config.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/boot/loader/paging.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/boot/loader/paging.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/display/logging.c" beforeDir="false" afterPath="$PROJECT_DIR$/boot/display/logging.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/display/logging.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/display/logging.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/handoff/handoff.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/handoff/handoff.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/handoff/handoff_shared.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/handoff/handoff_shared.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/handoff/memory/memory.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/handoff/memory/memory.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/handoff/memory/memory_shared.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/handoff/memory/memory_shared.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/loader/loader.c" beforeDir="false" afterPath="$PROJECT_DIR$/boot/loader/loader.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/loader/loader.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/loader/loader.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/loader/paging.c" beforeDir="false" afterPath="$PROJECT_DIR$/boot/loader/paging.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/loader/paging.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/loader/paging.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/boot/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/boot/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot/utils/utils.h" beforeDir="false" afterPath="$PROJECT_DIR$/boot/utils/utils.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kernel/linker.ld" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/linker.ld" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kernel/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kernel/memory/paging.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/memory/paging.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,6 +46,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="JsbtTreeLayoutManager">
     <layout place="tools.popupGrunt">
@@ -88,7 +86,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="yarn" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.textmate.bundles" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -106,6 +104,11 @@
       </method>
     </configuration>
     <configuration name="BOOTX64.so" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="thornhill" TARGET_NAME="BOOTX64.so" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="thornhill" RUN_TARGET_NAME="BOOTX64.so">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -150,11 +153,6 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <list>
       <item itemvalue="CMake Application.BOOTX64.EFI" />
       <item itemvalue="CMake Application.BOOTX64.so" />
@@ -188,7 +186,10 @@
       <workItem from="1634400421170" duration="27804000" />
       <workItem from="1634480270241" duration="10581000" />
       <workItem from="1634491023714" duration="6475000" />
-      <workItem from="1634569326744" duration="2700000" />
+      <workItem from="1634569326744" duration="9446000" />
+      <workItem from="1634672150806" duration="95000" />
+      <workItem from="1634672271329" duration="596000" />
+      <workItem from="1634673237689" duration="19519000" />
     </task>
     <servers />
   </component>

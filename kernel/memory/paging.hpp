@@ -10,58 +10,58 @@ namespace ThornhillKernel {
         /**
          * @brief Whether the page is currently in memory.
          */
-        int present : 1;
+        unsigned int present : 1;
 
         /**
          * @brief Whether the system may write to this page.
          */
-        int writable : 1;
+        unsigned int writable : 1;
 
         /**
          * @brief Whether user-space code may access this page (= true/1) or only
          * kernel-space code may access the page (= false/0).
          */
-        int userAccessible : 1;
+        unsigned int userAccessible : 1;
 
         /**
          * @brief Whether writes to this page bypass the cache and are written
          * directly to memory (= true/1) or not (= false/0).
          */
-        int writeThroughCaching : 1;
+        unsigned int writeThroughCaching : 1;
 
         /**
          * @brief Whether caching is entirely disabled for this page.
          */
-        int disableCache : 1;
+        unsigned int disableCache : 1;
 
         /**
          * @brief Set by the CPU when the page is accessed.
          */
-        int accessed : 1;
+        unsigned int accessed : 1;
 
         /**
          * @brief Set by the CPU when a write to the page occurs.
          */
-        int dirty : 1;
+        unsigned int dirty : 1;
 
         /**
          * @brief Must be a 0 in P1 and P4, creates a 1GiB page in P3 and creates
          * a 2MiB page in P2. (Where Px is the page table level x.)
          */
-        int hugePage : 1;
+        unsigned int hugePage : 1;
 
         /**
          * @brief If set, the page isn't flushed from caches on address space
          * switch, provided the PGE bit of the CR4 register is set.
          */
-        int global : 1;
+        unsigned int global : 1;
 
         /**
          * @brief Currently unused but reserved for use by the OS.
          * 
          * @see ThornhillPageTableEntry::osFlags2
          */
-        int osFlags1 : 3;
+        unsigned int osFlags1 : 3;
 
         /**
          * @brief Stores the 52-bit physical address of the next page table or final
@@ -79,7 +79,7 @@ namespace ThornhillKernel {
          * 
          * @see ThornhillPageTableEntry::osFlags1
          */
-        int osFlags2 : 10;
+        unsigned int osFlags2 : 10;
 
         /**
          * @brief Whether executing code on this page should be forbidden (= true/1)
@@ -87,7 +87,7 @@ namespace ThornhillKernel {
          * 
          * The NXE bit in the EFER register must be set.
          */
-        int noExecute : 1;
+        unsigned int noExecute : 1;
 
     };
 

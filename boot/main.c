@@ -80,7 +80,10 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     THBPrepareHandoffData(&HandoffData, Graphics);
 
     /* Add page table entry for kernel base address */
-    THBSetupPaging(&KernelSymbols);
+    Status = THBSetupPaging(&KernelSymbols);
+    if (EFI_ERROR(Status)) {
+        return THBErrorMessage(L"Failed to set up kernel environment.", &Status);
+    }
 
     /* We're ready! Let's exit boot services, grab the new memory map
         and do this thing! */
@@ -94,13 +97,15 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     UINT32 DescriptorVersion;
 
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
+    Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize + (8 * 512 * 512), (void**)&Map);
+    Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
     Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
     Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
 
     if (EFI_ERROR(Status))
-        return Status;
+        return THBErrorMessage(L"An error occurred whilst preparing to exit pre-boot.", &Status);
 
     Status = ST->BootServices->ExitBootServices(ImageHandle, MapKey);
 
@@ -111,7 +116,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     MemoryMap.DescriptorVersion = DescriptorVersion;
 
     if (EFI_ERROR(Status)) {
-        return THBErrorMessage(L"Failed to boot.", &Status);
+        return THBErrorMessage(L"Failed to exit pre-boot.", &Status);
     }
 
     HandoffMemorySegment HandoffMemorySegments[
