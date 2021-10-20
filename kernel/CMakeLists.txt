@@ -6,10 +6,14 @@ set(CMAKE_SOURCE_DIR ../)
 include_directories(../)
 file(GLOB_RECURSE THK_SOURCES *.cpp *.c ../drivers/*.cpp ../drivers/*.c ../lib/*.cpp ../lib/*.c ../font/*.cpp ../font/*.c)
 
+# Locate relevant crt*.o files.
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=crtbegin.o OUTPUT_VARIABLE CRT_BEGIN_OBJ)
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=crtend.o OUTPUT_VARIABLE CRT_END_OBJ)
+
 # Set up compiler and linker flags.
 set(CMAKE_C_FLAGS "-mcmodel=large -ffreestanding")
 set(CMAKE_CXX_FLAGS "-mcmodel=large -ffreestanding -n -Wl,--gc-sections -I. -Iarch/ -Iarch/${TH_ARCH} -O3 -Wall -Wextra -nostdlib -mgeneral-regs-only -mno-red-zone -fstack-protector-all -fPIC")
-set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE_NAME} <CMAKE_CXX_LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE_NAME} <CMAKE_CXX_LINK_FLAGS> <OBJECTS> -o <TARGET> ${CRT_BEGIN_OBJ} <LINK_LIBRARIES> ${CRT_END_OBJ}")
 set(CMAKE_CXX_LINK_FLAGS "-nostdlib -lgcc -Wl,--gc-sections -mgeneral-regs-only -mno-red-zone -T linker.ld -fPIC")
 configure_file(linker.ld linker.ld COPYONLY)
 
@@ -25,17 +29,17 @@ target_link_libraries(kernel interrupt_handler.o)
 
 # Copy kernel executable to output directory.
 add_custom_command(TARGET kernel POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy kernel ${TH_OUTPUT_DIRECTORY}/kernel
-)
+        COMMAND ${CMAKE_COMMAND} -E copy kernel ${TH_OUTPUT_DIRECTORY}/kernel
+        )
 
 # Finally add kernel to bootable image
 add_custom_target(populate-${TH_OUTPUT_IMG}
-    COMMENT "Adding kernel to bootable image..."
-    COMMAND ${CMAKE_COMMAND} -E copy ${TH_OUTPUT_DIRECTORY}/${TH_OUTPUT_IMG} thornhill.img
-    COMMAND "${TH_BUILD_SCRIPTS_DIRECTORY}/populateimg.sh"
-    COMMAND ${CMAKE_COMMAND} -E copy thornhill.img ${TH_OUTPUT_DIRECTORY}/${TH_OUTPUT_IMG}
-    BYPRODUCTS ${TH_OUTPUT_IMG}
-)
+        COMMENT "Adding kernel to bootable image..."
+        COMMAND ${CMAKE_COMMAND} -E copy ${TH_OUTPUT_DIRECTORY}/${TH_OUTPUT_IMG} thornhill.img
+        COMMAND "${TH_BUILD_SCRIPTS_DIRECTORY}/populateimg.sh"
+        COMMAND ${CMAKE_COMMAND} -E copy thornhill.img ${TH_OUTPUT_DIRECTORY}/${TH_OUTPUT_IMG}
+        BYPRODUCTS ${TH_OUTPUT_IMG}
+        )
 add_dependencies(populate-${TH_OUTPUT_IMG} kernel)
 
 # Add a pseudo-target to build the kernel and populate the bootloader image with the kernel.
