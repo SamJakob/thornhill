@@ -1,13 +1,11 @@
 #include "gdt.hpp"
-#include "drivers/hardware/serial.hpp"
+#include "lib/thornhill/kernel.hpp"
+#include "lib/thornhill/utils.hpp"
 
-void ThornhillGDT::memzero(void* memory, uint64_t length) {
-    for (uint64_t i = 0; i < length; i++)
-        ((uint8_t*)memory)[i] = 0;
-}
+using namespace Thornhill;
 
 void ThornhillGDT::setup() {
-    memzero((void*)&tss, sizeof(tss));
+    memzero((size_t*) &tss, sizeof(tss));
     uint64_t tss_base = ((uint64_t)&tss);
 
     thornhill_gdt_table.tss_low.base15_0 = tss_base & 0xffff;
@@ -22,4 +20,5 @@ void ThornhillGDT::setup() {
     };
 
     load_gdt(&gdt_ptr);
+    Kernel::debug("GDT", "Registered Thornhill GDT successfully.");
 }

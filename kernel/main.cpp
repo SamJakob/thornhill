@@ -11,7 +11,6 @@ extern "C" {
 #include "drivers/hardware/timer.hpp"
 #include "drivers/hardware/serial.hpp"
 
-#include "memory/manager.hpp"
 #include "memory/physical.hpp"
 #include "memory/paging.hpp"
 
@@ -26,7 +25,7 @@ void main(ThornhillHandoff* thornhillHandoff) {
     ThornhillSystemTime startupTime = ThornhillClock::readOfflineTime();
 
     // Start memory management.
-    ThornhillMemoryManager::initialize(thornhillHandoff->memoryMap);
+    ThornhillMemory::Physical::initialize(thornhillHandoff->memoryMap);
 
     /** INITIAL SETUP **/
 
@@ -49,6 +48,17 @@ void main(ThornhillHandoff* thornhillHandoff) {
 
     ThornhillGraphics::drawTime(&startupTime);
 
+//    const char* pagingTestMessage = "In the unlikely event you see this message, paging is actually working!";
+//
+//    auto* pagingTestMessageAddr = reinterpret_cast<uint8_t*>((uint8_t*) pagingTestMessage);
+//    // Now subtract the paging base address from the test message,
+//    // so we can access the same segment of physical memory from
+//    // its identity-mapped address (rather than kernel-mapped
+//    // virtual address).
+//    pagingTestMessageAddr = pagingTestMessageAddr - 0x0000001000000000;
+//
+//    ThornhillGraphics::drawText((const char*) pagingTestMessageAddr, 130, 160);
+
 //    TLB::flush();
 //
 //    uintptr_t badptr = 0xdeadbeef00;
@@ -61,12 +71,10 @@ extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
 
     ThornhillInterrupt::setAllowInterrupts(false);
     ThornhillSerial::initialize();
+    Kernel::debug("Initializing kernel core...");
 
     ThornhillGDT::setup();
     ThornhillMemory::Physical::reset();
-
-    //char buf[512] = {};
-    //ThornhillSerial::write(itoa(buf, (int64_t) &_init, 16, 512));
 
     main(thornhillHandoff);
     for (;;) {}
@@ -88,7 +96,7 @@ void Kernel::panic(const char* reason, uint64_t interruptNumber) {
 
     if (interruptNumber != 69) {
         char itoaBuffer[6];
-        ThornhillGraphics::drawText(itoa(itoaBuffer, interruptNumber, 10, 6), 20, 150, 2);
+        ThornhillGraphics::drawText(uitoa(itoaBuffer, interruptNumber, 10, 6), 20, 150, 2);
         ThornhillGraphics::drawText(reason, 20, 170, 2);
     } else {
         ThornhillGraphics::drawText(reason, 20, 150, 2);

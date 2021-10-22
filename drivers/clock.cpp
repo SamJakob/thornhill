@@ -1,5 +1,4 @@
 #include "clock.hpp"
-
 #include "io.hpp"
 
 const char* MONTHS[] = {"January", "February", "March",     "April",   "May",      "June",
@@ -80,17 +79,17 @@ ThornhillSystemTime ThornhillClock::readOfflineTime() {
 
 void ThornhillClock::applyTimeOffset(ThornhillSystemTime* time, ThornhillTimeOffset offset) {
     time->minutes += offset.minutes;
-    while (time->minutes > 59) {
+    while ((int8_t) time->minutes > 59) {
         time->hours++;
         time->minutes -= 60;
     }
-    while (time->minutes < 0) {
+    while ((int8_t) time->minutes < 0) {
         time->hours--;
         time->minutes += 60;
     }
 
     time->hours += offset.hours;
-    while (time->hours > 12) {
+    while ((int8_t) time->hours > 12) {
         if (time->isPM) {
             time->isPM = false;
             time->day++;
@@ -100,7 +99,7 @@ void ThornhillClock::applyTimeOffset(ThornhillSystemTime* time, ThornhillTimeOff
             time->hours -= 12;
         }
     }
-    while (time->hours < 0) {
+    while ((int8_t) time->hours < 0) {
         if (time->isPM) {
             //time->isPM = false;
             time->hours += 12;

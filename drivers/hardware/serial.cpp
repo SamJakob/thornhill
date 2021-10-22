@@ -1,6 +1,12 @@
 #include "serial.hpp"
 #include "../io.hpp"
 
+#include "lib/thornhill/kernel.hpp"
+
+using namespace Thornhill;
+
+bool ThornhillSerial::initialized = false;
+
 bool ThornhillSerial::isTransitEmpty() {
     return ThornhillIO::readByteFromPort(DEFAULT_SERIAL_PORT + 5) & 0x20;
 }
@@ -25,15 +31,22 @@ bool ThornhillSerial::initialize() {
     // Otherwise, set serial port in normal operation mode.
     // (not-loopback, IRQs enabled, OUT#1 and OUT#2 bits enabled)
     ThornhillIO::writeByteToPort(DEFAULT_SERIAL_PORT + 4, 0x0F);
+    ThornhillSerial::initialized = true;
+
+    Kernel::debug("Serial", "Serial driver initialized successfully!");
     return true;
 }
 
-void ThornhillSerial::writeCharacter(char data) {
+void ThornhillSerial::writeCharacter(unsigned char data) {
+    if (!ThornhillSerial::initialized) return;
+
     while (isTransitEmpty() == 0);
     ThornhillIO::writeByteToPort(DEFAULT_SERIAL_PORT, data);
 }
 
 void ThornhillSerial::write(const char* data, bool newlineChars) {
+    if (!ThornhillSerial::initialized) return;
+
     int index = 0;
     while (data[index] != 0) {
         writeCharacter(data[index]);

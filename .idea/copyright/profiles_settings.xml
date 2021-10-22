@@ -1,0 +1,11 @@
+<component name="CopyrightManager">
+  <settings>
+    <LanguageOptions name="ObjectiveC">
+      <option name="fileTypeOverride" value="3" />
+      <option name="box" value="true" />
+    </LanguageOptions>
+    <LanguageOptions name="Shell Script">
+      <option name="fileTypeOverride" value="3" />
+    </LanguageOptions>
+  </settings>
+</component>

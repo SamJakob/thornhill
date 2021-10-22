@@ -1,7 +1,6 @@
 #include <stdint.h>
 
-#ifndef TH_KERNEL_ARCH_GDT_H
-#define TH_KERNEL_ARCH_GDT_H
+#pragma once
 
 #define TH_KERNEL_CODE_SEGMENT 0x08
 #define TH_KERNEL_DATA_SEGMENT 0x10
@@ -191,5 +190,3 @@
     };
 
 #pragma pack ()
-
-#endif

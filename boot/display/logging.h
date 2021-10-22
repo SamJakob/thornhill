@@ -15,7 +15,7 @@
  * @return EFI_STATUS The status as it was passed through from the call to
  * `SystemTable->ConOut->OutputString`.
  */
-EFI_STATUS THBPrintBanner(bool ShouldClearScreen);
+EFI_STATUS THBPrintBanner(__attribute__((unused)) bool ShouldClearScreen);
 
 /**
  * @brief Prints a system message with time and date as a prefix. This simply
@@ -29,7 +29,7 @@ EFI_STATUS THBPrintBanner(bool ShouldClearScreen);
  * @param Message The UTF-16 char array to print to output.
  * @return EFI_STATUS The status as it was passed through from internal calls.
  */
-EFI_STATUS THBPrintMessage(CHAR16* Message);
+EFI_STATUS THBPrintMessage(__attribute__((unused)) CHAR16* Message);
 
 /**
  * @brief Prints the specified error message with extra formatting. Optionally,
@@ -44,4 +44,4 @@ EFI_STATUS THBPrintMessage(CHAR16* Message);
  * desired, null if not desired.
  * @return EFI_STATUS The status as it was passed through from internal calls.
  */
-EFI_STATUS THBErrorMessage(CHAR16* ErrorMessage, EFI_STATUS* StatusCode);
+EFI_STATUS THBErrorMessage(CHAR16* ErrorMessage, const EFI_STATUS* StatusCode);

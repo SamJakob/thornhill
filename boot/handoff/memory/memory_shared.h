@@ -56,7 +56,7 @@ typedef enum {
 
 typedef struct {
 
-    ThornhillMemoryType memoryType;
+    uint32_t memoryType;
     uint64_t physicalBaseAddress;
     uint64_t pageCount;
 

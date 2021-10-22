@@ -1,5 +1,4 @@
-#ifndef TH_DRIVERS_HARDWARE_SERIAL
-#define TH_DRIVERS_HARDWARE_SERIAL
+#pragma once
 
 #define COM1 0x3F8
 #define COM2 0x2F8
@@ -11,6 +10,7 @@
 class ThornhillSerial {
 
     private:
+      static bool initialized;
       static bool isTransitEmpty();
 
     public:
@@ -24,8 +24,6 @@ class ThornhillSerial {
        */
       static bool initialize();
       
-      static void writeCharacter(char data);
+      static void writeCharacter(unsigned char data);
       static void write(const char* data, bool newlineChars = true);
 };
-
-#endif

@@ -1,8 +1,7 @@
 #include <drivers/io.hpp>
 #include <stdint.h>
 
-#ifndef TH_KERNEL_ARCH_INTERRUPT
-#define TH_KERNEL_ARCH_INTERRUPT
+#pragma once
 
 extern "C" {
     #include "kernel/arch/x86_64/gdt/thornhill_gdt.h"
@@ -57,5 +56,3 @@ class ThornhillInterrupt {
 
       static interrupt_handler_t getHandlerFor(uint8_t interrupt);
 };
-
-#endif

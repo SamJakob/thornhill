@@ -1,5 +1,4 @@
-#ifndef CTHORN_STD_PRINTF
-#define CTHORN_STD_PRINTF
+#pragma once
 
 namespace std {
 
@@ -24,5 +23,3 @@ namespace std {
     int sprintf(char* str, const char* format, ...);
 
 }
-
-#endif

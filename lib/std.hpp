@@ -1,7 +1,4 @@
-#ifndef CTHORN_STD
-#define CTHORN_STD
+#pragma once
 
 // #include "lib/std/printf.hpp"
 #include "lib/std/string.hpp"
-
-#endif

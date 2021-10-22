@@ -36,7 +36,7 @@ namespace std {
         int end = length - 1;
 
         while (start < end) {
-            memswap((uintptr_t)str + start, (uintptr_t)str + end);
+            memswap(str + start, str + end);
             start++;
             end--;
         }

@@ -7,14 +7,14 @@
 
 struct ThornhillSystemTime {
 
-    int8_t year;
-    int16_t fullYear;
-    int8_t month;
-    int8_t day;
+    uint8_t year;
+    uint16_t fullYear;
+    uint8_t month;
+    uint8_t day;
 
-    int8_t hours;
-    int8_t minutes;
-    int8_t seconds;
+    uint8_t hours;
+    uint8_t minutes;
+    uint8_t seconds;
 
     bool isPM;
 };

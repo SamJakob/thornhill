@@ -1,6 +1,3 @@
-#ifndef TH_SYSTEM_CONFIGURATION
-#define TH_SYSTEM_CONFIGURATION
+#pragma once
 
-#define TH_SYSTEM_DEBUG_MODE false
-
-#endif
+#define TH_CONFIG_SYSTEM_DEBUG_MODE true

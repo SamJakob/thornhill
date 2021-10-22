@@ -4,44 +4,40 @@ extern "C" {
 
 #pragma once
 
+struct __attribute__((packed)) ThornhillPhysicalFrame {
+    uint64_t base;
+    uint64_t count;
+    uint64_t next;
+};
+
 namespace ThornhillMemory {
 
-/*
-struct PhysicalMemorySlab {
-    PhysicalMemorySlab* next;
-    PhysicalMemorySlab* prev;
-    bool allocated;
-    size_t size;
-};
-*/
+    class Physical {
 
-class Physical {
+      private:
+        static bool initialized;
 
-  private:
-    static bool isPhysicalAllocatorInitialized;
-    static uint8_t MEMORY[1024 * 1024 / 8];
+        static size_t totalMemory;
+        static size_t usedMemory;
 
-    static size_t totalMemory;
-    static size_t usedMemory;
+      public:
+        //
+        // Getters
+        //
+        static bool isInitialized() { return initialized; }
 
-  public:
-    //
-    // Getters
-    //
-    static bool isInitialized() { return isPhysicalAllocatorInitialized; }
+        static size_t getUsedMemory() { return usedMemory; }
 
-    static size_t getUsedMemory() { return usedMemory; }
+        static size_t getTotalMemory() { return totalMemory; }
 
-    static size_t getTotalMemory() { return totalMemory; }
+        //
+        // Memory Management Functions
+        //
+        static void reset();
 
-    //
-    // Memory Management Functions
-    //
-    static void reset();
+        static void initialize(HandoffMemoryMap bootMap);
 
-    static void initialize(HandoffMemoryMap handoffMemoryMap);
-
-    static void allocate(size_t memorySize);
-};
+        static void allocate(size_t memorySize);
+    };
 
 } // namespace ThornhillMemory

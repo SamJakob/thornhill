@@ -17,6 +17,10 @@ uint32_t pixel(PixelFormat format, Color color) {
 }
 
 void ThornhillGraphics::initialize(Screen screen) {
+    Kernel::debug("Graphics", "Initializing graphics driver...");
+    Kernel::debugf("Graphics", "\tDimensions: %ux%u", screen.width, screen.height);
+    Kernel::debugf("Graphics", "\tFramebuffer Base: 0x%x", screen.frame_buffer_base);
+
     ThornhillGraphics::screen = screen;
     ThornhillGraphics::clear(rgb(0, 128, 128));
 }

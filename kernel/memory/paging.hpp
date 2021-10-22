@@ -1,7 +1,6 @@
 #include <stdint.h>
 
-#ifndef TH_KERNEL_MEMORY_PAGING
-#define TH_KERNEL_MEMORY_PAGING
+#pragma once
 
 namespace ThornhillKernel {
 
@@ -118,5 +117,3 @@ namespace ThornhillKernel {
     };
 
 }
-
-#endif

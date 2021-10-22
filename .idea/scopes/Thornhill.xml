@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Thornhill" pattern="file[thornhill]:*/" />
+</component>

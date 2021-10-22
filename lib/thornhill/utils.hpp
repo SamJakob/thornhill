@@ -1,8 +1,8 @@
 #include <stdarg.h>
+#include <stddef.h>
 #include <stdint.h>
 
-#ifndef CTHORN_THORNHILL_UTILS
-#define CTHORN_THORNHILL_UTILS
+#pragma once
 
 namespace Thornhill {
 
@@ -13,7 +13,22 @@ namespace Thornhill {
      * @param a A byte pointer to swap with b.
      * @param b A byte pointer to swap with a.
      */
-    void memswap(uintptr_t a, uintptr_t b);
+    void memswap(char* a, char* b);
+
+    /**
+     * @brief Sets a section of memory from base to base + size to 0.
+     *
+     * @param base The base address.
+     * @param size The number of bytes after the base address to clear
+     * (i.e., the size of the cleared buffer).
+     */
+    void memzero(size_t* base, size_t size);
+
+    /**
+     * @brief Same as `itoa`, but works on unsigned integers.
+     * @see itoa
+     */
+    const char* uitoa(char* buffer, uint64_t value, uint8_t base, int bufferMax = 0);
 
     /**
      * @brief Converts the specified integer value to an ASCII
@@ -35,5 +50,3 @@ namespace Thornhill {
     const char* itoa(char* buffer, int64_t value, uint8_t base, int bufferMax = 0);
 
 }     // namespace Thornhill
-
-#endif

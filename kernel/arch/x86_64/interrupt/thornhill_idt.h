@@ -1,7 +1,6 @@
 #include <stdint.h>
 
-#ifndef TH_KERNEL_ARCH_IDT_H
-#define TH_KERNEL_ARCH_IDT_H
+#pragma once
 
 #pragma pack (1)
 
@@ -37,5 +36,3 @@ typedef enum {
     IDT_GATE_32BIT_INT      = 0b1110,
     IDT_GATE_32BIT_TRAP     = 0b1111
 } CpuIdtGateType;
-
-#endif

@@ -1,14 +1,12 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#ifndef CTHORN_THORNHILL_KERNEL
-#define CTHORN_THORNHILL_KERNEL
+#pragma once
 
 namespace Thornhill {
 
   namespace Kernel {
       [[noreturn]] void panic(const char* reason, uint64_t interruptNumber = 69);
-
 
       /**
        * @brief Prints the specified character in the serial debug
@@ -54,4 +52,4 @@ namespace Thornhill {
 
 }; // namespace Thornhill
 
-#endif
+#include "kernel_debug.hpp"

@@ -1,7 +1,7 @@
 #include "../config.h"
 #include "logging.h"
 
-EFI_STATUS THBPrintBanner(bool ShouldClearScreen) {
+EFI_STATUS THBPrintBanner(__attribute__((unused)) bool ShouldClearScreen) {
 
 #if SHOW_INFO_MESSAGES
 
@@ -30,7 +30,7 @@ EFI_STATUS THBPrintBanner(bool ShouldClearScreen) {
 
 }
 
-EFI_STATUS THBPrintMessage(CHAR16* Message) {
+EFI_STATUS THBPrintMessage(__attribute__((unused)) CHAR16* Message) {
 
 #if SHOW_INFO_MESSAGES
 
@@ -52,7 +52,7 @@ EFI_STATUS THBPrintMessage(CHAR16* Message) {
         CurrentHour = 12;
 
     Print(
-        (CHAR16*) L"[%d/%02d/%d %d:%02d:%02d %s] %s\r\n",
+        (CHAR16*) L"[BOOT] [%d/%02d/%d %d:%02d:%02d %s] %s\r\n",
         CurrentTime.Month,
         CurrentTime.Day,
         CurrentTime.Year,
@@ -75,7 +75,7 @@ EFI_STATUS THBPrintMessage(CHAR16* Message) {
 
 }
 
-EFI_STATUS THBErrorMessage(CHAR16* ErrorMessage, EFI_STATUS* StatusCode) {
+EFI_STATUS THBErrorMessage(CHAR16* ErrorMessage, const EFI_STATUS* StatusCode) {
 
     EFI_INPUT_KEY Key;
 

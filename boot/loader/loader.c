@@ -1,5 +1,6 @@
 #include "loader.h"
 
+#include <efilib.h>
 #include "../utils/utils.h"
 
 EFI_FILE* THBLoadKernelFile(EFI_HANDLE* Handle, CHAR16* FileName) {
@@ -35,7 +36,7 @@ CHAR16* THBCheckKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader) {
 
     /* Verify the kernel binary */
     if (
-        mem_compare(&(KernelHeader->e_ident[EI_MAG0]), ELFMAG, SELFMAG) != 0 ||
+        CompareMem(&(KernelHeader->e_ident[EI_MAG0]), ELFMAG, SELFMAG) != 0 ||
         KernelHeader->e_ident[EI_CLASS] != ELFCLASS64 ||
         KernelHeader->e_ident[EI_DATA] != ELFDATA2LSB ||
         KernelHeader->e_machine != EM_X86_64 ||
@@ -226,27 +227,27 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSy
             ) {
 
                 if (KernelSymbolEntry->st_name != 0) {
-                    char* SymbolName = KernelStringTable + KernelSymbolEntry->st_name;
+                    const CHAR8* SymbolName = (const CHAR8*) (KernelStringTable + KernelSymbolEntry->st_name);
 
-                    if (strcmpa(SymbolName, "kernel_virtual_base") == 0)
+                    if (strcmpa(SymbolName, (const CHAR8*) "kernel_virtual_base") == 0)
                         KernelSymbols->KernelBaseAddress = KernelSymbolEntry->st_value;
 
-                    if (strcmpa(SymbolName, "kernel_start") == 0)
+                    if (strcmpa(SymbolName, (const CHAR8*) "kernel_start") == 0)
                         KernelSymbols->KernelStartAddress = KernelSymbolEntry->st_value;
 
-                    if (strcmpa(SymbolName, "kernel_code_start") == 0)
+                    if (strcmpa(SymbolName, (const CHAR8*) "kernel_code_start") == 0)
                         KernelSymbols->KernelCodeStartAddress = KernelSymbolEntry->st_value;
 
-                    if (strcmpa(SymbolName, "kernel_code_end") == 0)
+                    if (strcmpa(SymbolName, (const CHAR8*) "kernel_code_end") == 0)
                         KernelSymbols->KernelCodeEndAddress = KernelSymbolEntry->st_value;
 
-                    if (strcmpa(SymbolName, "kernel_data_start") == 0)
+                    if (strcmpa(SymbolName, (const CHAR8*) "kernel_data_start") == 0)
                         KernelSymbols->KernelDataStartAddress = KernelSymbolEntry->st_value;
 
-                    if (strcmpa(SymbolName, "kernel_data_end") == 0)
+                    if (strcmpa(SymbolName, (const CHAR8*) "kernel_data_end") == 0)
                         KernelSymbols->KernelDataEndAddress = KernelSymbolEntry->st_value;
 
-                    if (strcmpa(SymbolName, "kernel_end") == 0)
+                    if (strcmpa(SymbolName, (const CHAR8*) "kernel_end") == 0)
                         KernelSymbols->KernelEndAddress = KernelSymbolEntry->st_value;
                 }
 

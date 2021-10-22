@@ -1,7 +1,6 @@
 #include <stdint.h>
 
-#ifndef TH_KERNEL_ARCH_ISR_H
-#define TH_KERNEL_ARCH_ISR_H
+#pragma once
 
 typedef struct {
     uint64_t cr0, cr2, cr3, cr4, rbp, rsi, rdi, rax, rbx, rcx, rdx;
@@ -81,5 +80,3 @@ extern void irq15();
 #define IRQ15 47
 
 typedef void (*interrupt_handler_t)(interrupt_state_t);
-
-#endif
