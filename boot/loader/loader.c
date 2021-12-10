@@ -1,7 +1,7 @@
 #include "loader.h"
 
+#include "../utils/thutils.h"
 #include <efilib.h>
-#include "../utils/utils.h"
 
 EFI_FILE* THBLoadKernelFile(EFI_HANDLE* Handle, CHAR16* FileName) {
     EFI_STATUS Status;

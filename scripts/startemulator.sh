@@ -21,4 +21,4 @@ fi
 
 echo "Starting system with image $ISOLocation..."
 # qemu-system-x86_64 -qmp tcp:localhost:4444,server,nowait -bios "$OVMFLocation" "$ISOLocation" -monitor stdio -no-reboot -no-shutdown -D ./qemu-log.txt -d int
-qemu-system-x86_64 -m 4096M -qmp tcp:localhost:4444,server,nowait -bios "$OVMFLocation" "$ISOLocation" -monitor stdio
+qemu-system-x86_64 -m 512M -qmp tcp:localhost:4444,server,nowait -bios "$OVMFLocation" "$ISOLocation" -monitor stdio

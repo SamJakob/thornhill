@@ -9,6 +9,8 @@
 #error "The system architecture is not defined. Please include a system architecture's include.hpp."
 #endif
 
+#define PAGES(__x) (TH_ARCH_PAGE_SIZE * (__x))
+
 #define PAGE_ALIGN(__x) ((__x) + TH_ARCH_PAGE_SIZE - ((__x) % TH_ARCH_PAGE_SIZE))
 
 #define IS_PAGE_ALIGNED(__x)            \

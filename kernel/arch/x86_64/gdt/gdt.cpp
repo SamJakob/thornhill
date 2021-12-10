@@ -1,6 +1,5 @@
 #include "gdt.hpp"
-#include "lib/thornhill/kernel.hpp"
-#include "lib/thornhill/utils.hpp"
+#include <thornhill>
 
 using namespace Thornhill;
 

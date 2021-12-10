@@ -1,6 +1,6 @@
-#include "string.hpp"
+#include <cstring>
 
-#include "lib/thornhill.hpp"
+#include <thornhill>
 using namespace Thornhill;
 
 namespace std {

@@ -1,0 +1,85 @@
+#include <stdint.h>
+#include <stdarg.h>
+
+#pragma once
+
+/**
+ * When the system triggers its own kernel panic, this interrupt number is used to signify that
+ * additional system data may be available from within the kernel, rather than by reading the state
+ * of external hardware.
+ *
+ * This additionally lets the system know that errors needn't include hardware interrupt
+ * information as the cause of the panic wasn't a hardware issue.
+ */
+#define SYSTEM_SELF_PANIC_INTERRUPT_NUMBER 69
+
+namespace Thornhill {
+
+    namespace Kernel {
+        /**
+         * To be used when the system encounters a fatal or unrecoverable error or enters an
+         * illegal state, such that if the system were to continue as normal, the system would
+         * become unstable or unreliable.
+         *
+         * This causes the system to display a message in the serial debug console and on screen,
+         * and to halt, stopping all execution.
+         *
+         * @param reason The textual reason for the kernel panic. For a software panic this can be
+         * defined as appropriate. For a hardware panic, this will be defined by the stub
+         * responsible for the interrupt number set when the hardware exception was triggered.
+         * @param interruptNumber The interrupt number, if there was a hardware exception. For
+         * software exceptions, this is always set to SYSTEM_SELF_PANIC_INTERRUPT_TIMER.
+         * @param context Optionally, additional contextual information about where or why the
+         * kernel panic was triggered.
+         */
+        [[noreturn]] void panic(
+            const char* reason,
+            uint64_t interruptNumber = SYSTEM_SELF_PANIC_INTERRUPT_NUMBER,
+            const char* context = nullptr
+        );
+
+        /**
+        * @brief Prints the specified character in the serial debug
+        * console.
+        *
+        * @param c The character to print in the serial console.
+        */
+        void printChar(char c);
+
+        /**
+        * @brief Prints the specified message in the serial debug
+        * console.
+        *
+        * @param message The message to print in the serial console.
+        * @param appendNewline Whether a newline should be appended
+        * after printing.
+        */
+        void print(const char* message, bool appendNewline = true);
+
+        /**
+        * @brief Prints the specified string format, after applying
+        * any formatting rules in the string, in the serial debug
+        * console.
+        *
+        * @param fmt The message to print, with formatting rules.
+        * @param ... The arguments, if any, for the format.
+        */
+        void printf(const char* fmt...);
+
+        /**
+        * @brief Just like printf, however it uses a va_list to
+        * obtain the arguments instead. This method is intended
+        * for API use.
+        *
+        * This also returns the number of characters printed.
+        *
+        * @param fmt The message to print, with formatting rules.
+        * @param arg The arguments, if any, for the format.
+        * @return The number of characters printed.
+        */
+        int vprintf(const char* fmt, va_list arg);
+    }; // namespace Kernel
+
+}; // namespace Thornhill
+
+#include "../src/kernel_debug.hpp"

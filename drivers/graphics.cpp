@@ -1,6 +1,12 @@
 #include "graphics.hpp"
 
 #include <stddef.h>
+#include <cstring>
+
+#include <thornhill>
+#include <utilities>
+
+using namespace Thornhill;
 
 uint32_t pixel(PixelFormat format, Color color) {
 

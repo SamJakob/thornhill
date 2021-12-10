@@ -1,0 +1,15 @@
+#pragma once
+
+namespace std {
+
+    template <class T>
+    constexpr const T& min(const T& lhs, const T& rhs) {
+        return (rhs < lhs) ? rhs : lhs;
+    }
+
+    template <class T>
+    constexpr const T& max(const T& lhs, const T& rhs) {
+        return (lhs < rhs) ? rhs : lhs;
+    }
+
+};

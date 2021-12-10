@@ -1,6 +1,5 @@
-#include "utils.hpp"
-
-#include "lib/std/string.hpp"
+#include <cstring>
+#include <utilities>
 
 using namespace std;
 
@@ -12,19 +11,21 @@ namespace Thornhill {
         *(uint8_t*)a = temp;
     }
 
-    void memzero(size_t* base, size_t size) {
+    void memzero(void* base, size_t size) {
+
+        auto* baseSz = (size_t*) base;
 
         size_t clearSize = size / sizeof(size_t);
-        size_t* ptr = base;
+        size_t* ptr = baseSz;
 
         // Clear up to the register-sized max
-        for (; ptr < base + clearSize; ptr++) {
+        for (; ptr < baseSz + clearSize; ptr++) {
             *ptr = 0;
         }
 
         // Clear the remainder using byte operations.
         uint8_t* bytePtr = ((uint8_t*) ptr) + 1;
-        for (; bytePtr < reinterpret_cast<uint8_t*>(base) + size; bytePtr++) {
+        for (; bytePtr < reinterpret_cast<uint8_t*>(baseSz) + size; bytePtr++) {
             *bytePtr = 0;
         }
 

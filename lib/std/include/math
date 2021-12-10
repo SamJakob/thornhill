@@ -1,0 +1,19 @@
+#pragma once
+
+namespace std {
+
+    inline long double floor(long double value) {
+        return __builtin_floorl(value);
+    }
+
+    inline long double round(long double value) {
+        return __builtin_roundl(value);
+    }
+
+    inline long double ceil(long double value) {
+        return __builtin_ceill(value);
+    }
+
+    long long int ceilToN(long double value, long long int multiple);
+
+};

@@ -1,8 +1,7 @@
-#include "kernel.hpp"
+#include <cstring>
+#include <thornhill>
 
 #include "drivers/hardware/serial.hpp"
-#include "lib/std.hpp"
-#include "lib/thornhill.hpp"
 
 using namespace std;
 using namespace Thornhill;

@@ -2,7 +2,7 @@ extern "C" {
 #include "boot/handoff/handoff_shared.h"
 }
 
-#include "lib/thornhill.hpp"
+#include <thornhill>
 
 #include "drivers/clock.hpp"
 #include "drivers/graphics.hpp"
@@ -12,25 +12,22 @@ extern "C" {
 #include "drivers/hardware/serial.hpp"
 
 #include "memory/physical.hpp"
-#include "memory/paging.hpp"
 
-using namespace ThornhillKernel;
 using namespace Thornhill;
 // #include "../lib/posix.hpp"
 // using namespace POSIX;
 
+bool HAS_BOOTED = false;
+
 void main(ThornhillHandoff* thornhillHandoff) {
+
+    /** SYSTEM STARTUP **/
 
     // Read startup time.
     ThornhillSystemTime startupTime = ThornhillClock::readOfflineTime();
 
     // Start memory management.
     ThornhillMemory::Physical::initialize(thornhillHandoff->memoryMap);
-
-    /** INITIAL SETUP **/
-
-    // Initialize the display and timer.
-    ThornhillGraphics::initialize(thornhillHandoff->screen);
 
     // Register the new interrupt handlers.
     ThornhillInterrupt::setupInterrupts();
@@ -40,6 +37,7 @@ void main(ThornhillHandoff* thornhillHandoff) {
     ThornhillKeyboard::initialize();
 
     /** KERNEL **/
+    HAS_BOOTED = true;
     ThornhillTimer::initialize(20, startupTime);
     ThornhillGraphics::drawTTY();
 
@@ -69,10 +67,15 @@ void main(ThornhillHandoff* thornhillHandoff) {
 
 extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
 
+    HAS_BOOTED = false;
     ThornhillInterrupt::setAllowInterrupts(false);
+
+    // Initialize the serial and display drivers.
     ThornhillSerial::initialize();
     Kernel::debug("Initializing kernel core...");
+    ThornhillGraphics::initialize(thornhillHandoff->screen);
 
+    // Initialize core memory management services.
     ThornhillGDT::setup();
     ThornhillMemory::Physical::reset();
 
@@ -81,25 +84,38 @@ extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
 
 }
 
-void Kernel::panic(const char* reason, uint64_t interruptNumber) {
+void Kernel::panic(const char* reason, uint64_t interruptNumber, const char* context) {
 
     ThornhillInterrupt::setAllowInterrupts(false);
 
     ThornhillSerial::write("!!! THORNHILL KERNEL PANIC !!!");
     ThornhillSerial::write(reason);
+    if (context != nullptr) ThornhillSerial::write(context);
     ThornhillSerial::write("!!! THORNHILL KERNEL PANIC !!!");
 
     ThornhillGraphics::clear(rgb(34, 34, 34));
 
     ThornhillGraphics::drawText("Thornhill", 20, 50, 6);
-    ThornhillGraphics::drawText("// The system needs to be restarted.", 20, 100, 2);
+    ThornhillGraphics::drawText(
+        HAS_BOOTED ? "Your system needs to be restarted." : "Your system failed to boot.",
+        20, 100, 2
+    );
 
-    if (interruptNumber != 69) {
+    if (interruptNumber == SYSTEM_SELF_PANIC_INTERRUPT_NUMBER) {
+        /* A kernel software error triggered the panic. */
+
+        // Print the reason and context (if available) below the reason.
+        ThornhillGraphics::drawText(reason, 20, 150, 2);
+        ThornhillGraphics::drawText(context, 20, 170, 1);
+    } else {
+        /* A hardware error caused the kernel panic. */
+
+        // Temporary buffer for converting the interrupt number to a string.
         char itoaBuffer[6];
+
+        // Draw the interrupt number and reason to the screen.
         ThornhillGraphics::drawText(uitoa(itoaBuffer, interruptNumber, 10, 6), 20, 150, 2);
         ThornhillGraphics::drawText(reason, 20, 170, 2);
-    } else {
-        ThornhillGraphics::drawText(reason, 20, 150, 2);
     }
 
     // For now, halt upon getting a kernel panic.

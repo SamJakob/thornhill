@@ -1,0 +1,8 @@
+#pragma once
+
+// Define useful constants and macros.
+#define null 0
+
+// Define standard thornhill libraries.
+#include <kernel>
+#include <utilities>

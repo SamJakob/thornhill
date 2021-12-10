@@ -22,7 +22,7 @@ namespace Thornhill {
      * @param size The number of bytes after the base address to clear
      * (i.e., the size of the cleared buffer).
      */
-    void memzero(size_t* base, size_t size);
+    void memzero(void* base, size_t size);
 
     /**
      * @brief Same as `itoa`, but works on unsigned integers.

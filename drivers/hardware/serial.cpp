@@ -1,7 +1,7 @@
 #include "serial.hpp"
-#include "../io.hpp"
 
-#include "lib/thornhill/kernel.hpp"
+#include <thornhill>
+#include "../io.hpp"
 
 using namespace Thornhill;
 

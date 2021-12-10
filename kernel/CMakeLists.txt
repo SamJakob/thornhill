@@ -8,8 +8,8 @@ file(GLOB_RECURSE THK_SOURCES *.cpp *.c ../drivers/*.cpp ../drivers/*.c ../lib/*
 
 # Set up compiler and linker flags.
 set(CMAKE_C_FLAGS "-mcmodel=large -ffreestanding")
-set(CMAKE_CXX_FLAGS "-mcmodel=large -ffreestanding -n -Wl,--gc-sections -I. -Iarch/ -Iarch/${TH_ARCH} -O3 -Wall -Wextra -Wpedantic -std=c++20 -nostdlib -mgeneral-regs-only -mno-red-zone -fstack-protector-all -fPIC")
-set(CMAKE_CXX_LINK_FLAGS "-nostdlib -lgcc -Wl,--gc-sections -mgeneral-regs-only -mno-red-zone -T linker.ld -fPIC")
+set(CMAKE_CXX_FLAGS "-mcmodel=large -ffreestanding -n -Wl,--gc-sections -I. -Iarch/ -Iarch/${TH_ARCH} -O3 -Wall -Wextra -Wpedantic -std=c++20 -nostdlib -mno-red-zone -fstack-protector-all -fPIC")
+set(CMAKE_CXX_LINK_FLAGS "-nostdlib -lgcc -Wl,--gc-sections -mno-red-zone -T linker.ld -fPIC")
 set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE_NAME} <CMAKE_CXX_LINK_FLAGS> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
 configure_file(linker.ld linker.ld COPYONLY)
 
@@ -21,6 +21,15 @@ add_library(interrupt_handler.o OBJECT "arch/${TH_ARCH}/interrupt/interrupt_hand
 add_executable(kernel "${THK_SOURCES}")
 add_dependencies(kernel bootloader)
 target_link_libraries(kernel gdt_loader.o interrupt_handler.o)
+
+# Add standard library
+set_property(
+        TARGET kernel
+        APPEND PROPERTY
+            INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/../lib/std/include"
+        APPEND PROPERTY
+            INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/../lib/thornhill/include"
+)
 
 # Copy kernel executable to output directory.
 add_custom_command(TARGET kernel POST_BUILD

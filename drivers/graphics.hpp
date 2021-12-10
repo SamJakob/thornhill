@@ -3,15 +3,11 @@
 #include "clock.hpp"
 #include "io.hpp"
 
-#include "lib/thornhill.hpp"
-#include "lib/std.hpp"
 #include "font/font8x8/font8x8_basic.h"
 
-using namespace std;
-using namespace Thornhill;
+#pragma once
 
-#ifndef TH_DRIVERS_GRAPHICS
-#define TH_DRIVERS_GRAPHICS
+using namespace std;
 
 #define FONT_CHARACTER_WIDTH 8
 #define FONT_CHARACTER_HEIGHT 8
@@ -51,5 +47,3 @@ class ThornhillGraphics {
         static void drawTTY();
         static void clear(Color color = rgb(0, 0, 0));
 };
-
-#endif
