@@ -24,7 +24,7 @@ namespace ThornhillMemory {
      * still meeting the specified criteria.
      */
     static uint64_t _firstAvailablePage(HandoffMemoryMap& bootMap, uint64_t minBaseAddress = 1) {
-        assert(minBaseAddress > 0)
+        assert(minBaseAddress > 0);
         uint64_t baseAddress = null;
 
         for (uintptr_t segmentIndex = 0; segmentIndex < bootMap.mapSize / sizeof(HandoffMemorySegment); segmentIndex++) {
@@ -136,6 +136,8 @@ namespace ThornhillMemory {
             // ...and locate the last available page.
             uint64_t lastPage = _lastAvailablePage(bootMap);
 
+            Kernel::debugf("PMM", "last page: %x", lastPage);
+
             if (firstPage == null) {
                 // If we failed to find a page (indicated by firstPage being null), we should panic
                 // because this means there's absolutely no pages available, meaning there's no
@@ -149,19 +151,16 @@ namespace ThornhillMemory {
             uint64_t inventoryPage = firstPage;
             Physical::physicalInventoryBase = firstPage;
 
-            assert(Physical::physicalInventoryBase != null)
-
-                /** The working offset in the inventory page to store the next physical frame. */
-                uint8_t inventoryOffset = 0;
+            assert(Physical::physicalInventoryBase != null);
 
             ThornhillPhysicalFrame* previousFrame = nullptr;
             auto* currentFrame = (ThornhillPhysicalFrame*)inventoryPage;
 
             uint64_t currentPage = _firstAvailablePage(bootMap, inventoryPage + PAGES(1));
 
-            while (currentPage < lastPage) {
+            while (currentPage <= lastPage) {
                 if (currentPage == null) {
-                    Kernel::debug("PMM", "No more usable pages.");
+                    Kernel::debug("PMM", "    No more usable pages.");
                     break;
                 }
 
@@ -175,27 +174,32 @@ namespace ThornhillMemory {
 
                 // Initialize the physical frame that will store the bitmap.
                 currentFrame->base = currentPage;
-                inventoryOffset += 24; // add the frame header to the offset.
+                // inventoryOffset += 24; // add the frame header to the offset.
 
                 // Calculate the size of the bitmap required to hold this contiguous section of pages. If we're at this point of execution, we can guarantee that the current inventory offset will have the appropriate frame headers set.
-                uint16_t bitmapSize = max(min(ceilToN((long double)pageCount / 8, 8),
-                                              (long long)TH_ARCH_PAGE_SIZE - inventoryOffset),
-                                          0LL /* ensure value stored in uint is, in fact, >= 0 */);
-                auto* bitmap = (uint8_t*)(inventoryPage + inventoryOffset);
+                uint16_t bitmapSize = max(
+                    (uint64_t) min(
+                        (uint64_t) ceilToN((long double)pageCount / 8, 8),
+                        (inventoryPage + PAGES(1)) - ((uint64_t)(&currentFrame) + 24)
+                    ),
+                    0UL /* ensure value stored in uint is, in fact, >= 0 */
+                );
+                auto* bitmap = (uint8_t*)(&currentFrame + 24);
                 // Zero the bitmap representing this section.
-                memzero(bitmap, bitmapSize);
+                memzero(&currentFrame + 24, bitmapSize);
 
                 // Determine whether the current bitmap frame filled the inventory page.
-                bool didFillInventoryPage = bitmapSize == TH_ARCH_PAGE_SIZE - inventoryOffset;
+                bool didFillInventoryPage = (uint64_t) &currentFrame + 24 + bitmapSize == (uint64_t) inventoryPage + PAGES(1);
+                if (didFillInventoryPage) Kernel::debug("PMM", "filled inventory page");
 
                 // Update the current frame to reflect the newly defined bitmap.
                 currentFrame->count = bitmapSize / 8;
                 currentFrame->bitmap = bitmap;
 
-                Kernel::debugf("PMM", "Adding %d page(s) (base = %x).", currentFrame->count,
+                Kernel::debugf("PMM", "    Adding %d page(s) (base = %x).", currentFrame->count,
                                currentFrame->base);
                 currentPage += PAGES(currentFrame->count);
-                Kernel::debugf("PMM", "Jumping to page %x", currentPage);
+                Kernel::debugf("PMM", "    Jumping to page %x", currentPage);
 
                 // Reset the current frame, update the previous frame if it exists and then replace
                 // the 'previousFrame' reference with the current frame.
@@ -213,9 +217,9 @@ namespace ThornhillMemory {
                     if (inventoryPage == null)
                         break;
 
-                    inventoryOffset = 0;
+                    // inventoryOffset = 0;
                     currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(inventoryPage);
-                    Kernel::debugf("PMM", "Kernel page filled, seeking next inventory page: %x",
+                    Kernel::debugf("PMM", "    Kernel page filled, seeking next inventory page: %x",
                                    inventoryPage);
 
                     // Then, start processing the next available page.
@@ -224,8 +228,8 @@ namespace ThornhillMemory {
                     // Start processing the next available page.
                     currentFrame = currentFrame + 24 + (bitmapSize / 8);
                     currentPage = _firstAvailablePage(bootMap, currentPage + PAGES(1));
-                    Kernel::debugf("PMM",
-                                   "Kernel page has remainder. Starting again from next page: %x",
+                    if (currentPage != null) Kernel::debugf("PMM",
+                                   "    Kernel page has remainder. Starting again from next page: %x",
                                    currentPage);
                 }
             }
@@ -235,136 +239,22 @@ namespace ThornhillMemory {
         {
             Kernel::debug("PMM", "Checking inventory...");
             auto* currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(Physical::physicalInventoryBase);
+            Kernel::debug("PMM", "    Loading page frame at base address.");
 
             while (currentFrame != null) {
                 Physical::totalMemory += PAGES(currentFrame->count);
+                Kernel::debugf("PMM", "      Cluster base: %x", currentFrame->base);
+                Kernel::debugf("PMM", "      Inventory page: %x", PAGE_ALIGN_DOWN((uint64_t) &currentFrame));
+                Kernel::debugf("PMM", "      Has %d pages.", currentFrame->count);
+                Kernel::debugf("PMM", "      Has %d KiB memory.", currentFrame->count * 4);
                 currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(currentFrame->next);
+                if (currentFrame != null) Kernel::debug("PMM", "    Jumping to next page frame.");
             }
         }
 
         Kernel::debug("PMM", "PMM is ready.");
-        Kernel::debugf("PMM", "\tPhysical memory: %d bytes", Physical::totalMemory);
+        Kernel::debugf("PMM", "\tPhysical memory: %d KiB (bytes)", Physical::totalMemory / 1024, Physical::totalMemory);
 
-    }
-
-    void Physical::initializeLegacy(HandoffMemoryMap bootMap) {
-        Kernel::debug("PMM", "Initializing physical memory manager...");
-
-        if (Physical::initialized) {
-            Kernel::panic("Attempted to re-initialize PMM.");
-        }
-
-        /* Take inventory of the physical memory,
-         * start writing kernel memory structures. */
-        Kernel::debug("PMM", "Taking inventory of memory structures...");
-
-        // Locate first available page with a non-zero memory address.
-        uint64_t baseAddress = _firstAvailablePage(bootMap, 1);
-        // ...and locate the last available page.
-        uint64_t lastBaseAddress = _lastAvailablePage(bootMap);
-
-        // If we failed to find a page, we need to panic as there's nowhere for the PMM to use and
-        // more importantly absolutely no usable memory in the system.
-        if (baseAddress == null) {
-            Kernel::panic("No available memory.");
-        } else Kernel::debugf("PMM", "Taking first page for PMM usage. %x", baseAddress);
-
-        // The base address of the page we're currently 'up to', with respect to taking
-        // inventory. We'll initially start with the page after the one we reserved for
-        // the PMM's inventory.
-        uint64_t currentBaseAddress = baseAddress;
-
-        // The current page serving as an 'inventory' page. (i.e., a page that the PMM
-        // uses to store information about other pages.)
-        struct {
-            // The base address of the page we're currently using to take inventory.
-            uintptr_t base;
-            // The current offset into the page.
-            uint16_t offset;
-        } currentInventory = { .base = null, .offset = 0 };
-
-        ThornhillPhysicalFrame* prevFrame = nullptr;
-
-        while (currentBaseAddress < lastBaseAddress) {
-
-            // If the current base address of the inventory page is null (0), we need
-            // to reserve the current page for our use.
-            if (currentInventory.base == null) {
-                currentInventory.base = currentBaseAddress;
-                currentInventory.offset = 0;
-
-                // Then increment the current base address, to start taking inventory
-                // of the next page.
-                currentBaseAddress += PAGES(1);
-            }
-
-            /* Take inventory in our inventory page. */
-
-            // Grab the section for the current page.
-            uint64_t currentSegmentIndex = _bootMapSegmentForPageAddress(bootMap, currentBaseAddress);
-            HandoffMemorySegment* segment = &bootMap.segments[currentSegmentIndex];
-
-            // The number of pages, to take inventory of, is the number of pages in the segment,
-            // minus the number of pages either reserved for the PMM at the start of the segment,
-            // or the number of pages that have already been taken inventory of.
-//            uint64_t pageCount = segment->pageCount - (
-//                (currentBaseAddress - segment->physicalBaseAddress) /
-//                TH_ARCH_PAGE_SIZE
-//            );
-            uint64_t pageCount = segment->pageCount;
-
-            // Calculate the size of the bitmap required to store the current segment.
-            uint16_t bitmapSize = min(
-                ceilToN((long double) pageCount / 8, 8),
-                (long long int) TH_ARCH_PAGE_SIZE - 24
-            );
-            auto* bitmap = (uint8_t*) (currentBaseAddress + 24);
-            memzero(bitmap, bitmapSize);
-
-            auto* inventoryAddress = (ThornhillPhysicalFrame*) (currentInventory.base + currentInventory.offset);
-            *(inventoryAddress) = {
-                .base = currentBaseAddress,
-                .next = null,
-                .count = pageCount,
-                .bitmap = bitmap
-            };
-            if (prevFrame != nullptr) prevFrame->next = (uint64_t)inventoryAddress;
-            prevFrame = inventoryAddress;
-
-            currentInventory.offset += 24 + bitmapSize;
-            currentBaseAddress += PAGES(pageCount);
-            Kernel::debugf("PMM", "%x", segment->pageCount);
-            Kernel::debugf("PMM", "%x", segment->physicalBaseAddress);
-            Kernel::debugf("PMM", "%x", (currentBaseAddress - segment->physicalBaseAddress) /
-                                            TH_ARCH_PAGE_SIZE);
-            Kernel::debugf("PMM", "%x", pageCount);
-            Kernel::debugf("PMM", "%x", PAGES(pageCount));
-            Kernel::debugf("PMM", "%x", currentBaseAddress);
-
-            for (;;);
-
-            /* End: Take inventory in our inventory page. */
-
-            // If we exceed the amount of data the current page can hold, we'll set our
-            // base to null to 'request' a new page the next time the loop occurs.
-            if (currentInventory.offset > TH_ARCH_PAGE_SIZE) {
-                currentInventory.base = null;
-            }
-
-        }
-//        uintptr_t pmmStructureBase = currentPage;
-//        currentPage += PAGES(1);
-//
-//        for (;pmmStructureBase < pmmStructureBase + PAGES(1);) {
-//            auto* pmmStructure = (ThornhillPhysicalFrame*) pmmStructureBase;
-//
-//            uint64_t currentPageSegmentIndex = _bootMapSegmentForPageAddress(bootMap, pmmStructureBase);
-//        }
-
-//        Physical::usedMemory = usedMemory;
-//        Physical::totalMemory = totalMemory;
-
-        Physical::initialized = true;
     }
 
     void Physical::allocate(size_t memorySize) {

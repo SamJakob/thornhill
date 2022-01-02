@@ -24,7 +24,7 @@
 #define assert(x) do { if (TH_CONFIG_SYSTEM_DEBUG_MODE) { \
     /* If the system is in debug mode, print the assertion failure message. */ \
     if (!(x)) Thornhill::Kernel::panic("Assertion failed: " #x, 69, __FILE__ ":" STR(__LINE__)); \
-} } while (0);
+} } while (0)
 
 namespace Thornhill {
 
