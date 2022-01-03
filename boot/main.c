@@ -89,9 +89,9 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 
     /* Exit boot services. */
     EFI_MEMORY_DESCRIPTOR* Map = NULL;
-    UINTN MapSize, MapKey;
-    UINTN DescriptorSize;
-    UINT32 DescriptorVersion;
+    UINTN MapSize = 0, MapKey = 0;
+    UINTN DescriptorSize = 0;
+    UINT32 DescriptorVersion = 0;
 
     // It is recommended to get the memory map a few (3-4) times, because there's
     // a catch-22 scenario, with respect to allocating the memory to store the
@@ -100,47 +100,56 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     // To solve this, the solution is apparently just to call the method a few
     // times and kinda just hope for the best. So here we are.
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
-    Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
-    Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
-    Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
-    Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
+
+    if (Status != EFI_BUFFER_TOO_SMALL) {
+        return THBErrorMessage(L"Non-compliant UEFI implementation. Report to your local motherboard manufacturer.", &Status);
+    }
+
+    MapSize += (2 * DescriptorSize);
+
+    // Allocate for hand-off data.
+    HandoffMemorySegment* HandoffMemorySegments;
+    Status = ST->BootServices->AllocatePool(
+        EfiLoaderData,
+        sizeof(HandoffMemorySegment) * (MapSize / DescriptorSize),
+        (void**)&HandoffMemorySegments
+    );
+
     Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
 
     if (EFI_ERROR(Status))
         return THBErrorMessage(L"An error occurred whilst preparing to exit the firmware pre-boot environment.", &Status);
 
-    Status = ST->BootServices->ExitBootServices(ImageHandle, MapKey);
-
-    if (EFI_ERROR(Status)) {
-        return THBErrorMessage(L"Failed to exit the firmware pre-boot environment.", &Status);
-    }
-
     /* Prepare hand-off data based on the memory map that we just fetched. */
-    HandoffMemorySegment HandoffMemorySegments[
-        (MapSize / DescriptorSize)
-    ];
+    UINTN SegmentIndex = 0;
     {
-        UINTN* StartOfMap = (UINTN*) Map;
-        UINTN* EndOfMap = StartOfMap + MapSize;
-
-        UINTN SegmentIndex = 0;
-        UINTN* Offset = StartOfMap;
-        EFI_MEMORY_DESCRIPTOR* EfiDescriptor = (EFI_MEMORY_DESCRIPTOR*) Offset;
+        UINTN StartOfMap = (UINTN) Map;
+        UINTN EndOfMap = StartOfMap + MapSize;
+        UINTN Offset = StartOfMap;
 
         while (Offset < EndOfMap) {
+            EFI_MEMORY_DESCRIPTOR* EfiDescriptor = (EFI_MEMORY_DESCRIPTOR*) Offset;
+
             HandoffMemorySegments[SegmentIndex].memoryType =
                 THBUefiToThornhillMemoryType(EfiDescriptor->Type);
             HandoffMemorySegments[SegmentIndex].pageCount = EfiDescriptor->NumberOfPages;
             HandoffMemorySegments[SegmentIndex].physicalBaseAddress = EfiDescriptor->PhysicalStart;
 
+            SegmentIndex++;
             Offset += DescriptorSize;
         }
     }
 
-    HandoffData.memoryMap.mapSize =
-        (MapSize / DescriptorSize) * sizeof(HandoffMemorySegment);
+    HandoffData.memoryMap.mapSize = SegmentIndex;
     HandoffData.memoryMap.segments = HandoffMemorySegments;
+
+    /* Exit boot services. */
+    Status = ST->BootServices->ExitBootServices(ImageHandle, MapKey);
+
+    if (EFI_ERROR(Status)) {
+        return THBErrorMessage(L"Failed to exit the firmware pre-boot environment.", &Status);
+    }
 
     /* Jump to kernel start! */
     ((void (*)(void*)) (KernelHeader.e_entry))(

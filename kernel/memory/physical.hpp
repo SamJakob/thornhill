@@ -50,7 +50,7 @@ namespace ThornhillMemory {
         /**
          * The base address of the first physical memory page holding a page inventory.
          */
-        static size_t physicalInventoryBase;
+        static size_t inventoryBase;
 
         /**
          * The total amount of physical memory available to the system.

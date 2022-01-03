@@ -63,6 +63,8 @@ void main(ThornhillHandoff* thornhillHandoff) {
 //    int x = *((int*)badptr);
 //
 //    Kernel::printf("%x", x);
+
+    Kernel::print("System is ready.");
 }
 
 extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
@@ -73,6 +75,7 @@ extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
     // Initialize the serial and display drivers.
     ThornhillSerial::initialize();
     Kernel::debug("Initializing kernel core...");
+
     ThornhillGraphics::initialize(thornhillHandoff->screen);
 
     // Initialize core memory management services.
