@@ -196,7 +196,6 @@ namespace ThornhillMemory {
 
                 // Determine whether the current bitmap will cause the inventory page to be filled.
                 bool didFillInventoryPage = (uint64_t) bitmap + bitmapSize == (uint64_t) inventoryPage + PAGES(1) - 1;
-                if (didFillInventoryPage) Kernel::debug("PMM", "filled inventory page.");
 
                 // Update the current frame to reflect the newly defined bitmap.
                 currentFrame->count = bitmapSize * 8;
@@ -244,8 +243,6 @@ namespace ThornhillMemory {
                 Physical::totalMemory += PAGES(currentFrame->count);
                 currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(currentFrame->next);
             }
-
-            Kernel::debugf("PMM", "no of pages: %d\n", noOfPages);
         }
 
         if (Physical::totalMemory < 1) {

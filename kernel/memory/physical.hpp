@@ -77,7 +77,6 @@ namespace ThornhillMemory {
         static void reset();
 
         static void initialize(HandoffMemoryMap bootMap);
-        static void initializeLegacy(HandoffMemoryMap bootMap);
 
         static void allocate(size_t memorySize);
     };
