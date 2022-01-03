@@ -4,7 +4,7 @@ param(
 
 # Print header.
 Write-Host "";
-Write-Host "Thornhill";
+Write-Host "Thornhill | USB Creator for Microsoft Windows Development Machines";
 Write-Host "Developed by NBTX";
 Write-Host "";
 

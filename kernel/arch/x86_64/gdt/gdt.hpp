@@ -1,8 +1,6 @@
-#pragma once
+#include "thornhill_gdt.h"
 
-extern "C" {
-  #include "thornhill_gdt.h"
-}
+#pragma once
 
 extern "C" void* load_gdt(void* gdt_ptr);
 

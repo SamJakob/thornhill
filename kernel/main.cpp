@@ -1,9 +1,6 @@
-extern "C" {
-#include "boot/handoff/handoff_shared.h"
-}
-
 #include <thornhill>
 
+#include "boot/handoff/handoff_shared.h"
 #include "drivers/clock.hpp"
 #include "drivers/graphics.hpp"
 #include "drivers/io.hpp"
@@ -14,8 +11,6 @@ extern "C" {
 #include "memory/physical.hpp"
 
 using namespace Thornhill;
-// #include "../lib/posix.hpp"
-// using namespace POSIX;
 
 bool HAS_BOOTED = false;
 
@@ -41,28 +36,7 @@ void main(ThornhillHandoff* thornhillHandoff) {
     ThornhillTimer::initialize(20, startupTime);
     ThornhillGraphics::drawTTY();
 
-    // sprintf(buf, "%s", "hello");
-    // ThornhillGraphics::drawText(buf, 130, 150);
-
     ThornhillGraphics::drawTime(&startupTime);
-
-//    const char* pagingTestMessage = "In the unlikely event you see this message, paging is actually working!";
-//
-//    auto* pagingTestMessageAddr = reinterpret_cast<uint8_t*>((uint8_t*) pagingTestMessage);
-//    // Now subtract the paging base address from the test message,
-//    // so we can access the same segment of physical memory from
-//    // its identity-mapped address (rather than kernel-mapped
-//    // virtual address).
-//    pagingTestMessageAddr = pagingTestMessageAddr - 0x0000001000000000;
-//
-//    ThornhillGraphics::drawText((const char*) pagingTestMessageAddr, 130, 160);
-
-//    TLB::flush();
-//
-//    uintptr_t badptr = 0xdeadbeef00;
-//    int x = *((int*)badptr);
-//
-//    Kernel::printf("%x", x);
 
     Kernel::print("System is ready.");
 
@@ -70,7 +44,7 @@ void main(ThornhillHandoff* thornhillHandoff) {
     ThornhillMemory::Physical::allocate(3);
 }
 
-extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
+extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
 
     HAS_BOOTED = false;
     ThornhillInterrupt::setAllowInterrupts(false);
@@ -129,7 +103,7 @@ void Kernel::panic(const char* reason, uint64_t interruptNumber, const char* con
 
 }
 
-extern "C" void interrupt_exception_handler(interrupt_state_t interruptState) {
+extern "C" [[maybe_unused]] void interrupt_exception_handler(interrupt_state_t interruptState) {
     switch (interruptState.int_no) {
         // Page Fault
         case 14:
@@ -143,7 +117,7 @@ extern "C" void interrupt_exception_handler(interrupt_state_t interruptState) {
     }
 }
 
-extern "C" void interrupt_request_handler(interrupt_state_t interruptState) {
+extern "C" [[maybe_unused]] void interrupt_request_handler(interrupt_state_t interruptState) {
     // After receiving an interrupt request, an EOI (End-Of-Interrupt) needs
     // to be sent to the PICs to indicate that new interrupts may be sent.
     if (interruptState.int_no >= 40)
@@ -158,8 +132,8 @@ extern "C" void interrupt_request_handler(interrupt_state_t interruptState) {
 
 // Not currently randomized. Just implemented for bug checking.
 #define STACK_CHK_GUARD 0x5fbb6beef86cd9f4
-uintptr_t __stack_chk_guard = STACK_CHK_GUARD;
+[[maybe_unused]] uintptr_t __stack_chk_guard = STACK_CHK_GUARD; // NOLINT(bugprone-reserved-identifier)
 
-extern "C" [[noreturn]] void __stack_chk_fail(void) {
+extern "C" [[maybe_unused]] [[noreturn]] void __stack_chk_fail(void) { // NOLINT(bugprone-reserved-identifier)
     Kernel::panic("Stack check failure.");
 }
