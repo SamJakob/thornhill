@@ -1,8 +1,8 @@
-extern "C" {
 #include "boot/handoff/memory/memory_shared.h"
-}
 
 #pragma once
+
+#define PHYSICAL_FRAME_HEADER_SIZE 32
 
 /**
  * A structure used by the Physical Memory Manager (PMM) to store information about a given
@@ -25,6 +25,11 @@ struct __attribute__((packed)) ThornhillPhysicalFrame {
      * from base to base + (count * TH_ARCH_PAGE_SIZE).
      */
     uint64_t count;
+
+    /**
+     * A bitmap of metadata about this physical frame.
+     */
+    uint64_t metadata;
 
     /**
      * The bitmap of page usage information of the pages represented by this frame. Each entry in
@@ -65,11 +70,11 @@ namespace ThornhillMemory {
         //
         // Getters
         //
-        static bool isInitialized() { return initialized; }
+        static inline bool isInitialized() { return initialized; }
 
-        static size_t getUsedMemory() { return usedMemory; }
+        static inline size_t getUsedMemory() { return usedMemory; }
 
-        static size_t getTotalMemory() { return totalMemory; }
+        static inline size_t getTotalMemory() { return totalMemory; }
 
         //
         // Memory Management Functions
@@ -78,7 +83,7 @@ namespace ThornhillMemory {
 
         static void initialize(HandoffMemoryMap bootMap);
 
-        static void allocate(size_t memorySize);
+        static void* allocate(size_t pageCount);
     };
 
 } // namespace ThornhillMemory

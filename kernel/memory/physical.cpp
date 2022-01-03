@@ -65,29 +65,6 @@ namespace ThornhillMemory {
     }
 
     /**
-     * Essentially the same as `_bootMapSegmentForPageAddress`, except it returns a true or false
-     * value indicating whether or not the address is available instead.
-     *
-     * @param bootMap The boot-time memory map that is passed into the PMM
-     * initialization method.
-     * @param address The address to check.
-     * @return True, if there is a boot-map segment containing that memory
-     * address, otherwise false.
-     */
-    static uint64_t _bootMapHasSegmentForPageAddress(HandoffMemoryMap& bootMap, uint64_t address) {
-        for (uintptr_t segmentIndex = 0; segmentIndex < bootMap.mapSize; segmentIndex++) {
-            if (
-                bootMap.segments[segmentIndex].physicalBaseAddress >= address &&
-                address < (bootMap.segments[segmentIndex].physicalBaseAddress + PAGES(bootMap.segments[segmentIndex].pageCount))
-            ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Returns the boot map's segment index of the segment of the page that the specified address
      * belongs to.
      *
@@ -173,13 +150,14 @@ namespace ThornhillMemory {
 
                 // Initialize the frame.
                 currentFrame->base = segment.physicalBaseAddress;
+                currentFrame->metadata = 0;
 
                 // Calculate the size of the bitmap required to hold this contiguous section of
                 // pages.
                 uint16_t bitmapSize = max(
                     (uint64_t) min(
                         (uint64_t) ceilToN((long double) segment.pageCount / 8, 8),
-                        (inventoryPage + PAGES(1)) - ((uint64_t)(currentFrame) + 24)
+                        (inventoryPage + PAGES(1)) - ((uint64_t)(currentFrame) + PHYSICAL_FRAME_HEADER_SIZE)
                     ),
                     0UL
                 );
@@ -190,7 +168,7 @@ namespace ThornhillMemory {
 
                 // Load the bitmap base address (which is the current frame offset by the page
                 // size.)
-                auto* bitmap = (uint8_t*)(currentFrame + 24);
+                auto* bitmap = (uint8_t*)(currentFrame + PHYSICAL_FRAME_HEADER_SIZE);
                 // Zero the bitmap.
                 memzero(bitmap, bitmapSize);
 
@@ -226,7 +204,7 @@ namespace ThornhillMemory {
                 }
                 // Otherwise, offset the inventory page.
                 else {
-                    currentFrame += 24 + bitmapSize;
+                    currentFrame += PHYSICAL_FRAME_HEADER_SIZE + bitmapSize;
                     currentPage = _firstAvailablePage(bootMap, currentPage + PAGES(1));
                 }
             }
@@ -237,9 +215,7 @@ namespace ThornhillMemory {
             Kernel::debug("PMM", "Checking inventory...");
             auto* currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(Physical::inventoryBase);
 
-            uint64_t noOfPages = 0;
             while (currentFrame != null) {
-                noOfPages += currentFrame->count;
                 Physical::totalMemory += PAGES(currentFrame->count);
                 currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(currentFrame->next);
             }
@@ -255,15 +231,79 @@ namespace ThornhillMemory {
 
         Physical::initialized = true;
         Kernel::debug("PMM", "PMM is ready.");
-        Kernel::debugf("PMM", "\tPhysical memory: %d KiB (%d bytes)", Physical::totalMemory / 1024, Physical::totalMemory);
+        Kernel::debugf("PMM", "    Physical memory: %u MiB (%u KiB, %u bytes)", Physical::totalMemory / 1024 / 1024, Physical::totalMemory / 1024, Physical::totalMemory);
     }
 
-    void Physical::allocate(size_t memorySize) {
+    /**
+     * Attempts to allocate the specified pageCount as a contiguous chunk of memory.
+     * If it fails, nullptr is returned, otherwise a pointer to the base address of the
+     * specified pageCount is returned.
+     * @param pageCount The amount of pages to allocate.
+     * @return A pointer; either to null or the base of the allocated memory.
+     */
+    void* Physical::allocate(size_t pageCount) {
+        Kernel::debugf("PMM", "Allocating %u pages...", pageCount);
+        auto* currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(Physical::inventoryBase);
 
-        if (!IS_PAGE_ALIGNED(memorySize))
-            return Kernel::panic("Assertion failed: memorySize passed to allocate is not page aligned.",
-                                 0);
+        while (currentFrame != null) {
+            // The base of the current frame.
+            uint64_t base = currentFrame->base;
+            // The offset from [base] that the contiguous chunk of memory starts.
+            uint64_t baseOffset = 0;
+            // The number of presently found contiguous pages after baseOffset.
+            uint64_t contiguous = 0;
 
+            for (uint64_t pageGroup = 0; pageGroup < currentFrame->count; pageGroup++) {
+                if (contiguous >= pageCount) {
+                    // TODO: mark allocated.
+                    for (uint64_t i = 0; i < pageCount; i++) {
+                        // Get the bitmap entry based on the floored-by-8 page index.
+                        uint64_t bitmapGroupBase = ((baseOffset / TH_ARCH_PAGE_SIZE) + i) / 8;
+                        uint64_t bitmapGroupOffset = ((baseOffset / TH_ARCH_PAGE_SIZE) + i) % 8;
+
+                        currentFrame->bitmap[bitmapGroupBase] |= 1 << (7 - bitmapGroupOffset);
+                        usedMemory += TH_ARCH_PAGE_SIZE;
+                    }
+
+                    Kernel::debugf("PMM", "Allocated %u pages. (Total: %u, Used Mem: %u)", pageCount, usedMemory / TH_ARCH_PAGE_SIZE, usedMemory);
+                    return (void*) (base + baseOffset);
+                }
+
+                // If the entire group in the bitmap is free, then mark the entire group as
+                // free contiguous pages.
+                if (currentFrame->bitmap[pageGroup] == 0) contiguous += 8;
+                // Otherwise, there is an entry in the bitmap that is not free, so we need to
+                // start counting from the first free page.
+                else {
+                    // Figure out the 0-indexed location of the first free page in this group.
+                    uint8_t location = 0;
+
+                    for (uint8_t check = 8; check <= 8; check--) {
+                        if ((currentFrame->bitmap[pageGroup] & (0b1 << check)) > 0) {
+                            location = 8 - check;
+                        }
+                    }
+
+                    // If there is no free page in this bitmap group, skip it and continue to
+                    // the next one.
+                    assert(location != 0);
+                    if (location >= 8) {
+                        contiguous = 0;
+                        baseOffset = PAGES((pageGroup + 1) * 8);
+                        continue;
+                    }
+
+                    // Now add contiguous pages and set baseOffset.
+                    baseOffset = PAGES((pageGroup * 8) + location);
+                    contiguous = 8 - location;
+                }
+            }
+
+            currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(currentFrame->next);
+        }
+
+        Kernel::debugf("PMM", "Failed to allocate %u pages.", pageCount);
+        return nullptr;
     }
 
 } // namespace ThornhillMemory

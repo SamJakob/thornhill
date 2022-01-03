@@ -65,6 +65,9 @@ void main(ThornhillHandoff* thornhillHandoff) {
 //    Kernel::printf("%x", x);
 
     Kernel::print("System is ready.");
+
+    ThornhillMemory::Physical::allocate(5);
+    ThornhillMemory::Physical::allocate(3);
 }
 
 extern "C" [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
