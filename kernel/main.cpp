@@ -24,17 +24,28 @@ void main(ThornhillHandoff* thornhillHandoff) {
     // Start memory management.
     ThornhillMemory::Physical::initialize(thornhillHandoff->memoryMap);
 
+    Kernel::debug("test");
+
     // Register the new interrupt handlers.
     ThornhillInterrupt::setupInterrupts();
+    Kernel::debug("test2");
     ThornhillInterrupt::setAllowInterrupts(true);
+    Kernel::debug("test3");
 
     // Register the keyboard driver.
     ThornhillKeyboard::initialize();
 
+    Kernel::debug("test3.5");
+
     /** KERNEL **/
     HAS_BOOTED = true;
     ThornhillTimer::initialize(20, startupTime);
+
+    Kernel::debug("test4");
+
     ThornhillGraphics::drawTTY();
+
+    Kernel::debug("test5");
 
     ThornhillGraphics::drawTime(&startupTime);
 
@@ -136,4 +147,14 @@ extern "C" [[maybe_unused]] void interrupt_request_handler(interrupt_state_t int
 
 extern "C" [[maybe_unused]] [[noreturn]] void __stack_chk_fail(void) { // NOLINT(bugprone-reserved-identifier)
     Kernel::panic("Stack check failure.");
+}
+
+extern "C" void* memcpy(void *dest, const void *src, size_t n) {
+    const auto *q = static_cast<const unsigned char*>(src);
+    auto *p = static_cast<unsigned char*>(dest);
+
+    while (n--)
+        *p++ = *q++;
+
+    return dest;
 }

@@ -9,7 +9,7 @@ set(THB_EFI_LINKER_SCRIPT "${THB_EFI_LIB_DIR}/elf_${TH_ARCH}_efi.lds")
 file(GLOB_RECURSE THB_SOURCES *.c)
 
 # Set compiler flags.
-set(CMAKE_C_FLAGS "${THB_EFI_INCLUDES} -ffreestanding -fno-stack-protector -c -std=c2x -nostdlib -fpic -fshort-wchar -mno-red-zone -O3 -Wall -Wextra -Wpedantic")
+set(CMAKE_C_FLAGS "${THB_EFI_INCLUDES} -target x86_64-none-elf -ffreestanding -fno-stack-protector -c -std=c2x -nostdlib -fpic -fshort-wchar -mno-red-zone -O3 -Wall -Wextra -Wpedantic")
 if (${TH_ARCH} MATCHES "x86_64")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHAVE_USE_MS_ABI")
 endif ()

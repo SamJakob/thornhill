@@ -57,6 +57,8 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSy
     Elf64_Phdr* KernelProgramHeaders;
     UINTN KernelProgramHeaderTableSize;
 
+    Print(L"Fuck");
+
     {
         // Seek to the program headers offset in the ELF file.
         Kernel->SetPosition(Kernel, KernelHeader->e_phoff);
@@ -70,6 +72,8 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSy
         if (EFI_ERROR(Status))
             return Status;
     }
+
+    Print(L"Fuck2");
 
     /* Load the kernel binary into memory. */
     for (
@@ -121,6 +125,8 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSy
         }
     }
 
+    Print(L"Fuck3");
+
     /* Read the section headers */
     Elf64_Shdr* KernelSectionHeaders;
     UINTN KernelSectionTableSize;
@@ -137,6 +143,8 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSy
         if (EFI_ERROR(Status))
             return Status;
     }
+
+    Print(L"Fuck4");
 
     /* Identify the index for the main string table. */
     UINTN StringTableIndex = 0;
@@ -181,6 +189,8 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSy
             return Status;
         }
     }
+
+    Print(L"Fuck5");
 
     /* Parse the section headers for useful data */
     for (

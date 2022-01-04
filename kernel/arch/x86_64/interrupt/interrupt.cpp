@@ -8,9 +8,9 @@ uint8_t ThornhillInterrupt::generateIdtDescriptorType(CpuIdtGateType gateType,
 
 void ThornhillInterrupt::setAllowInterrupts(bool allowInterrupts) {
     if (allowInterrupts)
-        __asm__ __volatile__("sti");
+        asm volatile ("sti");
     else
-        __asm__ __volatile__("cli");
+        asm volatile ("cli");
 }
 
 void ThornhillInterrupt::setupInterrupts() {
@@ -82,7 +82,7 @@ void ThornhillInterrupt::setupInterrupts() {
     idt_register.base = (uint64_t)&idt;
     idt_register.limit = IDT_ENTRIES * sizeof(idt_descriptor_t) - 1;
 
-    __asm__ __volatile__("lidt (%0)" : : "r"(&idt_register));
+    asm volatile("lidt (%0)" : : "r"(&idt_register));
 }
 
 void ThornhillInterrupt::setIdtGate(int gateNumber, uint64_t handler) {

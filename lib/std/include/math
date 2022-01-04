@@ -1,18 +1,42 @@
+#include <thornhill>
+
 #pragma once
+
+typedef union
+{
+    double value;
+    struct
+    {
+        uint32_t lsw;
+        uint32_t msw;
+    } parts;
+    struct
+    {
+        uint64_t w;
+    } xparts;
+} ieee_double_shape_type;
+
+static const double huge = 1.0e300;
+
+#define EXTRACT_WORDS(ix0,ix1,d)				\
+do {								\
+  ieee_double_shape_type ew_u;					\
+  ew_u.value = (d);						\
+  (ix0) = ew_u.parts.msw;					\
+  (ix1) = ew_u.parts.lsw;					\
+} while (0)
+
+#define INSERT_WORDS(d,ix0,ix1)					\
+do {								\
+  ieee_double_shape_type iw_u;					\
+  iw_u.parts.msw = (ix0);					\
+  iw_u.parts.lsw = (ix1);					\
+  (d) = iw_u.value;						\
+} while (0)
 
 namespace std {
 
-    inline long double floor(long double value) {
-        return __builtin_floorl(value);
-    }
-
-    inline long double round(long double value) {
-        return __builtin_roundl(value);
-    }
-
-    inline long double ceil(long double value) {
-        return __builtin_ceill(value);
-    }
+    long double ceil(long double x);
 
     long long int ceilToN(long double value, long long int multiple);
 
