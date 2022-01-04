@@ -17,17 +17,17 @@ uint8_t ThornhillIO::readByteFromPort(uint16_t port) {
     return result;
 }
 
-void ThornhillIO::writeByteToPort (uint16_t port, uint8_t data) {
+void ThornhillIO::writeByteToPort(uint16_t port, uint8_t data) {
     __asm__("out %%al, %%dx" : : "a" (data), "d" (port));
 }
 
-uint16_t ThornhillIO::readWordFromPort (uint16_t port) {
+uint16_t ThornhillIO::readWordFromPort(uint16_t port) {
     uint16_t result;
     __asm__("in %%dx, %%ax" : "=a" (result) : "d" (port));
     return result;
 }
 
-void ThornhillIO::writeWordToPort (uint16_t port, uint16_t data) {
+void ThornhillIO::writeWordToPort(uint16_t port, uint16_t data) {
     __asm__("out %%ax, %%dx" : : "a" (data), "d" (port));
 }
 
