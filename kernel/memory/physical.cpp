@@ -93,7 +93,12 @@ namespace ThornhillMemory {
     size_t Physical::totalMemory = 0;
     size_t Physical::inventoryBase = 0;
 
-    void Physical::reset() { Physical::initialized = false; }
+    void Physical::reset() {
+        Physical::initialized = false;
+        Physical::usedMemory = 0;
+        Physical::totalMemory = 0;
+        Physical::inventoryBase = 0;
+    }
 
     void Physical::initialize(HandoffMemoryMap bootMap) {
         Kernel::debug("PMM", "Initializing physical memory manager...");
@@ -234,13 +239,6 @@ namespace ThornhillMemory {
         Kernel::debugf("PMM", "    Physical memory: %u MiB (%u KiB, %u bytes)", Physical::totalMemory / 1024 / 1024, Physical::totalMemory / 1024, Physical::totalMemory);
     }
 
-    /**
-     * Attempts to allocate the specified pageCount as a contiguous chunk of memory.
-     * If it fails, nullptr is returned, otherwise a pointer to the base address of the
-     * specified pageCount is returned.
-     * @param pageCount The amount of pages to allocate.
-     * @return A pointer; either to null or the base of the allocated memory.
-     */
     void* Physical::allocate(size_t pageCount) {
         Kernel::debugf("PMM", "Allocating %u pages...", pageCount);
         auto* currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(Physical::inventoryBase);
@@ -304,6 +302,10 @@ namespace ThornhillMemory {
 
         Kernel::debugf("PMM", "Failed to allocate %u pages.", pageCount);
         return nullptr;
+    }
+
+    [[maybe_unused]] void Physical::deallocate([[maybe_unused]] void* base, [[maybe_unused]] size_t pageCount) {
+        Kernel::panic("Tried to deallocate, but wasn't yet implemented.");
     }
 
 } // namespace ThornhillMemory

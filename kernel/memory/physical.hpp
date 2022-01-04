@@ -61,6 +61,7 @@ namespace ThornhillMemory {
          * The total amount of physical memory available to the system.
          */
         static size_t totalMemory;
+
         /**
          * The total amount of physical memory used by the system.
          */
@@ -70,20 +71,52 @@ namespace ThornhillMemory {
         //
         // Getters
         //
+
+        /**
+         * Returns whether or not the bootloader is initialized.
+         * @return true, if it is. Otherwise false.
+         */
         static inline bool isInitialized() { return initialized; }
 
+        /**
+         * Returns the number of bytes of physical memory currently in use by the PMM.
+         * @return The number of bytes in use by the PMM in a size_t.
+         */
         static inline size_t getUsedMemory() { return usedMemory; }
 
+        /**
+         * Returns the total amount of physical memory available to the PMM. This is calculated
+         * on initialization of the PMM based on the number of available pages.
+         * @return The number of bytes totally available to the PMM in a size_t.
+         */
         static inline size_t getTotalMemory() { return totalMemory; }
 
         //
         // Memory Management Functions
         //
+
+        /**
+         * Resets the memory manager so that it can be initialized again.
+         */
         static void reset();
 
+        /**
+         * Initializes the Physical Memory Manager (PMM) with the specified memory map from the
+         * firmware.
+         * @param bootMap The bootmap passed to the OS by the bootloader.
+         */
         static void initialize(HandoffMemoryMap bootMap);
 
+        /**
+         * Attempts to allocate the specified pageCount as a contiguous chunk of memory.
+         * If it fails, nullptr is returned, otherwise a pointer to the base address of the
+         * specified pageCount is returned.
+         * @param pageCount The amount of pages to allocate.
+         * @return A pointer; either to null or the base of the allocated memory.
+         */
         static void* allocate(size_t pageCount);
+
+        static void deallocate(void* base, size_t pageCount);
     };
 
 } // namespace ThornhillMemory
