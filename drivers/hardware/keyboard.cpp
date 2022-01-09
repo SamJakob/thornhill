@@ -25,7 +25,8 @@ void ThornhillKeyboard::handleInterrupt(interrupt_state_t) {
     }
 
     if (keycode == KEY_BACKSPACE) {
-        xOffset -= 10;
+        if (xOffset != 0)
+            xOffset -= 10;
         ThornhillGraphics::drawRect(rgb(0,0,0), 130 + xOffset, 160 + yOffset, 10, 10);
         return;
     }
