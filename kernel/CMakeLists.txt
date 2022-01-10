@@ -47,5 +47,5 @@ add_custom_target(populate-${TH_OUTPUT_IMG}
 add_dependencies(populate-${TH_OUTPUT_IMG} kernel)
 
 # Add a pseudo-target to build the kernel and populate the bootloader image with the kernel.
-add_custom_target(thornhill)
+add_custom_target(thornhill ALL)
 add_dependencies(thornhill populate-${TH_OUTPUT_IMG})

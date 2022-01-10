@@ -43,16 +43,43 @@ __attribute__((unused)) EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_T
 
     /* Initialize the appropriate UEFI graphics mode for the OS. */
     Status = THBPrintMessage(L"Configuring graphics output protocol...");
-    // EFI_GRAPHICS_OUTPUT_MODE_INFORMATION* GraphicsOutputInfo;
     {
-        UINT32 CurrentGraphicsMode;
+        UINTN GraphicsOutputInfoSize;
+        EFI_GRAPHICS_OUTPUT_MODE_INFORMATION* GraphicsOutputInfo;
+        UINT32 CurrentGraphicsMode = 21;
+        if (Graphics->Mode && (Graphics->Mode->MaxMode - 1) < 21) {
+            CurrentGraphicsMode = Graphics->Mode->MaxMode - 1;
+        }
 
-        // TODO: Allow resolution auto-detection or selection.
-        CurrentGraphicsMode = 21;
-        Status = Graphics->SetMode(Graphics, CurrentGraphicsMode);
+        // Start at mode 21 (1680 x 1050) and query decreasing modes until one is found.
+        for (INTN QueryingMode = CurrentGraphicsMode; QueryingMode >= 0; QueryingMode--) {
+            Status = Graphics->QueryMode(
+                Graphics, QueryingMode, &GraphicsOutputInfoSize, &GraphicsOutputInfo
+            );
+
+            // Some buggy UEFI implementations will return EFI_NOT_STARTED upon initial
+            // querying of the UEFI mode because they require a call to GOP's SetMode
+            // function to start GOP.
+            if (Status == EFI_NOT_STARTED) {
+                Status = Graphics->SetMode(Graphics, Graphics->Mode ? Graphics->Mode->Mode : 0);
+                Status = Graphics->QueryMode(
+                    Graphics, QueryingMode, &GraphicsOutputInfoSize, &GraphicsOutputInfo
+                );
+            }
+
+            // Now, check the status. If we have an error, skip to the next mode.
+            if (EFI_ERROR(Status)) continue;
+
+            // Otherwise, set the graphics mode.
+            CurrentGraphicsMode = QueryingMode;
+            Status = Graphics->SetMode(Graphics, CurrentGraphicsMode);
+            break;
+        }
 
         if (EFI_ERROR(Status)) {
-            return THBErrorMessage(L"Failed to initialize graphics output protocol.", &Status);
+            return THBErrorMessage(
+                L"Failed to initialize graphics output protocol.", &Status
+            );
         }
 
         ST->ConOut->ClearScreen(ST->ConOut);

@@ -45,4 +45,4 @@
  * messages which can be helpful for working on the bootloader or debugging early parts of the
  * kernel.
  */
-#define SHOW_INFO_MESSAGES      false
+#define SHOW_INFO_MESSAGES      true
