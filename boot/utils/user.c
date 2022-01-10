@@ -11,7 +11,7 @@ typedef struct {
     UINT16* PressedKey;
 } THBSleepDelegateContext;
 
-VOID EFI_FUNCTION test(
+VOID EFI_FUNCTION THBSleepDelegate(
     IN EFI_EVENT                    Event,
     IN THBSleepDelegateContext*     Context
 ) {
@@ -59,7 +59,7 @@ EFI_STATUS THBSleep(
         };
         Status = ST->BootServices->CreateEvent(
             EVT_NOTIFY_WAIT, TPL_NOTIFY,
-            (EFI_EVENT_NOTIFY) test,
+            (EFI_EVENT_NOTIFY) THBSleepDelegate,
             (VOID*) &Context,
             &EventList[0]
         );
