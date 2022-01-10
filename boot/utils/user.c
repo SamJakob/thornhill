@@ -67,7 +67,10 @@ EFI_STATUS THBSleep(
 
         // Dynamically set the event for the timer.
         Status = ST->BootServices->CreateEvent(EVT_TIMER, TPL_CALLBACK, NULL, NULL, &EventList[1]);
-        if (EFI_ERROR(Status)) return Status;
+        if (EFI_ERROR(Status)) {
+            ST->BootServices->CloseEvent(EventList[0]);
+            return Status;
+        }
 
         // Set the duration of and start the timer.
         Status = ST->BootServices->SetTimer(EventList[1], TimerRelative, Duration);
@@ -79,11 +82,13 @@ EFI_STATUS THBSleep(
 
         // Wait for either the console input, or the timer.
         Status = ST->BootServices->WaitForEvent(2, EventList, &EventTriggeredIndex);
-        if (EFI_ERROR(Status)) return Status;
 
         // Close the timer event.
         ST->BootServices->CloseEvent(EventList[0]);
         ST->BootServices->CloseEvent(EventList[1]);
+
+        // If there was a problem, just exit here with the error status.
+        if (EFI_ERROR(Status)) return Status;
 
         // If the timer expired ensure that it is indicated that no key was pressed.
         if (EventTriggeredIndex == 1) {
@@ -91,7 +96,8 @@ EFI_STATUS THBSleep(
             return Status;
         }
 
-        // Otherwise, an acceptable key was pressed.
+        // Otherwise, an acceptable key was pressed, and our delegate function will have
+        // set the PressedKey variable.
         return Status;
     }
 

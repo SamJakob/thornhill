@@ -127,21 +127,18 @@ __attribute__((unused)) EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_T
     UINTN DescriptorSize = 0;
     UINT32 DescriptorVersion = 0;
 
-    // It is recommended to get the memory map a few (3-4) times, because there's
-    // a catch-22 scenario, with respect to allocating the memory to store the
-    // memory map (allocating memory for GetMemoryMap, can sometimes change the
-    // memory map meaning it needs to be called again.)
-    // To solve this, the solution is apparently just to call the method a few
-    // times and kinda just hope for the best. So here we are.
+    // Compliant UEFI implementations will immediately return EFI_BUFFER_TOO_SMALL when
+    // GetMemoryMap is called initially (assuming MapSize is set to 0 - which would be appropriate
+    // as there's no way of knowing the correct map size straight away.)
+    // However, we pass in a reference to our MapSize integer, which a compliant firmware will then
+    // overwrite with an appropriate map size in bytes.
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
-
     if (Status != EFI_BUFFER_TOO_SMALL) {
         return THBErrorMessage(L"Non-compliant UEFI implementation. Report to your local motherboard manufacturer.", &Status);
     }
 
-    MapSize += (2 * DescriptorSize);
-
-    // Allocate for hand-off data.
+    // Before increasing the MapSize, we can here allocate memory to hold our own memory map for
+    // handing off to the kernel.
     HandoffMemorySegment* HandoffMemorySegments;
     Status = ST->BootServices->AllocatePool(
         EfiLoaderData,
@@ -149,6 +146,16 @@ __attribute__((unused)) EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_T
         (void**)&HandoffMemorySegments
     );
 
+    // Because we're about to have to create a second memory map (containing only the information
+    // the kernel needs in a preferred format and so the kernel needn't include all the EFI
+    // headers) we add enough memory to the map for two additional descriptors.
+    // (Requiring more would be an extremely unusually fragmented memory map, but to accommodate
+    // as such, one can simply increase the constant size, or take multiple attempts to acquire
+    // enough space for the memory map.)
+    MapSize += (2 * DescriptorSize);
+
+    // Finally, we attempt to allocate the necessary memory and then pass this newly allocated
+    // buffer into GetMemoryMap.
     Status = ST->BootServices->AllocatePool(EfiLoaderData, MapSize, (void**)&Map);
     Status = ST->BootServices->GetMemoryMap(&MapSize, Map, &MapKey, &DescriptorSize, &DescriptorVersion);
 
