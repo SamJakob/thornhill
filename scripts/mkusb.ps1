@@ -49,7 +49,7 @@ if (!$ddExists) {
 <#
 # Get a list of all the drives on the system.
 Write-Host "Enumerating drives...";
-$drives = Get-WmiObject win32_diskdrive -Filter "InterfaceType = 'USB'" | Select Caption,DeviceID,BytesPerSector,InterfaceType,Size;
+$drives = Get-WmiObject win32_diskdrive -Filter "InterfaceType = 'USB'" | Select Caption,DeviceID,BytesPerSector,InterfaceType,BitmapSize;
 $drive;
 
 if (-not $drives) {

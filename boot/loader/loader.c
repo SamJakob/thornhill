@@ -1,29 +1,7 @@
 #include "loader.h"
 
-#include "../utils/thutils.h"
+#include "../utils/file.h"
 #include <efilib.h>
-
-EFI_FILE* THBLoadKernelFile(EFI_HANDLE* Handle, CHAR16* FileName) {
-    EFI_STATUS Status;
-    EFI_HANDLE_PROTOCOL HandleProtocol = ST->BootServices->HandleProtocol;
-    
-    EFI_LOADED_IMAGE_PROTOCOL* LoadedImage;
-    Status = HandleProtocol(*Handle, &gEfiLoadedImageProtocolGuid, (void**) &LoadedImage);
-
-    EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* FileSystem;
-    HandleProtocol(LoadedImage->DeviceHandle, &gEfiSimpleFileSystemProtocolGuid, (void**) &FileSystem);
-
-    EFI_FILE* Root;
-    FileSystem->OpenVolume(FileSystem, &Root);
-
-    EFI_FILE* Kernel;
-    Status = Root->Open(Root, &Kernel, FileName, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
-
-    if (EFI_ERROR(Status))
-        return NULL;
-    else
-        return Kernel;
-}
 
 CHAR16* THBCheckKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader) {
 

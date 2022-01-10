@@ -42,16 +42,6 @@ typedef struct {
 } THBKernelSymbols;
 
 /**
- * @brief Loads the specified kernel file from the same device the UEFI
- * bootloader was loaded from.
- * 
- * @param Handle The current EFI handle.
- * @param FileName The name of the kernel to load.
- * @return EFI_FILE* The EFI file object or null if it couldn't be loaded.
- */
-EFI_FILE* THBLoadKernelFile(EFI_HANDLE* Handle, CHAR16* FileName);
-
-/**
  * @brief Loads the kernel headers from the specified file and performs
  * basic checks on the headers to help ensure the kernel is valid and
  * compatible with the current system.

@@ -8,15 +8,18 @@
 #include <efidef.h>
 
 #include "display/logging.h"
+#include "display/logo.h"
 #include "loader/loader.h"
 #include "loader/paging.h"
+#include "utils/file.h"
+#include "utils/user.h"
 
 #include "handoff/handoff.h"
 #include "handoff/memory/memory.h"
 
 #include "config.h"
 
-EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
+__attribute__((unused)) EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
 
     // Initializes the GNU EFI libraries. Performing various tasks, such as
     // defining a globally enabled ST variable to access the SystemTable.
@@ -25,10 +28,50 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     EFI_STATUS Status;
     Status = THBPrintBanner(true);
     Status = THBPrintMessage(L"Initializing system, please wait...");
+
+    /* Locate Graphics Output Protocol. */
+    EFI_GRAPHICS_OUTPUT_PROTOCOL* Graphics;
+    Status = ST->BootServices->LocateProtocol(
+        &gEfiGraphicsOutputProtocolGuid, NULL, (void**) &Graphics
+    );
+    if (EFI_ERROR(Status)) {
+        return THBErrorMessage(
+            L"Failed to locate Graphics Output Protocol.",
+            NULL
+        );
+    }
+
+    /* Initialize the appropriate UEFI graphics mode for the OS. */
+    Status = THBPrintMessage(L"Configuring graphics output protocol...");
+    // EFI_GRAPHICS_OUTPUT_MODE_INFORMATION* GraphicsOutputInfo;
+    {
+        UINT32 CurrentGraphicsMode;
+
+        // TODO: Allow resolution auto-detection or selection.
+        CurrentGraphicsMode = 21;
+        Status = Graphics->SetMode(Graphics, CurrentGraphicsMode);
+
+        if (EFI_ERROR(Status)) {
+            return THBErrorMessage(L"Failed to initialize graphics output protocol.", &Status);
+        }
+
+        ST->ConOut->ClearScreen(ST->ConOut);
+    }
+
+#if !SHOW_INFO_MESSAGES
+    /* Render the background and boot logo. */
+    EFI_FILE* BootLogo = THBLocateFile(&ImageHandle, LOGO_FILENAME);
+    // Simply fills the background with a solid color.
+    // This doubles as a way of checking if GOP is indeed functioning.
+    THBRenderBackground(Graphics);
+    // Loads the boot logo as specified in the config from the boot device and then
+    // renders it on screen.
+    THBRenderBootLogo(BootLogo, Graphics);
+#endif
     
     /* Open the kernel file from the device the UEFI app was loaded from. */
     Status = THBPrintMessage(L"Locating kernel...");
-    EFI_FILE* Kernel = THBLoadKernelFile(&ImageHandle, KERNEL_FILENAME);
+    EFI_FILE* Kernel = THBLocateFile(&ImageHandle, KERNEL_FILENAME);
     if (Kernel == NULL) {
         return THBErrorMessage(
             L"Failed to locate system kernel on boot device.",
@@ -52,25 +95,16 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
         return THBErrorMessage(L"Failed to load kernel.", &Status);
     }
 
-    /* Initialize the appropriate UEFI graphics mode for the OS. */
-    Status = THBPrintMessage(L"Initializing graphics protocol...");
-    EFI_GRAPHICS_OUTPUT_PROTOCOL* Graphics;
-    // EFI_GRAPHICS_OUTPUT_MODE_INFORMATION* GraphicsOutputInfo;
-    {
-        UINT32 CurrentGraphicsMode;
-
-        // TODO: Allow resolution auto-detection or selection.
-        Status = ST->BootServices->LocateProtocol(&gEfiGraphicsOutputProtocolGuid, NULL, (void**) &Graphics);
-        CurrentGraphicsMode = 21;
-
-        Status = Graphics->SetMode(Graphics, CurrentGraphicsMode);
-
-        if (EFI_ERROR(Status)) {
-            return THBErrorMessage(L"Failed to initialize graphics protocol.", &Status);
-        }
-
-        ST->ConOut->ClearScreen(ST->ConOut);
-    }
+    /* Sleep for BOOT_DELAY_SECONDS (if it's greater than 0). */
+#if BOOT_DELAY_SECONDS > 0 && !SHOW_INFO_MESSAGES
+    UINT16 SleepSkipKeyCodes[] = { SCAN_ESC };
+    UINT16 PressedKey;
+    Status = THBSleep(
+        EFI_TIMER_PERIOD_SECONDS(BOOT_DELAY_SECONDS),
+        &PressedKey,
+        1, SleepSkipKeyCodes
+    );
+#endif
 
     /* Start handoff procedure so we can jump to kernel. */
     Status = THBPrintMessage(L"Preparing pre-boot data for kernel...");
@@ -148,7 +182,10 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable) {
     Status = ST->BootServices->ExitBootServices(ImageHandle, MapKey);
 
     if (EFI_ERROR(Status)) {
-        return THBErrorMessage(L"Failed to exit the firmware pre-boot environment.", &Status);
+        return THBErrorMessage(
+            L"Failed to exit the firmware pre-boot environment.",
+            &Status
+        );
     }
 
     /* Jump to kernel start! */

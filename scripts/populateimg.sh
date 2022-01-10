@@ -1,2 +1,2 @@
-echo Copying kernel to system image...
+echo "\tCopying kernel to system image..."
 mcopy -i thornhill.img kernel ::/

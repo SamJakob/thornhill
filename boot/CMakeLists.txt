@@ -35,7 +35,7 @@ add_dependencies(BOOTX64.EFI BOOTX64.so)
 
 # Finally, make a bootable image.
 add_custom_target(${TH_OUTPUT_IMG}
-    COMMAND "${TH_BUILD_SCRIPTS_DIRECTORY}/mkimg.sh"
+    COMMAND "${TH_BUILD_SCRIPTS_DIRECTORY}/mkimg.sh" ${CMAKE_CURRENT_SOURCE_DIR}/../assets
     COMMENT "Building bootable image..."
     BYPRODUCTS ${TH_OUTPUT_IMG}
 )
