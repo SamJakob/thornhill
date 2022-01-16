@@ -86,7 +86,7 @@ void ThornhillGraphics::drawTime(ThornhillSystemTime* time) {
 
     int intendedLength = 2;
     char itoaBuffer[5];
-    char strpadBuffer[3];
+    char strpadBuffer[3] = {null, null, null};
 
     drawText(shortMonth, offsetStart, screen.height - 100, 2);
     drawText(strpad(itoa(itoaBuffer, time->day, 10, 5), strpadBuffer, '0', intendedLength),
