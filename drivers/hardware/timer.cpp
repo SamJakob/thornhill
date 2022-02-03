@@ -4,10 +4,15 @@ void ThornhillTimer::timerCallback(interrupt_state_t) {
     if (tick > 5) {
         currentTime = ThornhillClock::readOfflineTime();
         ThornhillGraphics::drawTime(&currentTime);
+	if (handler != nullptr) handler(&currentTime);
         tick = 0;
     }
 
     tick++;
+}
+
+void ThornhillTimer::setHandler(void (*handler)(ThornhillSystemTime*)) {
+    ThornhillTimer::handler = handler;
 }
 
 void ThornhillTimer::initialize(uint16_t frequency, ThornhillSystemTime startupTime) {
@@ -25,3 +30,4 @@ void ThornhillTimer::initialize(uint16_t frequency, ThornhillSystemTime startupT
 
 uint16_t ThornhillTimer::tick = 0;
 ThornhillSystemTime ThornhillTimer::currentTime;
+void (*ThornhillTimer::handler)(ThornhillSystemTime*) = nullptr;
