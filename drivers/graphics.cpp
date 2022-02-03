@@ -61,6 +61,32 @@ void ThornhillGraphics::drawText(const char* characters, uint16_t x, uint16_t y,
     }
 }
 
+void ThornhillGraphics::drawTextFuncky(char* characters, size_t start, size_t len, uint16_t x, uint16_t y, int scale,
+				       int padding, uint16_t max) {
+    size_t pointer = start;
+
+    uint16_t deltaX = 0;
+    uint16_t deltaY = 0;
+    while (characters[pointer] != 0) {
+	if (characters[pointer] == '\n') {
+	    deltaX = 0;
+	    deltaY += 10 * scale;
+	    pointer++;
+	    continue;
+	}
+	
+        drawCharacter(characters[pointer], x + deltaX, y + deltaY, scale);
+
+        deltaX += ((FONT_CHARACTER_WIDTH * scale) + padding);
+        pointer++;
+	if (deltaX >= max) {
+	    deltaX = 0;
+	    deltaY += 10 * scale;
+	}
+	if (pointer == len) pointer = 0;
+    }
+}
+
 void ThornhillGraphics::drawRect(Color color, uint32_t x, uint32_t y, uint32_t width,
                                  uint32_t height) {
     for (uint32_t currentY = y; currentY < y + height; currentY++) {

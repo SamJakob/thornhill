@@ -7,6 +7,7 @@
 #include "drivers/hardware/keyboard.hpp"
 #include "drivers/hardware/timer.hpp"
 #include "drivers/hardware/serial.hpp"
+#include "ski/ski.hpp"
 
 #include "memory/physical.hpp"
 
@@ -38,10 +39,13 @@ void main(ThornhillHandoff* thornhillHandoff) {
 
     ThornhillGraphics::drawTime(&startupTime);
 
+    ThornhillSKI::initialize();
+    ThornhillKeyboard::setHandler(&ThornhillSKI::handleInput);
+
     Kernel::print("System is ready.");
 
-    ThornhillMemory::Physical::allocate(5);
-    ThornhillMemory::Physical::allocate(3);
+    //ThornhillMemory::Physical::allocate(5);
+    //ThornhillMemory::Physical::allocate(3);
 }
 
 extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {

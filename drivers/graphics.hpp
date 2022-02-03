@@ -2,6 +2,7 @@
 
 #include "clock.hpp"
 #include "io.hpp"
+#include <stddef.h>
 
 #include "font/font8x8/font8x8_basic.h"
 
@@ -39,6 +40,9 @@ class ThornhillGraphics {
         static void drawText(const char* characters, uint16_t x, uint16_t y, int scale = 1,
                              int padding = 0);
         static void drawRect(Color color, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+        static void drawTextFuncky(char* characters, size_t start, size_t len, uint16_t x, uint16_t y, int scale,
+				       int padding, uint16_t max);
+
 
         //
         // UI

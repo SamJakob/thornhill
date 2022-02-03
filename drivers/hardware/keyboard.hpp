@@ -14,8 +14,11 @@ class ThornhillKeyboard {
     //    static char buf[];
 
     public:
+      //TODO make this private
+      static void DefaultHandler(uint8_t);
       static void initialize();
       static void handleInterrupt(interrupt_state_t);
+      static void setHandler(void (*handler)(uint8_t));
 };
 
 #endif
