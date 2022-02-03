@@ -41,7 +41,7 @@ class ThornhillGraphics {
                              int padding = 0);
         static void drawRect(Color color, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
         static void drawTextFuncky(char* characters, size_t start, size_t len, uint16_t x, uint16_t y, int scale,
-				       int padding, uint16_t max);
+				   int padding, uint16_t max, int* endX, int* endY);
 
 
         //

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdint.h"
+#include "../../drivers/clock.hpp"
 
 #define ThornHillSKIBufferSize 2024
 
@@ -13,7 +14,10 @@ class ThornhillSKI {
     public:
       static void initialize();
       static void draw();
+
       static void handleInput(uint8_t);
+      static void handleTimer(ThornhillSystemTime* time);
+
       static void insertChar(char);
       static void insert(const char* str);
       static void goBack();

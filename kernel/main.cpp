@@ -41,6 +41,7 @@ void main(ThornhillHandoff* thornhillHandoff) {
 
     ThornhillSKI::initialize();
     ThornhillKeyboard::setHandler(&ThornhillSKI::handleInput);
+    ThornhillTimer::setHandler(&ThornhillSKI::handleTimer);
 
     Kernel::print("System is ready.");
 
