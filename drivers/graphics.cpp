@@ -22,18 +22,18 @@ uint32_t pixel(PixelFormat format, Color color) {
     }
 }
 
-void ThornhillGraphics::initialize(Screen screen) {
+void ThornhillGraphicsDriver::initialize(Screen screen) {
     Kernel::debug("Graphics", "Initializing graphics driver...");
     Kernel::debugf("Graphics", "\tDimensions: %ux%u", screen.width, screen.height);
     Kernel::debugf("Graphics", "\tFramebuffer Base: 0x%x", screen.frame_buffer_base);
 
-    ThornhillGraphics::screen = screen;
-    ThornhillGraphics::clear(rgb(0, 128, 128));
+    ThornhillGraphicsDriver::screen = screen;
+    ThornhillGraphicsDriver::clear(rgb(0, 128, 128));
 }
 
-Screen* ThornhillGraphics::getScreen() { return &screen; }
+Screen* ThornhillGraphicsDriver::getScreen() { return &screen; }
 
-void ThornhillGraphics::drawCharacter(char character, uint16_t x, uint16_t y, int scale) {
+void ThornhillGraphicsDriver::drawCharacter(char character, uint16_t x, uint16_t y, int scale) {
     for (int screenY = y; screenY < y + (FONT_CHARACTER_HEIGHT * scale); screenY++) {
         for (int screenX = x; screenX < x + (FONT_CHARACTER_WIDTH * scale); screenX++) {
             uint64_t screenOffset = (screenY * screen.width) + screenX;
@@ -47,7 +47,7 @@ void ThornhillGraphics::drawCharacter(char character, uint16_t x, uint16_t y, in
     }
 }
 
-void ThornhillGraphics::drawText(const char* characters, uint16_t x, uint16_t y, int scale,
+void ThornhillGraphicsDriver::drawText(const char* characters, uint16_t x, uint16_t y, int scale,
                         int padding) {
 
     size_t pointer = 0;
@@ -61,7 +61,7 @@ void ThornhillGraphics::drawText(const char* characters, uint16_t x, uint16_t y,
     }
 }
 
-void ThornhillGraphics::drawTextFuncky(char* characters, size_t start, size_t len, uint16_t x, uint16_t y, int scale,
+void ThornhillGraphicsDriver::drawTextFuncky(char* characters, size_t start, size_t len, uint16_t x, uint16_t y, int scale,
 				       int padding, uint16_t max, int* endX, int* endY) {
     size_t pointer = start;
 
@@ -90,7 +90,7 @@ void ThornhillGraphics::drawTextFuncky(char* characters, size_t start, size_t le
     *endY = y + deltaY;
 }
 
-void ThornhillGraphics::drawRect(Color color, uint32_t x, uint32_t y, uint32_t width,
+void ThornhillGraphicsDriver::drawRect(Color color, uint32_t x, uint32_t y, uint32_t width,
                                  uint32_t height) {
     for (uint32_t currentY = y; currentY < y + height; currentY++) {
         for (uint32_t currentX = x; currentX < x + width; currentX++) {
@@ -100,7 +100,7 @@ void ThornhillGraphics::drawRect(Color color, uint32_t x, uint32_t y, uint32_t w
     }
 }
 
-void ThornhillGraphics::drawTime(ThornhillSystemTime* time) {
+void ThornhillGraphicsDriver::drawTime(ThornhillSystemTime* time) {
     int offsetStart = 60;
     bool blinkSeparators = false;
 
@@ -137,7 +137,7 @@ void ThornhillGraphics::drawTime(ThornhillSystemTime* time) {
     drawText(time->isPM ? "PM" : "AM", offsetStart + 120, screen.height - 124, 2);
 }
 
-void ThornhillGraphics::drawTTY() {
+void ThornhillGraphicsDriver::drawTTY() {
 
     unsigned int termWidth = screen.width - 240;
     unsigned int termHeight = screen.height - 240;
@@ -157,8 +157,8 @@ void ThornhillGraphics::drawTTY() {
 }
 
 
-void ThornhillGraphics::clear(Color color) {
+void ThornhillGraphicsDriver::clear(Color color) {
     drawRect(color, 0, 0, screen.width, screen.height);
 }
 
-Screen ThornhillGraphics::screen;
+Screen ThornhillGraphicsDriver::screen;

@@ -10,28 +10,28 @@ static uint8_t _bcdToBinary(uint8_t bcd) {
     return ((bcd & 0xF0) >> 1) + ( (bcd & 0xF0) >> 3) + (bcd & 0xf);
 }
 
-uint8_t ThornhillIO::readByteFromPort(uint16_t port) {
+uint8_t ThornhillIODriver::readByteFromPort(uint16_t port) {
     uint8_t result;
 
     __asm__("in %%dx, %%al" : "=a" (result) : "d" (port));
     return result;
 }
 
-void ThornhillIO::writeByteToPort (uint16_t port, uint8_t data) {
+void ThornhillIODriver::writeByteToPort (uint16_t port, uint8_t data) {
     __asm__("out %%al, %%dx" : : "a" (data), "d" (port));
 }
 
-uint16_t ThornhillIO::readWordFromPort (uint16_t port) {
+uint16_t ThornhillIODriver::readWordFromPort (uint16_t port) {
     uint16_t result;
     __asm__("in %%dx, %%ax" : "=a" (result) : "d" (port));
     return result;
 }
 
-void ThornhillIO::writeWordToPort (uint16_t port, uint16_t data) {
+void ThornhillIODriver::writeWordToPort (uint16_t port, uint16_t data) {
     __asm__("out %%ax, %%dx" : : "a" (data), "d" (port));
 }
 
-uint8_t ThornhillIO::readCMOSRegister (uint16_t cmosRegister, bool isBCDEncodedBinaryDecimal) {
+uint8_t ThornhillIODriver::readCMOSRegister (uint16_t cmosRegister, bool isBCDEncodedBinaryDecimal) {
 
     const bool NMIDisableBit = 0b1;
 

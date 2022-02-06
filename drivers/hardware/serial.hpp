@@ -7,7 +7,7 @@
 
 #define DEFAULT_SERIAL_PORT COM1
 
-class ThornhillSerial {
+class ThornhillSerialDriver {
 
     private:
       static bool initialized;
@@ -16,7 +16,7 @@ class ThornhillSerial {
     public:
       /**
        * @brief Initializes the serial interface and driver. Returns true if the
-       * intialization was succesful, or false if there was an error.
+       * initialization was successful, or false if there was an error.
        * 
        * @return true Initialization was successful and the driver may be used.
        * @return false Initialization failed and the driver is not ready for

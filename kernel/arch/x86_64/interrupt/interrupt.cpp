@@ -49,16 +49,16 @@ void ThornhillInterrupt::setupInterrupts() {
     setIdtGate(31, (uint64_t)isr31);
 
     // Remap the PIC.
-    ThornhillIO::writeByteToPort(0x20, 0x11);
-    ThornhillIO::writeByteToPort(0xA0, 0x11);
-    ThornhillIO::writeByteToPort(0x21, 0x20);
-    ThornhillIO::writeByteToPort(0xA1, 0x28);
-    ThornhillIO::writeByteToPort(0x21, 0x04);
-    ThornhillIO::writeByteToPort(0xA1, 0x02);
-    ThornhillIO::writeByteToPort(0x21, 0x01);
-    ThornhillIO::writeByteToPort(0xA1, 0x01);
-    ThornhillIO::writeByteToPort(0x21, 0x00);
-    ThornhillIO::writeByteToPort(0xA1, 0x00);
+    ThornhillIODriver::writeByteToPort(0x20, 0x11);
+    ThornhillIODriver::writeByteToPort(0xA0, 0x11);
+    ThornhillIODriver::writeByteToPort(0x21, 0x20);
+    ThornhillIODriver::writeByteToPort(0xA1, 0x28);
+    ThornhillIODriver::writeByteToPort(0x21, 0x04);
+    ThornhillIODriver::writeByteToPort(0xA1, 0x02);
+    ThornhillIODriver::writeByteToPort(0x21, 0x01);
+    ThornhillIODriver::writeByteToPort(0xA1, 0x01);
+    ThornhillIODriver::writeByteToPort(0x21, 0x00);
+    ThornhillIODriver::writeByteToPort(0xA1, 0x00);
 
     // Install the IRQs.
     setIdtGate(32, (uint64_t)irq0);

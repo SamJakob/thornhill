@@ -12,24 +12,24 @@ bool THCompareSystemTime(ThornhillSystemTime* timeA, ThornhillSystemTime* timeB)
 
 ThornhillSystemTime ThornhillClock::_performOfflineTimeRead() {
 
-    uint8_t statusRegisterB = ThornhillIO::readCMOSRegister(0x0B);
+    uint8_t statusRegisterB = ThornhillIODriver::readCMOSRegister(0x0B);
 
     bool b24HourFormat  =   (statusRegisterB & 0b010);
     bool isBcdEncoded   =  !(statusRegisterB & 0b100);
 
-    int8_t century = ThornhillIO::readCMOSRegister(0x32, isBcdEncoded);
+    int8_t century = ThornhillIODriver::readCMOSRegister(0x32, isBcdEncoded);
     
     ThornhillSystemTime time;
 
-    time.year        =       ThornhillIO::readCMOSRegister(0x09, isBcdEncoded);
+    time.year        = ThornhillIODriver::readCMOSRegister(0x09, isBcdEncoded);
     time.fullYear    =       (century != 0) ? (century * 100) + time.year : 0;
 
-    time.month       =       ThornhillIO::readCMOSRegister(0x08, isBcdEncoded);
-    time.day         =       ThornhillIO::readCMOSRegister(0x07, isBcdEncoded);
+    time.month       = ThornhillIODriver::readCMOSRegister(0x08, isBcdEncoded);
+    time.day         = ThornhillIODriver::readCMOSRegister(0x07, isBcdEncoded);
 
-    time.hours       =       ThornhillIO::readCMOSRegister(0x04, isBcdEncoded);
-    time.minutes     =       ThornhillIO::readCMOSRegister(0x02, isBcdEncoded);
-    time.seconds     =       ThornhillIO::readCMOSRegister(0x00, isBcdEncoded);
+    time.hours       = ThornhillIODriver::readCMOSRegister(0x04, isBcdEncoded);
+    time.minutes     = ThornhillIODriver::readCMOSRegister(0x02, isBcdEncoded);
+    time.seconds     = ThornhillIODriver::readCMOSRegister(0x00, isBcdEncoded);
 
     time.isPM        =       false;
 
@@ -52,7 +52,7 @@ ThornhillSystemTime ThornhillClock::_performOfflineTimeRead() {
 }
 
 bool ThornhillClock::isRTCUpdateInProgress() {
-    uint8_t statusRegisterA = ThornhillIO::readCMOSRegister(0x0A);
+    uint8_t statusRegisterA = ThornhillIODriver::readCMOSRegister(0x0A);
     return statusRegisterA &= 0x40;
 }
 
@@ -61,7 +61,7 @@ ThornhillSystemTime ThornhillClock::readOfflineTime() {
 
     // Apply time offset.
     // ThornhillClock::applyTimeZone(&time, &TH_TIMEZONE_NEW_BRAUNFELS, true);
-    ThornhillClock::applyTimeZone(&time, &TH_TIMEZONE_LONDON, true);
+    ThornhillClock::applyTimeZone(&time, &TH_TIMEZONE_LONDON, false);
 
     return time;
 

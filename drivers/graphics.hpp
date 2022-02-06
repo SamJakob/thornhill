@@ -16,7 +16,7 @@ using namespace std;
 #define rgb(r, g, b) {r, g, b}
 uint32_t pixel(PixelFormat format, Color color);
 
-class ThornhillGraphics {
+class ThornhillGraphicsDriver {
 
     private:
         static Screen screen;

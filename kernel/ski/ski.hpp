@@ -3,7 +3,7 @@
 #include "stdint.h"
 #include "../../drivers/clock.hpp"
 
-#define ThornHillSKIBufferSize 2024
+#define ThornhillSKIBufferSize 2024
 
 class ThornhillSKI {
 
@@ -15,7 +15,7 @@ class ThornhillSKI {
       static void initialize();
       static void draw();
 
-      static void handleInput(uint8_t);
+      static void handleInput(unsigned int keycode);
       static void handleTimer(ThornhillSystemTime* time);
 
       static void insertChar(char);

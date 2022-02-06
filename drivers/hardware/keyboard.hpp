@@ -1,24 +1,19 @@
 #include "kernel/keyboard/keyboard.hpp"
 
 #include "../io.hpp"
-#include "../graphics.hpp"
 
 #include "kernel/arch/x86_64/include.hpp"
 
-#ifndef TH_DRIVERS_HARDWARE_KEYBOARD
-#define TH_DRIVERS_HARDWARE_KEYBOARD
+#pragma once
 
-class ThornhillKeyboard {
-
-    // private:
-    //    static char buf[];
+/**
+ * Kernel driver for the hardware keyboard. This driver is responsible for passing keyboard
+ * input to a unified interface in the kernel for accepting keyboard input.
+ */
+class ThornhillKeyboardDriver {
 
     public:
-      //TODO make this private
-      static void DefaultHandler(uint8_t);
-      static void initialize();
-      static void handleInterrupt(interrupt_state_t);
-      static void setHandler(void (*handler)(uint8_t));
-};
+        static void initialize();
+        static void handleInterrupt(interrupt_state_t);
 
-#endif
+};

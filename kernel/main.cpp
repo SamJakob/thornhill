@@ -5,7 +5,7 @@
 #include "drivers/graphics.hpp"
 #include "drivers/io.hpp"
 #include "drivers/hardware/keyboard.hpp"
-#include "drivers/hardware/timer.hpp"
+#include "drivers/hardware/pit.hpp"
 #include "drivers/hardware/serial.hpp"
 #include "ski/ski.hpp"
 
@@ -30,18 +30,18 @@ void main(ThornhillHandoff* thornhillHandoff) {
     ThornhillInterrupt::setAllowInterrupts(true);
 
     // Register the keyboard driver.
-    ThornhillKeyboard::initialize();
+    ThornhillKeyboard::setOnKeyPress(&ThornhillSKI::handleInput);
+    ThornhillKeyboardDriver::initialize();
 
     /** KERNEL **/
     HAS_BOOTED = true;
-    ThornhillTimer::initialize(20, startupTime);
-    ThornhillGraphics::drawTTY();
+    ThornhillPITDriver::initialize(20, startupTime);
+    ThornhillGraphicsDriver::drawTTY();
 
-    ThornhillGraphics::drawTime(&startupTime);
+    ThornhillGraphicsDriver::drawTime(&startupTime);
 
     ThornhillSKI::initialize();
-    ThornhillKeyboard::setHandler(&ThornhillSKI::handleInput);
-    ThornhillTimer::setHandler(&ThornhillSKI::handleTimer);
+    ThornhillPITDriver::setOnTimerCallback(&ThornhillSKI::handleTimer);
 
     Kernel::print("System is ready.");
 
@@ -55,10 +55,10 @@ extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* thornhill
     ThornhillInterrupt::setAllowInterrupts(false);
 
     // Initialize the serial and display drivers.
-    ThornhillSerial::initialize();
+    ThornhillSerialDriver::initialize();
     Kernel::debug("Initializing kernel core...");
 
-    ThornhillGraphics::initialize(thornhillHandoff->screen);
+    ThornhillGraphicsDriver::initialize(thornhillHandoff->screen);
 
     // Initialize core memory management services.
     ThornhillGDT::setup();
@@ -73,15 +73,16 @@ void Kernel::panic(const char* reason, uint64_t interruptNumber, const char* con
 
     ThornhillInterrupt::setAllowInterrupts(false);
 
-    ThornhillSerial::write("!!! THORNHILL KERNEL PANIC !!!");
-    ThornhillSerial::write(reason);
-    if (context != nullptr) ThornhillSerial::write(context);
-    ThornhillSerial::write("!!! THORNHILL KERNEL PANIC !!!");
+    ThornhillSerialDriver::write("!!! THORNHILL KERNEL PANIC !!!");
+    ThornhillSerialDriver::write(reason);
+    if (context != nullptr)
+        ThornhillSerialDriver::write(context);
+    ThornhillSerialDriver::write("!!! THORNHILL KERNEL PANIC !!!");
 
-    ThornhillGraphics::clear(rgb(34, 34, 34));
+    ThornhillGraphicsDriver::clear(rgb(34, 34, 34));
 
-    ThornhillGraphics::drawText("Thornhill", 20, 50, 6);
-    ThornhillGraphics::drawText(
+    ThornhillGraphicsDriver::drawText("Thornhill", 20, 50, 6);
+    ThornhillGraphicsDriver::drawText(
         HAS_BOOTED ? "Your system needs to be restarted." : "Your system failed to boot.",
         20, 100, 2
     );
@@ -90,8 +91,8 @@ void Kernel::panic(const char* reason, uint64_t interruptNumber, const char* con
         /* A kernel software error triggered the panic. */
 
         // Print the reason and context (if available) below the reason.
-        ThornhillGraphics::drawText(reason, 20, 150, 2);
-        ThornhillGraphics::drawText(context, 20, 170, 1);
+        ThornhillGraphicsDriver::drawText(reason, 20, 150, 2);
+        ThornhillGraphicsDriver::drawText(context, 20, 170, 1);
     } else {
         /* A hardware error caused the kernel panic. */
 
@@ -99,8 +100,8 @@ void Kernel::panic(const char* reason, uint64_t interruptNumber, const char* con
         char itoaBuffer[6];
 
         // Draw the interrupt number and reason to the screen.
-        ThornhillGraphics::drawText(uitoa(itoaBuffer, interruptNumber, 10, 6), 20, 150, 2);
-        ThornhillGraphics::drawText(reason, 20, 170, 2);
+        ThornhillGraphicsDriver::drawText(uitoa(itoaBuffer, interruptNumber, 10, 6), 20, 150, 2);
+        ThornhillGraphicsDriver::drawText(reason, 20, 170, 2);
     }
 
     // For now, halt upon getting a kernel panic.
@@ -126,8 +127,8 @@ extern "C" [[maybe_unused]] void interrupt_request_handler(interrupt_state_t int
     // After receiving an interrupt request, an EOI (End-Of-Interrupt) needs
     // to be sent to the PICs to indicate that new interrupts may be sent.
     if (interruptState.int_no >= 40)
-        ThornhillIO::writeByteToPort(0xA0, 0x20); // slave
-    ThornhillIO::writeByteToPort(0x20, 0x20);     // master
+        ThornhillIODriver::writeByteToPort(0xA0, 0x20); // slave
+    ThornhillIODriver::writeByteToPort(0x20, 0x20);     // master
 
     if (ThornhillInterrupt::hasHandlerFor(interruptState.int_no)) {
         interrupt_handler_t handler = ThornhillInterrupt::getHandlerFor(interruptState.int_no);

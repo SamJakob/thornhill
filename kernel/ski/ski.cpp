@@ -1,17 +1,14 @@
 #include "ski.hpp"
 
-#include <cstring>
-
 #include "../../drivers/graphics.hpp"
 #include "../../drivers/hardware/keyboard.hpp"
-#include "../keyboard/keyboard.hpp"
 
 #include <utilities>
 #include <thornhill>
 
 using namespace Thornhill;
 
-char buffer[ThornHillSKIBufferSize];
+char buffer[ThornhillSKIBufferSize];
 
 int printStart = 1;
 int interpeterStart = 1;
@@ -23,7 +20,7 @@ void insertU(const char *in) {
 }
 
 void ThornhillSKI::initialize() {
-    for (int i = 0; i < ThornHillSKIBufferSize; i++) {
+    for (int i = 0; i < ThornhillSKIBufferSize; i++) {
         buffer[i] = 0;
     }
     printStart = 1;
@@ -57,31 +54,31 @@ bool squareOn = false;
 
 void ThornhillSKI::draw() {
     ald();
-    Screen *screen = ThornhillGraphics::getScreen();
+    Screen *screen = ThornhillGraphicsDriver::getScreen();
 
     unsigned int termWidth = screen->width - 240;
     unsigned int termHeight = screen->height - 240;
 
     // window content
     if (redraw) {
-	ThornhillGraphics::drawRect(rgb(0, 0, 0), 120, 140, termWidth, termHeight);
+        ThornhillGraphicsDriver::drawRect(rgb(0, 0, 0), 120, 140, termWidth, termHeight);
 	redraw = false;
     } else if (savedX > 0 && savedY > 0) {
-	ThornhillGraphics::drawRect(rgb(0, 0, 0), savedX, savedY, 10, 10);
+        ThornhillGraphicsDriver::drawRect(rgb(0, 0, 0), savedX, savedY, 10, 10);
 	squareOn = true;
     }
-    ThornhillGraphics::drawTextFuncky(buffer, printStart, ThornHillSKIBufferSize, 120, 140, 1, 0, termWidth, &savedX, &savedY);
-    
-    ThornhillGraphics::drawRect(rgb(255, 255, 255), savedX, savedY, 10, 10);
+    ThornhillGraphicsDriver::drawTextFuncky(buffer, printStart, ThornhillSKIBufferSize, 120, 140, 1, 0, termWidth, &savedX, &savedY);
+
+    ThornhillGraphicsDriver::drawRect(rgb(255, 255, 255), savedX, savedY, 10, 10);
     rld();
 }
 
-void ThornhillSKI::handleTimer(ThornhillSystemTime *_) {
+void ThornhillSKI::handleTimer(ThornhillSystemTime*) {
     ald();
     if (squareOn)
-	ThornhillGraphics::drawRect(rgb(0, 0, 0), savedX, savedY, 10, 10);
+        ThornhillGraphicsDriver::drawRect(rgb(0, 0, 0), savedX, savedY, 10, 10);
     else
-	ThornhillGraphics::drawRect(rgb(255, 255, 255), savedX, savedY, 10, 10);
+        ThornhillGraphicsDriver::drawRect(rgb(255, 255, 255), savedX, savedY, 10, 10);
     squareOn = !squareOn;
     rld();
 }
@@ -95,16 +92,16 @@ void ThornhillSKI::insertCharAd(char a, bool check, bool draw) {
 	return;
     }
     buffer[pos] = a;
-    pos = (pos + 1) % ThornHillSKIBufferSize;
+    pos = (pos + 1) % ThornhillSKIBufferSize;
  
     if (pos == printStart) {
 	//Make it so that it goes at least 2
 	if (buffer[printStart] != 0 && buffer[printStart] != '\n')
-	    printStart = (printStart + 1) % ThornHillSKIBufferSize;
+	    printStart = (printStart + 1) % ThornhillSKIBufferSize;
 	if (buffer[printStart] != 0 && buffer[printStart] != '\n')
-	    printStart = (printStart + 1) % ThornHillSKIBufferSize;
+	    printStart = (printStart + 1) % ThornhillSKIBufferSize;
 	while (buffer[printStart] != 0 && buffer[printStart] != '\n' && printStart != pos + 1) {
-	    printStart = (printStart + 1) % ThornHillSKIBufferSize;
+	    printStart = (printStart + 1) % ThornhillSKIBufferSize;
 	}
 	buffer[printStart] = 0;
 	printStart++;
@@ -122,7 +119,7 @@ bool checkEq(const char* str, size_t pos) {
     size_t pointerB = pos;
     while(str[pointer] != 0 && str[pointer] == buffer[pointerB]) {
 	pointer++;
-	pointerB = (pointerB + 1) % ThornHillSKIBufferSize;
+	pointerB = (pointerB + 1) % ThornhillSKIBufferSize;
     }
     return str[pointer] == buffer[pointerB];
 }
@@ -130,7 +127,7 @@ bool checkEq(const char* str, size_t pos) {
 void ThornhillSKI::process() {
     if (checkEq("panic", interpeterStart)) {
 	insertU("\npanic!");
-	for (int c = 0; c < ThornHillSKIBufferSize; c++) {
+	for (int c = 0; c < ThornhillSKIBufferSize; c++) {
 	    insertCharAd('a', false, true);
 	}
 	Kernel::panic("You asked for it", 69, "I don't know man I am just some code!");
@@ -150,16 +147,17 @@ void ThornhillSKI::insert(const char* str) {
 
 void ThornhillSKI::goBack() {
     if (pos == interpeterStart) return;
-    if (pos == 0) pos = ThornHillSKIBufferSize;
+    if (pos == 0) pos = ThornhillSKIBufferSize;
     pos--;
     buffer[pos] = 0;
     ThornhillSKI::draw();
 }
 
-void ThornhillSKI::handleInput(uint8_t keycode) {
-    if (keycode > KEYCODE_MAX) return;
+void ThornhillSKI::handleInput(unsigned int keycode) {
+    if (keycode > ThornhillKeyboard::getCharacterSetSize()) return;
     else if (keycode == KEY_ENTER) ThornhillSKI::insertChar('\n');
     else if (keycode == KEY_SPACE) ThornhillSKI::insertChar(' ');
     else if (keycode == KEY_BACKSPACE) ThornhillSKI::goBack();
-    else insertChar(THKeyboard::keycode_ascii[(int)keycode]);
+    else
+        insertChar(ThornhillKeyboard::translateKeycodeToAscii(keycode));
 }

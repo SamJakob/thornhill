@@ -8,9 +8,9 @@ using namespace Thornhill;
 
 namespace Thornhill::Kernel {
 
-    void printChar(char c) { ThornhillSerial::writeCharacter(c); }
+    void printChar(char c) { ThornhillSerialDriver::writeCharacter(c); }
     void print(const char* message, bool appendNewline) {
-        ThornhillSerial::write(message, appendNewline);
+        ThornhillSerialDriver::write(message, appendNewline);
     }
 
     int vprintf(const char* fmt, va_list arg) {
