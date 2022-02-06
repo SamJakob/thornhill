@@ -22,15 +22,12 @@ void main(ThornhillHandoff* thornhillHandoff) {
     // Read startup time.
     ThornhillSystemTime startupTime = ThornhillClock::readOfflineTime();
 
-    // Start memory management.
-    ThornhillMemory::Physical::initialize(thornhillHandoff->memoryMap);
-
     // Register the new interrupt handlers.
     ThornhillInterrupt::setupInterrupts();
     ThornhillInterrupt::setAllowInterrupts(true);
 
     // Register the keyboard driver.
-    ThornhillKeyboard::setOnKeyPress(&ThornhillSKI::handleInput);
+    ThornhillKeyboard::setOnKeyPress(ThornhillSKI::handleInput);
     ThornhillKeyboardDriver::initialize();
 
     /** KERNEL **/
@@ -41,7 +38,7 @@ void main(ThornhillHandoff* thornhillHandoff) {
     ThornhillGraphicsDriver::drawTime(&startupTime);
 
     ThornhillSKI::initialize();
-    ThornhillPITDriver::setOnTimerCallback(&ThornhillSKI::handleTimer);
+    ThornhillPITDriver::setOnTimerCallback(ThornhillSKI::handleTimer);
 
     Kernel::print("System is ready.");
 
@@ -58,11 +55,12 @@ extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* thornhill
     ThornhillSerialDriver::initialize();
     Kernel::debug("Initializing kernel core...");
 
+    ThornhillGDT::setup();
     ThornhillGraphicsDriver::initialize(thornhillHandoff->screen);
 
     // Initialize core memory management services.
-    ThornhillGDT::setup();
     ThornhillMemory::Physical::reset();
+//    ThornhillMemory::Physical::initialize(thornhillHandoff->memoryMap);
 
     main(thornhillHandoff);
     for (;;) {}
@@ -131,8 +129,7 @@ extern "C" [[maybe_unused]] void interrupt_request_handler(interrupt_state_t int
     ThornhillIODriver::writeByteToPort(0x20, 0x20);     // master
 
     if (ThornhillInterrupt::hasHandlerFor(interruptState.int_no)) {
-        interrupt_handler_t handler = ThornhillInterrupt::getHandlerFor(interruptState.int_no);
-        handler(interruptState);
+        ThornhillInterrupt::triggerHandlerFor(interruptState.int_no, interruptState);
     }
 }
 

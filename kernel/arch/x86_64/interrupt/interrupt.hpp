@@ -19,7 +19,7 @@ typedef enum {
 
 class ThornhillInterrupt {
     private:
-        static interrupt_handler_t interruptHandlers[256];
+        static ThornhillInterruptHandler interruptHandlers[256];
 
         /**
          * @brief  Generates the type field for the IDT descriptor in a more readable way.
@@ -50,9 +50,11 @@ class ThornhillInterrupt {
 
       static void setIdtGate(int gateNumber, uint64_t handler);
 
-      static void registerInterruptHandler(uint8_t interrupt, interrupt_handler_t handler);
+      static void registerInterruptHandler(uint8_t interrupt, ThornhillInterruptHandler handler);
 
       static bool hasHandlerFor(uint8_t interrupt);
 
-      static interrupt_handler_t getHandlerFor(uint8_t interrupt);
+      static ThornhillInterruptHandler getHandlerFor(uint8_t interrupt);
+
+      static void triggerHandlerFor(uint8_t interrupt, interrupt_state_t interruptState);
 };

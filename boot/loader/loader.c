@@ -233,5 +233,24 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSy
         }
     }
 
+    /* Zero-initialize all the BSS sections of the kernel. */
+    for (
+        // Create a temporary pointer for the current KernelSegmentHeader.
+        Elf64_Shdr* KernelSectionHeaderEntry = KernelSectionHeaders;
+        // Ensure we don't proceed past the segment header table.
+        (char*)KernelSectionHeaderEntry <
+        (char*)KernelSectionHeaders + KernelSectionTableSize;
+        // Loop over each section header
+        KernelSectionHeaderEntry =
+            (Elf64_Shdr*)( (uint64_t)KernelSectionHeaderEntry + KernelHeader->e_shentsize )
+    ) {
+        if (KernelSectionHeaderEntry->sh_type == SHT_NOBITS) {
+            ZeroMem(
+                (void*) (KernelSectionHeaderEntry->sh_addr - KernelSymbols->KernelBaseAddress),
+                KernelSectionHeaderEntry->sh_size
+            );
+        }
+    }
+
     return Status;
 }

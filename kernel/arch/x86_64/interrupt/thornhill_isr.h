@@ -79,4 +79,4 @@ extern void irq15();
 #define IRQ14 46
 #define IRQ15 47
 
-typedef void (*interrupt_handler_t)(interrupt_state_t);
+typedef void (*ThornhillInterruptHandler)(interrupt_state_t);

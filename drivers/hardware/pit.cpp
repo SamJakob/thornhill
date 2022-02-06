@@ -31,4 +31,4 @@ void ThornhillPITDriver::initialize(uint16_t frequency, ThornhillSystemTime star
 
 uint16_t ThornhillPITDriver::tick = 0;
 ThornhillSystemTime ThornhillPITDriver::currentTime;
-void (*ThornhillPITDriver::onTimerCallbackHandler)(ThornhillSystemTime*) = nullptr;
+ThornhillPITHandler ThornhillPITDriver::onTimerCallbackHandler = nullptr;

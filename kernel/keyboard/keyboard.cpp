@@ -16,8 +16,6 @@ const char keycode_ascii[] = {
     '?', '?', '?'
 };
 
-ThornhillKeyboardHandler ThornhillKeyboard::onKeyPressHandler;
-
 unsigned int ThornhillKeyboard::getCharacterSetSize() {
     return *(&keycode_ascii + 1) - keycode_ascii;
 }
@@ -42,6 +40,8 @@ void ThornhillKeyboard::setOnKeyPress(ThornhillKeyboardHandler handler) {
     onKeyPressHandler = handler;
 }
 
+ThornhillKeyboardHandler ThornhillKeyboard::onKeyPressHandler = nullptr;
+
 void ThornhillKeyboard::triggerKeyPress(unsigned int keycode) {
-    if (onKeyPressHandler != nullptr) onKeyPressHandler(keycode);
+     if (onKeyPressHandler != nullptr) onKeyPressHandler(keycode);
 }

@@ -95,16 +95,21 @@ void ThornhillInterrupt::setIdtGate(int gateNumber, uint64_t handler) {
     idt[gateNumber].null_descriptor_2 = 0;
 }
 
-void ThornhillInterrupt::registerInterruptHandler(uint8_t interrupt, interrupt_handler_t handler) {
+void ThornhillInterrupt::registerInterruptHandler(uint8_t interrupt,
+                                                  ThornhillInterruptHandler handler) {
     interruptHandlers[interrupt] = handler;
 }
 
 bool ThornhillInterrupt::hasHandlerFor(uint8_t interrupt) {
-    return interruptHandlers[interrupt] != 0;
+    return interruptHandlers[interrupt] != nullptr;
 }
 
-interrupt_handler_t ThornhillInterrupt::getHandlerFor(uint8_t interrupt) {
+ThornhillInterruptHandler ThornhillInterrupt::getHandlerFor(uint8_t interrupt) {
     return interruptHandlers[interrupt];
 }
 
-interrupt_handler_t ThornhillInterrupt::interruptHandlers[256];
+void ThornhillInterrupt::triggerHandlerFor(uint8_t interrupt, interrupt_state_t interruptState) {
+    (getHandlerFor(interrupt))(interruptState);
+}
+
+ThornhillInterruptHandler ThornhillInterrupt::interruptHandlers[256];
