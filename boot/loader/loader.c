@@ -128,7 +128,7 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSy
         (char*)KernelSectionHeaders + KernelSectionTableSize;
         // Loop over each section header
         KernelSectionHeaderEntry =
-            (Elf64_Shdr*)( (uint64_t)KernelSectionHeaderEntry + KernelHeader->e_shentsize )
+            (Elf64_Shdr*)( (UINT64)KernelSectionHeaderEntry + KernelHeader->e_shentsize )
     ) {
         if (KernelSectionHeaderEntry->sh_type == SHT_STRTAB && (
             KernelHeader->e_shstrndx == SHN_UNDEF || KernelHeader->e_shstrndx != StringTableIndex
@@ -169,7 +169,7 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSy
         (char*)KernelSectionHeaders + KernelSectionTableSize;
         // Loop over each section header
         KernelSectionHeaderEntry =
-            (Elf64_Shdr*)( (uint64_t)KernelSectionHeaderEntry + KernelHeader->e_shentsize )
+            (Elf64_Shdr*)( (UINT64)KernelSectionHeaderEntry + KernelHeader->e_shentsize )
     ) {
         /* Locate the symbol table. */
         if (KernelSectionHeaderEntry->sh_type == SHT_SYMTAB) {
@@ -201,7 +201,7 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSy
                 (char*)KernelSymbolTable + KernelSymbolTableSize;
                 // Loop over each symbol.
                 KernelSymbolEntry =
-                    (Elf64_Sym*)( (uint64_t)KernelSymbolEntry + KernelSectionHeaderEntry->sh_entsize )
+                    (Elf64_Sym*)( (UINT64)KernelSymbolEntry + KernelSectionHeaderEntry->sh_entsize )
             ) {
 
                 if (KernelSymbolEntry->st_name != 0) {
@@ -242,7 +242,7 @@ EFI_STATUS THBLoadKernel(EFI_FILE* Kernel, Elf64_Ehdr* KernelHeader, THBKernelSy
         (char*)KernelSectionHeaders + KernelSectionTableSize;
         // Loop over each section header
         KernelSectionHeaderEntry =
-            (Elf64_Shdr*)( (uint64_t)KernelSectionHeaderEntry + KernelHeader->e_shentsize )
+            (Elf64_Shdr*)( (UINT64)KernelSectionHeaderEntry + KernelHeader->e_shentsize )
     ) {
         if (KernelSectionHeaderEntry->sh_type == SHT_NOBITS) {
             ZeroMem(

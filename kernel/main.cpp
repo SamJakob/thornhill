@@ -15,15 +15,14 @@ using namespace Thornhill;
 
 bool HAS_BOOTED = false;
 
-void main(ThornhillHandoff* thornhillHandoff) {
+void main() {
 
     /** SYSTEM STARTUP **/
 
     // Read startup time.
     ThornhillSystemTime startupTime = ThornhillClock::readOfflineTime();
 
-    // Register the new interrupt handlers.
-    ThornhillInterrupt::setupInterrupts();
+    // Re-enable interrupts.
     ThornhillInterrupt::setAllowInterrupts(true);
 
     // Register the keyboard driver.
@@ -55,14 +54,18 @@ extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* thornhill
     ThornhillSerialDriver::initialize();
     Kernel::debug("Initializing kernel core...");
 
-    ThornhillGDT::setup();
+    // Enable the graphics driver.
     ThornhillGraphicsDriver::initialize(thornhillHandoff->screen);
+
+    // Set up the global descriptor table and interrupts.
+    ThornhillGDT::setup();
+    ThornhillInterrupt::setupInterrupts();
 
     // Initialize core memory management services.
     ThornhillMemory::Physical::reset();
-//    ThornhillMemory::Physical::initialize(thornhillHandoff->memoryMap);
+    ThornhillMemory::Physical::initialize(thornhillHandoff->memoryMap);
 
-    main(thornhillHandoff);
+    main();
     for (;;) {}
 
 }

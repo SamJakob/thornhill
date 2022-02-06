@@ -13,6 +13,8 @@ namespace Thornhill {
 
     void memzero(void* base, size_t size) {
 
+        if (base == nullptr || size == 0) return;
+
         auto* baseSz = (size_t*) base;
 
         size_t clearSize = size / sizeof(size_t);

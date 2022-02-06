@@ -129,7 +129,6 @@ namespace ThornhillMemory {
             Physical::inventoryBase = firstPage;
             assert(Physical::inventoryBase != null);
 
-
             ThornhillPhysicalFrame* previousFrame = nullptr;
             // Take the first page as the inventory page.
             uint64_t inventoryPage = firstPage;
@@ -156,13 +155,21 @@ namespace ThornhillMemory {
                 // Initialize the frame.
                 currentFrame->base = segment.physicalBaseAddress;
                 currentFrame->metadata = 0;
+                currentFrame->next = null;
 
-                // Calculate the size of the bitmap required to hold this contiguous section of
-                // pages.
+                // Calculate the size of the bitmap (in bytes) required to hold this contiguous
+                // section of pages.
+                // TODO: deal with remainder. Currently lots of memory is wasted.
                 uint16_t bitmapSize = max(
                     (uint64_t) min(
+                        // The number of pages this frame holds (divided by 8, because this is a
+                        // byte array, where each bit of the byte represents a page).
+                        // TODO: set remainder to USED.
                         (uint64_t) ceilToN((long double) segment.pageCount / 8, 8),
-                        (inventoryPage + PAGES(1)) - ((uint64_t)(currentFrame) + PHYSICAL_FRAME_HEADER_SIZE)
+                        // Get the base address of the next consecutive page with PAGE_ALIGN_UP,
+                        // and subtract from it the base address of the bitmap. This yields the
+                        // maximum possible size of the bitmap.
+                        (PAGE_ALIGN_UP((uint64_t) currentFrame)) - ((uint64_t)(currentFrame) + PHYSICAL_FRAME_HEADER_SIZE)
                     ),
                     0UL
                 );
@@ -200,7 +207,8 @@ namespace ThornhillMemory {
                     // Take the next available page as an inventory page.
                     inventoryPage = _firstAvailablePage(bootMap, currentPage + PAGES(1));
 
-                    // If an inventory page couldn't be found, break early as we've exhausted available memory.
+                    // If an inventory page couldn't be found, break early as we've exhausted
+                    // available memory.
                     if (inventoryPage == null)
                         break;
 
@@ -220,7 +228,7 @@ namespace ThornhillMemory {
             Kernel::debug("PMM", "Checking inventory...");
             auto* currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(Physical::inventoryBase);
 
-            while (currentFrame != null) {
+            while (currentFrame != nullptr) {
                 Physical::totalMemory += PAGES(currentFrame->count);
                 currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(currentFrame->next);
             }
