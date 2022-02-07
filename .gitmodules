@@ -1,3 +1,4 @@
 [submodule "third-party/gnu-efi"]
 	path = third-party/gnu-efi
 	url = https://github.com/SamJakob/gnu-efi
+	ignore = dirty
