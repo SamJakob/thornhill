@@ -59,12 +59,4 @@ if (NOT DEFINED TH_CURRENT_SOURCE_DIR)
     message(FATAL_ERROR "You must set TH_CURRENT_SOURCE_DIR to the root of the project to run this script.")
 endif()
 
-if(EXISTS ${TH_CURRENT_SOURCE_DIR}/config/version.h)
-    file(READ ${TH_CURRENT_SOURCE_DIR}/config/version.h VERSION_)
-else()
-    set(VERSION_ "")
-endif()
-
-if (NOT "${VERSION}" STREQUAL "${VERSION_}")
-    file(WRITE ${TH_CURRENT_SOURCE_DIR}/config/version.h "${VERSION}")
-endif()
+file(WRITE ${TH_CURRENT_SOURCE_DIR}/config/version.h "${VERSION}")
