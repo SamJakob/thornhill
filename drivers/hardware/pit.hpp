@@ -43,4 +43,11 @@ class ThornhillPITDriver {
      * @param handler The new handler for a timer callback.
      */
     static void setOnTimerCallback(ThornhillPITHandler handler);
+
+    /**
+     * Get the current time from the PIT driver.
+     * @return A ThornhillSystemTime structure.
+     */
+     // TODO: refactor this to kernel/time.cpp
+    static ThornhillSystemTime getCurrentTime();
 };

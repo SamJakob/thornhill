@@ -29,6 +29,10 @@ void ThornhillPITDriver::initialize(uint16_t frequency, ThornhillSystemTime star
     ThornhillIODriver::writeByteToPort(0x40, high);
 }
 
+ThornhillSystemTime ThornhillPITDriver::getCurrentTime() {
+    return currentTime;
+}
+
 uint16_t ThornhillPITDriver::tick = 0;
 ThornhillSystemTime ThornhillPITDriver::currentTime;
 ThornhillPITHandler ThornhillPITDriver::onTimerCallbackHandler = nullptr;

@@ -13,6 +13,8 @@ namespace std {
     }
 
     const char* strpad(const char* str, char* output, char padChar, int intendedLength) {
+        memzero(output, intendedLength);
+
         int valueLength = strlen(str);
         if (valueLength >= intendedLength)
             return str;

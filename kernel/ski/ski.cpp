@@ -3,6 +3,11 @@
 #include "../../drivers/graphics.hpp"
 #include "../../drivers/hardware/keyboard.hpp"
 
+#include "../../config/version.h"
+#include "kernel/memory/physical.hpp"
+#include "drivers/hardware/pit.hpp"
+#include "cstring"
+
 #include <utilities>
 #include <thornhill>
 
@@ -20,9 +25,7 @@ void insertU(const char *in) {
 }
 
 void ThornhillSKI::initialize() {
-    for (int i = 0; i < ThornhillSKIBufferSize; i++) {
-        buffer[i] = 0;
-    }
+    memzero(buffer, ThornhillSKIBufferSize);
     printStart = 1;
     interpeterStart = 1;
     pos = 1;
@@ -126,13 +129,131 @@ bool checkEq(const char* str, size_t pos) {
 
 void ThornhillSKI::process() {
     if (checkEq("panic", interpeterStart)) {
-	insertU("\npanic!");
+
+        insertU("\npanic!");
 	for (int c = 0; c < ThornhillSKIBufferSize; c++) {
 	    insertCharAd('a', false, true);
 	}
 	Kernel::panic("You asked for it", 69, "I don't know man I am just some code!");
-	return;
-    } else insertU("\nCommand not found\n");
+
+        return;
+
+    } else if (checkEq("sysinfo", interpeterStart)) {
+
+        char itoaBuffer[33];
+        itoaBuffer[32] = 0;
+
+        char padBuffer[3];
+        padBuffer[2] = 0;
+
+        insertU(
+            "\n\n"
+            "System Information:\n"
+            "Thornhill - build " TH_GIT_REV " (built on " TH_BUILD_DATE " at " TH_BUILD_TIME ")\n"
+            "\n"
+            "-> Used Physical Memory: "
+        );
+        insertU(uitoa(
+            itoaBuffer, ThornhillMemory::Physical::getUsedMemory(),
+            10, 32
+        ));
+        insertU(" bytes");
+
+        insertU("\n"
+            "-> Total Physical Memory: "
+        );
+        insertU(uitoa(
+            itoaBuffer, ThornhillMemory::Physical::getTotalMemory(),
+            10, 32
+        ));
+        insertU(" bytes");
+
+        insertU("\n"
+            "-> Current System Time: "
+        );
+
+        ThornhillSystemTime systemTime = ThornhillPITDriver::getCurrentTime();
+
+        insertU(uitoa(
+            itoaBuffer, systemTime.month,
+            10, 32
+            ));
+        insertU("/");
+        insertU(strpad(
+            uitoa(
+                itoaBuffer, systemTime.day,
+                10, 32
+                ),
+            padBuffer,
+            '0',
+            2
+            ));
+        insertU("/");
+        insertU(uitoa(
+            itoaBuffer, systemTime.fullYear,
+            10, 32
+            ));
+        insertU(", ");
+        insertU(strpad(
+            uitoa(
+                itoaBuffer, systemTime.hours,
+                10, 32
+                ),
+            padBuffer,
+            '0',
+            2
+            ));
+        insertU(":");
+        insertU(strpad(
+            uitoa(
+                itoaBuffer, systemTime.minutes,
+                10, 32
+                ),
+            padBuffer,
+            '0',
+            2
+            ));
+        insertU(":");
+        insertU(strpad(
+            uitoa(
+                itoaBuffer, systemTime.seconds,
+                10, 32
+                ),
+            padBuffer,
+            '0',
+            2
+            ));
+        insertU("\n\n");
+
+    } else if (checkEq("clear", interpeterStart)) {
+
+        memzero(buffer, ThornhillSKIBufferSize);
+        printStart = 1;
+        interpeterStart = 1;
+        pos = 1;
+
+        redraw = true;
+        ThornhillSKI::draw();
+
+    } else if (checkEq("help", interpeterStart)) {
+
+        insertU(
+            "\n\n"
+            "Available Commands:\n"
+            "- help: Display this message.\n"
+            "\n"
+            "- clear: Clear the screen.\n"
+            "- panic: Trigger a system panic.\n"
+            "- sysinfo: Show basic system information.\n"
+            "\n"
+        );
+
+    } else {
+
+        insertU("\n\nCommand not found. Try 'help' to see commands.\n\n");
+
+    }
+
     insertU("k > ");
 }
 

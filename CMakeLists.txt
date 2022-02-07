@@ -87,6 +87,15 @@ endif()
 # Ensure output directory is ready.
 execute_process(COMMAND "${CMAKE_COMMAND} -E make_directory ${TH_OUTPUT_DIRECTORY}")
 
+# Run the version script.
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/config/version.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/config/_version.h
+    COMMAND ${CMAKE_COMMAND} -DTH_CURRENT_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/version.cmake
+)
+add_custom_target(version ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/config/version.h)
+
 # Include components.
 add_subdirectory(boot)
 add_subdirectory(kernel)
