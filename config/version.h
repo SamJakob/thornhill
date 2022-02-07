@@ -7,11 +7,11 @@
 
 #pragma once
 
-#define TH_GIT_REV "07940ae-WORKING"
+#define TH_GIT_REV "9d196ba-WORKING"
 #define TH_GIT_TAG ""
 #define TH_GIT_BRANCH "master"
 
 #define TH_BUILD_DATE "02/07/2022"
 #define TH_BUILD_DATE_UTC "02/07/2022"
-#define TH_BUILD_TIME "11:21:59"
-#define TH_BUILD_TIME_UTC "11:21:59"
+#define TH_BUILD_TIME "12:03:18"
+#define TH_BUILD_TIME_UTC "12:03:18"
