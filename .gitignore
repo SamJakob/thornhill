@@ -13,6 +13,7 @@ out/**
 .vscode/**
 cmake-build*/**
 build/**
+config/version.h
 
 #
 # macOS
