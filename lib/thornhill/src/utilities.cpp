@@ -1,8 +1,6 @@
 #include <cstring>
 #include <utilities>
 
-using namespace std;
-
 namespace Thornhill {
 
     void memswap(char* a, char* b) {
@@ -62,7 +60,7 @@ namespace Thornhill {
         // Finally, we'll append the null terminator
         // and reverse the string.
         buffer[i] = 0;
-        strrev(&buffer[0], i);
+        std::strrev(&buffer[0], i);
 
         return &buffer[0];
     }
@@ -112,7 +110,7 @@ namespace Thornhill {
         // Finally, we'll append the null terminator
         // and reverse the string.
         buffer[i] = 0;
-        strrev(&buffer[0], i);
+        std::strrev(&buffer[0], i);
 
         return &buffer[0];
     }

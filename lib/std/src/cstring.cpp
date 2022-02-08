@@ -1,7 +1,6 @@
 #include <cstring>
 
 #include <thornhill>
-using namespace Thornhill;
 
 namespace std {
 
@@ -13,7 +12,7 @@ namespace std {
     }
 
     const char* strpad(const char* str, char* output, char padChar, int intendedLength) {
-        memzero(output, intendedLength);
+        Thornhill::memzero(output, intendedLength);
 
         int valueLength = strlen(str);
         if (valueLength >= intendedLength)
@@ -38,7 +37,7 @@ namespace std {
         int end = length - 1;
 
         while (start < end) {
-            memswap(str + start, str + end);
+            Thornhill::memswap(str + start, str + end);
             start++;
             end--;
         }

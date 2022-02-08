@@ -4,48 +4,48 @@
 
 #define PHYSICAL_FRAME_HEADER_SIZE 32
 
-/**
- * A structure used by the Physical Memory Manager (PMM) to store information about a given
- * cluster of pages.
- */
-struct __attribute__((packed)) ThornhillPhysicalFrame {
-
-    /**
-     * The physical base address of the first page that this frame refers to.
-     */
-    uint64_t base;
-
-    /**
-     * The virtual base address of the next ThornhillPhysicalFrame structure.
-     */
-    uint64_t next;
-
-    /**
-     * The number of pages in the current frame. This frame, therefore refers to all memory
-     * from base to base + (count * TH_ARCH_PAGE_SIZE).
-     */
-    uint64_t count;
-
-    /**
-     * A bitmap of metadata about this physical frame.
-     */
-    uint64_t metadata;
-
-    /**
-     * The bitmap of page usage information of the pages represented by this frame. Each entry in
-     * the bitmap, bit N, refers to the page starting at base + (N * TH_ARCH_PAGE_SIZE). e.g., bit
-     * 0 refers to the base address, bit 1 refers to the page after the base address, etc.
-     *
-     * A bit value of 1 denotes that the page is in use. A bit value of 0 denotes that the page is
-     * not in use.
-     *
-     * Any entries in the bitmap after N = `count` are undefined.
-     */
-    uint8_t* bitmap;
-
-};
-
 namespace ThornhillMemory {
+
+    /**
+     * A structure used by the Physical Memory Manager (PMM) to store information about a given
+     * cluster of pages.
+     */
+    struct __attribute__((packed)) ThornhillPhysicalFrame {
+
+        /**
+         * The physical base address of the first page that this frame refers to.
+         */
+        uint64_t base;
+
+        /**
+         * The virtual base address of the next ThornhillPhysicalFrame structure.
+         */
+        uint64_t next;
+
+        /**
+         * The number of pages in the current frame. This frame, therefore refers to all memory
+         * from base to base + (count * TH_ARCH_PAGE_SIZE).
+         */
+        uint64_t count;
+
+        /**
+         * A bitmap of metadata about this physical frame.
+         */
+        uint64_t metadata;
+
+        /**
+         * The bitmap of page usage information of the pages represented by this frame. Each entry in
+         * the bitmap, bit N, refers to the page starting at base + (N * TH_ARCH_PAGE_SIZE). e.g., bit
+         * 0 refers to the base address, bit 1 refers to the page after the base address, etc.
+         *
+         * A bit value of 1 denotes that the page is in use. A bit value of 0 denotes that the page is
+         * not in use.
+         *
+         * Any entries in the bitmap after N = `count` are undefined.
+         */
+        uint8_t* bitmap;
+
+    };
 
     class Physical {
 
@@ -73,7 +73,7 @@ namespace ThornhillMemory {
         //
 
         /**
-         * Returns whether or not the bootloader is initialized.
+         * Returns whether or not the physical memory manager is initialized.
          * @return true, if it is. Otherwise false.
          */
         static inline bool isInitialized() { return initialized; }

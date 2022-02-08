@@ -109,11 +109,14 @@ namespace ThornhillKernel {
             /**
              * @brief Invalidates a specific page in the TLB so that it's
              * loaded from the page table on the next access.
+             *
+             * If the address is not page-aligned this will do nothing. In debug mode
+             * it will throw an assertion failure.
              * 
-             * @param address The address of the page that should be flushed
+             * @param address The base address of the page that should be flushed
              * from the TLB.
              */
-            static void invalidatePage(uintptr_t address);
+            static void invalidatePage(uint64_t address);
     };
 
 }

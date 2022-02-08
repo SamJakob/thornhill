@@ -20,4 +20,15 @@ namespace std {
         return isPositive ? result : -result;
     }
 
+    long long int floorToN(long double value, long long int multiple) {
+        long long int roundedValue = floor(value);
+
+        bool isPositive = roundedValue >= 0;
+        if (!isPositive)
+            roundedValue = -roundedValue;
+
+        long long int result = (roundedValue / multiple) * multiple;
+        return isPositive ? result : -result;
+    }
+
 }

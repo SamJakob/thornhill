@@ -17,9 +17,9 @@ ThornhillSystemTime ThornhillClock::_performOfflineTimeRead() {
     bool b24HourFormat  =   (statusRegisterB & 0b010);
     bool isBcdEncoded   =  !(statusRegisterB & 0b100);
 
-    int8_t century = ThornhillIODriver::readCMOSRegister(0x32, isBcdEncoded);
+    auto century = (int8_t) ThornhillIODriver::readCMOSRegister(0x32, isBcdEncoded);
     
-    ThornhillSystemTime time;
+    ThornhillSystemTime time{};
 
     time.year        = ThornhillIODriver::readCMOSRegister(0x09, isBcdEncoded);
     time.fullYear    =       (century != 0) ? (century * 100) + time.year : 0;
@@ -53,7 +53,7 @@ ThornhillSystemTime ThornhillClock::_performOfflineTimeRead() {
 
 bool ThornhillClock::isRTCUpdateInProgress() {
     uint8_t statusRegisterA = ThornhillIODriver::readCMOSRegister(0x0A);
-    return statusRegisterA &= 0x40;
+    return statusRegisterA & 0x40;
 }
 
 ThornhillSystemTime ThornhillClock::readOfflineTime() {

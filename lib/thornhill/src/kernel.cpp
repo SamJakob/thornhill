@@ -3,7 +3,6 @@
 
 #include "drivers/hardware/serial.hpp"
 
-using namespace std;
 using namespace Thornhill;
 
 namespace Thornhill::Kernel {
@@ -41,28 +40,28 @@ namespace Thornhill::Kernel {
                     case 's':
                         strPtr = va_arg(arg, char*);
                         print(strPtr, false);
-                        length += strlen(strPtr);
+                        length += std::strlen(strPtr);
                         break;
 
                     /* %d => print number as decimal */
                     case 'd':
                         itoa(buffer, va_arg(arg, int64_t), 10, 32);
                         print(buffer, false);
-                        length += strlen(buffer);
+                        length += std::strlen(buffer);
                         break;
 
                     /* %u => print unsigned number as integer */
                     case 'u':
                         uitoa(buffer, va_arg(arg, uint64_t), 10, 32);
                         print(buffer, false);
-                        length += strlen(buffer);
+                        length += std::strlen(buffer);
                         break;
 
                     /* %x => print number as hexadecimal */
                     case 'x':
                         uitoa(buffer, va_arg(arg, uint64_t), 16, 32);
                         print(buffer, false);
-                        length += strlen(buffer);
+                        length += std::strlen(buffer);
                         break;
 
                     /* %n => print newline */

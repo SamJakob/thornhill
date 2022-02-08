@@ -10,6 +10,7 @@
 #include "ski/ski.hpp"
 
 #include "memory/physical.hpp"
+#include "kernel/memory/virtual.hpp"
 
 using namespace Thornhill;
 
@@ -64,6 +65,8 @@ extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* thornhill
     // Initialize core memory management services.
     ThornhillMemory::Physical::reset();
     ThornhillMemory::Physical::initialize(thornhillHandoff->memoryMap);
+    ThornhillMemory::Virtual::reset();
+    ThornhillMemory::Virtual::initialize();
 
     main();
     for (;;) {}

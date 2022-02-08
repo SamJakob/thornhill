@@ -162,11 +162,18 @@ void ThornhillSKI::process() {
         insertU("\n"
             "-> Total Physical Memory: "
         );
+
+        insertU(uitoa(
+            itoaBuffer, ThornhillMemory::Physical::getTotalMemory() / 1024 / 1024,
+            10, 32
+        ));
+
+        insertU(" MiB (");
         insertU(uitoa(
             itoaBuffer, ThornhillMemory::Physical::getTotalMemory(),
             10, 32
         ));
-        insertU(" bytes");
+        insertU(" bytes)");
 
         insertU("\n"
             "-> Current System Time: "
