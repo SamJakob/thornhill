@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <math>
+#include <cmath>
 #include <thornhill>
 
 #include "physical.hpp"
@@ -167,10 +167,10 @@ namespace ThornhillMemory {
                 // section of pages.
                 uint64_t maxPossibleBitmapSize = ((uint64_t) inventoryPage + PAGES(1)) - ((uint64_t)currentFrame + PHYSICAL_FRAME_HEADER_SIZE);
                 uint16_t bitmapSize = max(
-                    (uint64_t) min(
+                    min(
                         // The number of pages this frame holds (divided by 8, because this is a
                         // byte array, where each bit of the byte represents a page).
-                        (uint64_t) ceilToN((long double) segment->pageCount / 8, 8),
+                        (uint64_t)llceiln((long double)segment->pageCount / 8, 8),
                         // Get the base address of the next consecutive page with PAGE_ALIGN_UP,
                         // and subtract from it the base address of the bitmap. This yields the
                         // maximum possible size of the bitmap.

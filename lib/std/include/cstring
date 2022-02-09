@@ -36,6 +36,93 @@ namespace std {
      * @param str The string to reverse.
      * @param length The length of the string, excluding null terminators.
      */
-    void strrev(char* str, int length);
+    void strrev(char* str, unsigned int length);
+
+    /**
+     * Splits the specified string into a series of tokens using the specified delimiter.
+     * This is the POSIX re-entrant version of strtok which is not implemented in the system
+     * library due to it's being regarded as an unsafe and poorly implemented function.
+     *
+     * The savePointer is used to determine the starting point when str is not specified
+     * (i.e., to find tokens after the first one).
+     *
+     * If str IS NOT a nullptr, the first token is ALWAYS returned and savePointer is set to the
+     * next starting point.
+     *
+     * Otherwise, if str IS a nullptr, the token denoted by savePointer is returned and savePointer
+     * is, again, set to the next starting point.
+     *
+     * In both cases (of whether str is nullptr), a null byte will be inserted where the first
+     * character of the delimiter would be.
+     *
+     * If the delimiter is empty (i.e., strlen(delimiter) < 1), the original string pointer, str,
+     * will always be returned (regardless of whether it is a nullptr).
+     *
+     * @param str The string to be tokenized.
+     * @param delimiter The delimiter that the str should be split on.
+     * @param savePointer The starting point to use if str is nullptr.
+     * @return The pointer to the first token in the string, or nullptr if none are found.
+     */
+    char* strtok_r(char* str, const char* delimiter, char** savePointer);
+
+    /**
+     * Returns the number of chars in the span at the start of str that are each contained in the
+     * specified string, chars.
+     * This does not include null-terminating chars, instead ending when they are encountered.
+     *
+     * @param str The string to find the span within.
+     * @param chars The string containing the chars that should be accepted in the span.
+     * @return The number of chars at the start of str that are each contained in chars.
+     * Hence, if all the chars in str are in chars, this will return strlen(str) and if the
+     * first character of str is not in chars, this will return 0.
+     */
+    int strspn(const char* str, const char* chars);
+
+    /**
+     * Returns the number of chars at the start of str that are NOT contained in the specified
+     * string, chars.
+     * This search includes null-terminating characters meaning the function will return the
+     * length of str if none of the characters in chars are found in str.
+     *
+     * This is essentially the inverse of strspn with respect to matching.
+     *
+     * @param str The string to find the span within.
+     * @param chars The string containing the chars that should NOT be accepted in the span.
+     * @return The number of chars at the start of str that are NOT contained in chars.
+     */
+    int strcspn(const char* str, const char* chars);
+
+    /**
+     * Compares str1 to str2.
+     * If they are equal, this returns 0. If they are not equal it returns the difference in the
+     * ASCII values of the first non-matching character in each string (with the character in str2
+     * being subtracted from the character in str1).
+     *
+     * e.g., strcmp("day", "date") would give a difference of 5, switching the strings would give
+     * -5.
+     *
+     * If the string ends before a difference is found, it will compare with the null byte, so
+     * strcmp("date", "da") would be 116 (the ASCII value of t) and switching them would be -116.
+     *
+     * @param str1 The string to compare against.
+     * @param str2 The string to compare with str1.
+     * @return Either 0 (if str1 is identical to str2), or the difference in ASCII values of the
+     * first character to not match.
+     */
+    int strcmp(const char* str1, const char* str2);
+
+    /**
+     * Compares up to n characters of str1 to str2.
+     * This works the same as strcmp except that only up to n characters are compared.
+     *
+     * @see strcmp
+     *
+     * @param str1 The string to compare against.
+     * @param str2 The string to compare with str1.
+     * @param n The maximum number of characters to compare.
+     * @return Either 0 (if str1 is identical to str2), or the difference in ASCII values of the
+     * first character to not match.
+     */
+    int strncmp(const char* str1, const char* str2, int n);
     
 }

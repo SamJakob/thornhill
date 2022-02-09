@@ -1,0 +1,181 @@
+#pragma once
+
+#define COMPILER_BUILTIN_FLOOR __builtin_floor
+#define COMPILER_BUILTIN_FLOOR_FLOAT __builtin_floorf
+#define COMPILER_BUILTIN_FLOOR_EXTENDED __builtin_floorl
+
+#define COMPILER_BUILTIN_ROUND __builtin_round
+#define COMPILER_BUILTIN_ROUND_FLOAT __builtin_roundf
+#define COMPILER_BUILTIN_ROUND_EXTENDED __builtin_roundl
+
+#define COMPILER_BUILTIN_CEIL __builtin_ceil
+#define COMPILER_BUILTIN_CEIL_FLOAT __builtin_ceilf
+#define COMPILER_BUILTIN_CEIL_EXTENDED __builtin_ceill
+
+namespace std {
+
+    /**
+     * Rounds the specified value down to the largest integral value that is not greater than the
+     * specified value.
+     *
+     * @param value The value to round down.
+     * @return The rounded-down value as a single precision floating point value.
+    */
+    constexpr float floor(float value) {
+        return COMPILER_BUILTIN_FLOOR_FLOAT(value);
+    }
+
+    /**
+     * Rounds the specified value down to the largest integral value that is not greater than the
+     * specified value.
+     *
+     * @param value The value to round down.
+     * @return The rounded-down value as a double precision floating point value.
+     */
+    constexpr double floor(double value) {
+        return COMPILER_BUILTIN_FLOOR(value);
+    }
+
+    /**
+     * Rounds the specified value down to the largest integral value that is not greater than the
+     * specified value.
+     *
+     * @param value The value to round down.
+     * @return The rounded-down value as an extended precision (long double) floating point value.
+     */
+    constexpr long double floor(long double value) {
+        return COMPILER_BUILTIN_FLOOR_EXTENDED(value);
+    }
+
+    /**
+     * Rounds the specified value to the nearest integral value (mathematical round) with half-up
+     * rounding (0.5 is rounded to 1 rather than 0).
+     *
+     * @param value The value to round.
+     * @return The rounded value as a single precision floating point value.
+     */
+    constexpr float round(float value) {
+        return COMPILER_BUILTIN_ROUND_FLOAT(value);
+    }
+
+    /**
+     * Rounds the specified value to the nearest integral value (mathematical round) with half-up
+     * rounding (0.5 is rounded to 1 rather than 0).
+     *
+     * @param value The value to round.
+     * @return The rounded value as a double precision floating point value.
+     */
+    constexpr double round(double value) {
+        return COMPILER_BUILTIN_ROUND(value);
+    }
+
+    /**
+     * Rounds the specified value to the nearest integral value (mathematical round) with half-up
+     * rounding (0.5 is rounded to 1 rather than 0).
+     *
+     * @param value The value to round.
+     * @return The rounded value as an extended precision (long double) floating point value.
+     */
+    constexpr long double round(long double value) {
+        return COMPILER_BUILTIN_ROUND_EXTENDED(value);
+    }
+
+    /**
+     * Rounds the specified value up to the smallest integral value not less than the specified
+     * value.
+     *
+     * @param value The value to round up.
+     * @return The rounded-up value as a single-preicison floating point value.
+     */
+    constexpr float ceil(float value) {
+        return COMPILER_BUILTIN_CEIL_FLOAT(value);
+    }
+
+    /**
+     * Rounds the specified value up to the smallest integral value not less than the specified
+     * value.
+     *
+     * @param value The value to round up.
+     * @return The rounded-up value as a single-preicison floating point value.
+     */
+    constexpr double ceil(double value) {
+        return COMPILER_BUILTIN_CEIL(value);
+    }
+
+    /**
+     * Rounds the specified value up to the smallest integral value not less than the specified
+     * value.
+     *
+     * @param value The value to round up.
+     * @return The rounded-up value as an extended precision (long double) floating point value.
+     */
+    constexpr long double ceil(long double value) {
+        return COMPILER_BUILTIN_CEIL_EXTENDED(value);
+    }
+
+    /**
+     * Rounds the specified value up to the smallest integral value not less than the specified
+     * value that is also a multiple of the multiple parameter and returns the value as a long
+     * integer.
+     *
+     * @param value The value to round up.
+     * @param multiple The multiple to round up to.
+     * @return The rounded-up value as a signed long integer.
+     */
+    constexpr long int lceiln(double value, long int multiple) {
+        long int roundedValue = ceil(value);
+
+        bool isPositive = roundedValue >= 0;
+        if (!isPositive)
+            roundedValue = -roundedValue;
+
+        long int result;
+
+        if ((multiple & (multiple - 1)) == 0) {
+            result = (roundedValue + (multiple - 1)) & -multiple;
+            return isPositive ? result : -result;
+        }
+
+        result = ((roundedValue + (multiple - 1)) / multiple) * multiple;
+        return isPositive ? result : -result;
+    }
+
+    /**
+     * Rounds the specified value up to the smallest integral value not less than the specified
+     * value that is also a multiple of the multiple parameter and returns the value as a long
+     * long integer.
+     *
+     * @param value The value to round up.
+     * @param multiple The multiple to round up to.
+     * @return The rounded-up value as a signed long long integer.
+     */
+    constexpr long long int llceiln(long double value, long long int multiple) {
+        long long int roundedValue = ceil(value);
+
+        bool isPositive = roundedValue >= 0;
+        if (!isPositive)
+            roundedValue = -roundedValue;
+
+        long long int result;
+
+        if ((multiple & (multiple - 1)) == 0) {
+            result = (roundedValue + (multiple - 1)) & -multiple;
+            return isPositive ? result : -result;
+        }
+
+        result = ((roundedValue + (multiple - 1)) / multiple) * multiple;
+        return isPositive ? result : -result;
+    }
+
+    constexpr long long int floorn(long double value, long long int multiple) {
+        long long int roundedValue = floor(value);
+
+        bool isPositive = roundedValue >= 0;
+        if (!isPositive)
+            roundedValue = -roundedValue;
+
+        long long int result = (roundedValue / multiple) * multiple;
+        return isPositive ? result : -result;
+    }
+
+};

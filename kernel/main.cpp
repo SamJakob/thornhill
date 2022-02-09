@@ -69,7 +69,7 @@ extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* thornhill
     ThornhillMemory::Virtual::initialize();
 
     main();
-    for (;;) {}
+    for (;;) {};
 
 }
 

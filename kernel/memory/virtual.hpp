@@ -42,7 +42,7 @@ namespace ThornhillMemory {
         static void reset();
 
         /**
-         * Initializes the Virtual Memory Manager (VMM).
+         * Initializes the Virtual Memory Manager (VMM) by setting up the OS-level page tables.
          */
         static void initialize();
 
