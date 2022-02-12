@@ -18,29 +18,16 @@ get_filename_component(TH_OUTPUT_DIRECTORY          "./out" ABSOLUTE)
 # Set global build system properties.
 set(TH_OUTPUT_IMG "thornhill.img")
 
-# Use cross-compilers where necessary.
-if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Darwin")
-    message("Non-native executable environment detected. Using cross-compilers.")
-    set(CMAKE_ASM_LINK_EXECUTABLE x86_64-elf-as)
-    set(CMAKE_C_COMPILER x86_64-elf-gcc)
-    set(CMAKE_CXX_COMPILER x86_64-elf-g++)
-    set(CMAKE_C_LINK_EXECUTABLE_NAME x86_64-elf-ld)
-    set(CMAKE_CXX_LINK_EXECUTABLE_NAME x86_64-elf-g++)
+message("Non-native executable environment detected. Using cross-compilers.")
+set(CMAKE_ASM_LINK_EXECUTABLE x86_64-elf-as)
+set(CMAKE_C_COMPILER x86_64-elf-gcc)
+set(CMAKE_CXX_COMPILER x86_64-elf-g++)
+set(CMAKE_C_LINK_EXECUTABLE_NAME x86_64-elf-ld)
+set(CMAKE_CXX_LINK_EXECUTABLE_NAME x86_64-elf-g++)
 
-    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-endif()
-
-if (NOT DEFINED CMAKE_ASM_LINK_EXECUTABLE)
-    set(CMAKE_ASM_LINK_EXECUTABLE "/usr/bin/as")
-endif()
-if (NOT DEFINED CMAKE_C_LINK_EXECUTABLE_NAME)
-    set(CMAKE_C_LINK_EXECUTABLE_NAME /usr/bin/ld)
-endif ()
-if (NOT DEFINED CMAKE_CXX_LINK_EXECUTABLE_NAME)
-    set(CMAKE_CXX_LINK_EXECUTABLE_NAME /usr/bin/ld)
-endif ()
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 # Check dependencies and prerequisites.
 if (NOT EXISTS /usr/include/efi AND NOT EXISTS /usr/local/include/efi)
