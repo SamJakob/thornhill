@@ -19,6 +19,7 @@ add_library(interrupt_handler.o OBJECT "arch/${TH_ARCH}/interrupt/interrupt_hand
 
 # Produce kernel executable.
 add_executable(kernel "${THK_SOURCES}")
+add_dependencies(kernel version)
 add_dependencies(kernel bootloader)
 target_link_libraries(kernel gdt_loader.o interrupt_handler.o)
 
