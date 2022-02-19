@@ -1,9 +1,17 @@
+#include <cstddef>
+
 #pragma once
 
 namespace std {
 
     template<typename _Tp>
     class reference_wrapper;
+
+    //
+    // Forward Declarations
+    //
+    template<typename>
+    struct is_function;
 
     // integral_constant
     template<typename _Tp, _Tp __v>
@@ -23,11 +31,336 @@ namespace std {
     template<bool __v>
     using bool_constant = integral_constant<bool, __v>;
 
+    template<bool __v>
+    using __bool_constant = integral_constant<bool, __v>;
+
     // true_type: compile-time boolean with true value.
     using true_type = integral_constant<bool, true>;
 
     // false_type: compile-time boolean with false value.
     using false_type = integral_constant<bool, false>;
+
+    //
+    // Metaprogramming helper types
+    //
+
+    // __conditional
+    template<bool>
+    struct __conditional { template <typename _Tp, typename> using type = _Tp; };
+
+    template<>
+    struct __conditional<false> {
+        template<typename, typename _Up> using type = _Up;
+    };
+
+    // C++ 11 and built-in __conditional_t
+    template<bool _Cond, typename _If, typename _Else>
+    using __conditional_t = typename __conditional<_Cond>::template type<_If, _Else>;
+
+    template<bool _Cond, typename _IfTrue, typename _IfFalse>
+    struct conditional { typedef _IfTrue type; };
+
+    template<typename _IfTrue, typename _IfFalse>
+    struct conditional<false, _IfTrue, _IfFalse> { typedef _IfFalse type; };
+
+    template<typename... _Tp>
+    struct common_type;
+
+    // type_identity
+    template <typename _Type>
+    struct __type_identity { using type = _Type; };
+
+    template<typename _Tp>
+    using __type_identity_t = typename __type_identity<_Tp>::type;
+
+    // or
+    template<typename...>
+    struct __or_;
+
+    template<>
+    struct __or_<> : public false_type {};
+
+    template<typename _B1>
+    struct __or_<_B1> : public _B1 {};
+
+    template<typename _B1, typename _B2>
+    struct __or_<_B1, _B2> : public __conditional_t<_B1::value, _B1, _B2> {};
+
+    template<typename _B1, typename _B2, typename _B3, typename... _Bn>
+    struct __or_<_B1, _B2, _B3, _Bn...> : public __conditional_t<_B1::value, _B1, __or_<_B2, _B3, _Bn...>> {};
+
+    // and
+    template<typename...>
+    struct __and_;
+
+    template<>
+    struct __and_<> : public true_type {};
+
+    template<typename _B1>
+    struct __and_<_B1> : public _B1 {};
+
+    template<typename _B1, typename _B2>
+    struct __and_<_B1, _B2> : public __conditional_t<_B1::value, _B2, _B1> {};
+
+    template<typename _B1, typename _B2, typename _B3, typename... _Bn>
+    struct __and_<_B1, _B2, _B3, _Bn...> : public __conditional_t<_B1::value, __and_<_B2, _B3, _Bn...>, _B1> {};
+
+    // not
+    template<typename _Pp>
+    struct __not_ : public __bool_constant<!bool(_Pp::value)> {};
+
+    template<typename... _Bn>
+    inline constexpr bool __or_v = __or_<_Bn...>::value;
+
+    template<typename... _Bn>
+    inline constexpr bool __and_v = __and_<_Bn...>::value;
+
+#define __cpp_lib_logical_traits 201510L
+
+    template<typename... _Bn>
+    struct conjunction : __and_<_Bn...> {};
+
+    template<typename... _Bn>
+    struct disjunction : __or_<_Bn...> {};
+
+    template<typename _Pp>
+    struct negation : __not_<_Pp> {};
+
+    template<typename... _Bn>
+    inline constexpr bool conjunction_v = conjunction<_Bn...>::value;
+
+    template<typename... _Bn>
+    inline constexpr bool disjunction_v = disjunction<_Bn...>::value;
+
+    template<typename _Pp>
+    inline constexpr bool negation_v = negation<_Pp>::value;
+
+    //
+    // const, volatile manipulation
+    //
+
+    // remove_const
+    template<typename _Tp>
+    struct remove_const { typedef _Tp type; };
+
+    template<typename _Tp>
+    struct remove_const<_Tp const> { typedef _Tp type; };
+
+    // remove_volatile
+    template<typename _Tp>
+    struct remove_volatile { typedef _Tp type; };
+
+    template<typename _Tp>
+    struct remove_volatile<_Tp volatile> { typedef _Tp type; };
+
+    // remove_cv (remove const, volatile)
+    template<typename _Tp>
+    struct remove_cv { using type = _Tp; };
+
+    template<typename _Tp>
+    struct remove_cv<const _Tp> { using type = _Tp; };
+
+    template<typename _Tp>
+    struct remove_cv<volatile _Tp> { using type = _Tp; };
+
+    template<typename _Tp>
+    struct remove_cv<const volatile _Tp> { using type = _Tp; };
+
+    // add_const
+    template<typename _Tp>
+    struct add_const { typedef _Tp const type; };
+
+    // add_volatile
+    template<typename _Tp>
+    struct add_volatile {typedef _Tp volatile type; };
+
+    // add_cv
+    template<typename _Tp>
+    struct add_cv {
+        typedef typename
+        add_const<typename add_volatile<_Tp>::type>::type type;
+    };
+
+    // C++ 11 aliases for types of add_x and remove_x.
+    template<typename _Tp>
+    using remove_const_t = typename remove_const<_Tp>::type;
+
+    template<typename _Tp>
+    using remove_volatile_t = typename remove_volatile<_Tp>::type;
+
+    template<typename _Tp>
+    using remove_cv_t = typename remove_cv<_Tp>::type;
+
+    template<typename _Tp>
+    using add_const_t = typename add_const<_Tp>::type;
+
+    template<typename _Tp>
+    using add_volatile_t = typename add_volatile<_Tp>::type;
+
+    template<typename _Tp>
+    using add_cv_t = typename add_cv<_Tp>::type;
+
+    // __remove_cv_t (internal version of C++ 11 std::remove_cv_t)
+    template<typename _Tp>
+    using __remove_cv_t = typename remove_cv<_Tp>::type;
+
+    //
+    // Primary type categories.
+    //
+
+    // is_void
+    template<typename>
+    struct __is_void_helper : public false_type {};
+
+    template<>
+    struct __is_void_helper<void> : public true_type {};
+
+    template<typename _Tp>
+    struct is_void : public __is_void_helper<__remove_cv_t<_Tp>>::type {};
+
+    // is_null_ptr
+#define __cpp_lib_is_null_pointer 201309L
+
+    template<typename>
+    struct __is_null_pointer_helper : public false_type {};
+
+    template<>
+    struct __is_null_pointer_helper<std::nullptr_t> : public true_type {};
+
+    template<typename _Tp>
+    struct is_null_pointer : public __is_null_pointer_helper<remove_cv_t<_Tp>>::type {};
+
+    // is_integral
+    template<typename>
+    struct __is_integral_helper : public false_type {};
+
+    template<>
+    struct __is_integral_helper<bool> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<char> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<signed char> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<unsigned char> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<wchar_t> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<char8_t> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<char16_t> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<char32_t> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<short> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<unsigned short> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<int> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<unsigned int> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<long> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<unsigned long> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<long long> : public true_type {};
+
+    template<>
+    struct __is_integral_helper<unsigned long long> : public true_type {};
+
+    template<typename _Tp>
+    struct is_integral : public __is_integral_helper<__remove_cv_t<_Tp>>::type {};
+
+    // is_floating_point
+    template<typename>
+    struct __is_floating_point_helper : public false_type {};
+
+    template<>
+    struct __is_floating_point_helper<float> : public true_type {};
+
+    template<>
+    struct __is_floating_point_helper<double> : public true_type {};
+
+    template<>
+    struct __is_floating_point_helper<long double> : public true_type {};
+
+    template<typename _Tp>
+    struct is_floating_point : public __is_floating_point_helper<__remove_cv_t<_Tp>>::type {};
+
+    // is_array
+    template<typename>
+    struct is_array : public false_type {};
+
+    template<typename _Tp, std::size_t _Size>
+    struct is_array<_Tp[_Size]> : public true_type {};
+
+    template<typename _Tp>
+    struct is_array<_Tp[]> : public true_type {};
+
+    // is_pointer
+    template<typename>
+    struct __is_pointer_helper : public false_type {};
+
+    template<typename _Tp>
+    struct __is_pointer_helper<_Tp*> : public true_type {};
+
+    template<typename _Tp>
+    struct is_pointer : public __is_pointer_helper<__remove_cv_t<_Tp>>::type {};
+
+    // is_lvalue_reference
+    template<typename>
+    struct is_lvalue_reference : public false_type {};
+
+    template<typename _Tp>
+    struct is_lvalue_reference<_Tp&> : public true_type {};
+
+    // is_rvalue_reference
+    template<typename>
+    struct is_rvalue_reference : public false_type {};
+
+    template<typename _Tp>
+    struct is_rvalue_reference<_Tp&&> : public true_type {};
+
+    // is_member_object_pointer
+    template<typename>
+    struct __is_member_object_pointer_helper : public false_type {};
+
+    template<typename _Tp, typename _Cp>
+    struct __is_member_object_pointer_helper<_Tp _Cp::*>
+        : public __not_<is_function<_Tp>>::type {};
+
+    template<typename _Tp>
+    struct is_member_object_pointer
+        : public __is_member_object_pointer_helper<__remove_cv_t<_Tp>>::type {};
+
+    // is_member_function_pointer
+    template<typename>
+    struct __is_member_function_pointer_helper : public false_type {};
+
+    template<typename _Tp, typename _Cp>
+    struct __is_member_function_pointer_helper<_Tp _Cp::*> : public is_function<_Tp>::type {};
+
+    template<typename _Tp>
+    struct is_member_function_pointer
+        : public __is_member_function_pointer_helper<__remove_cv_t<_Tp>>::type {};
+
+    //
+    // Type properties
+    //
 
     // is_const
     template<typename>
@@ -57,8 +390,9 @@ namespace std {
 
     // is_function
     template<typename _Tp>
-        struct is_function : public bool_constant<!is_const<const _Tp>::value> {};
+    struct is_function : public __bool_constant<!is_const<const _Tp>::value> {};
 
+    // enum underlying type.
     template<typename _Tp, bool = is_enum<_Tp>::value>
     struct __underlying_type_impl {
         using type = __underlying_type(_Tp);
@@ -85,5 +419,71 @@ namespace std {
 
     template<bool _Cond, typename _Tp = void>
     using enable_if_t = typename enable_if<_Cond, _Tp>::type;
+
+    //
+    // Composite type categories
+    //
+
+    // Forward definitions
+    template<typename>
+    struct is_member_pointer;
+
+    // is_reference
+    template<typename _Tp>
+    struct is_reference
+        : public __or_<is_lvalue_reference<_Tp>,
+                       is_rvalue_reference<_Tp>>::type {};
+
+    // is_arithmetic
+    template<typename _Tp>
+    struct is_arithmetic
+        : public __or_<is_integral<_Tp>, is_floating_point<_Tp>>::type {};
+
+    // is_fundamental
+    template<typename _Tp>
+    struct is_fundamental
+        : public __or_<is_arithmetic<_Tp>, is_void<_Tp>, is_null_pointer<_Tp>>::type {};
+
+    // is_object
+    template<typename _Tp>
+    struct is_object
+        : public __not_<__or_<is_function<_Tp>, is_reference<_Tp>, is_void<_Tp>>>::type {};
+
+    // is_scalar
+    template<typename _Tp>
+    struct is_scalar
+        : public __or_<is_arithmetic<_Tp>, is_enum<_Tp>, is_pointer<_Tp>,
+                       is_member_pointer<_Tp>, is_null_pointer<_Tp>>::type {};
+
+    // is_compound
+    template<typename _Tp>
+    struct is_compound : public __not_<is_fundamental<_Tp>>::type {};
+
+    // is_member_pointer
+    template<typename _Tp>
+    struct __is_member_pointer_helper : public false_type {};
+
+    template<typename _Tp, typename _Cp>
+    struct __is_member_pointer_helper<_Tp _Cp::*> : public true_type {};
+
+    template<typename _Tp>
+    struct is_member_pointer : public __is_member_pointer_helper<__remove_cv_t<_Tp>>::type {};
+
+    // is_same
+    template<typename, typename>
+    struct is_same;
+
+    template<typename _Tp, typename... _Types>
+    using __is_one_of = __or_<is_same<_Tp, _Types>...>;
+
+    //
+    // Type relations
+    //
+
+    template<typename _Tp, typename _Up>
+    struct is_same : public integral_constant<bool, __is_same(_Tp, _Up)> {};
+
+    template<typename _Base, typename _Derived>
+    struct is_base_of : public integral_constant<bool, __is_base_of(_Base, _Derived)> {};
 
 }
