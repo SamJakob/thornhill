@@ -71,14 +71,14 @@ namespace ThornhillKernel {
          * likewise, the high-end bits can be omitted as x86-64 only actually
          * supports 52-bit physical addresses.
          */
-        uint64_t physicalAddress : 39;
+        uint64_t physicalAddress : 40;
 
         /**
          * @brief Currently unused but reserved for use by the OS.
          * 
          * @see ThornhillPageTableEntry::osFlags1
          */
-        unsigned int osFlags2 : 10;
+        unsigned int osFlags2 : 11;
 
         /**
          * @brief Whether executing code on this page should be forbidden (= true/1)

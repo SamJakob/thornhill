@@ -1,3 +1,4 @@
+#include <thornhill>
 #include "boot/handoff/memory/memory_shared.h"
 
 #pragma once
@@ -111,6 +112,7 @@ namespace ThornhillMemory {
          * Attempts to allocate the specified pageCount as a contiguous chunk of memory.
          * If it fails, nullptr is returned, otherwise a pointer to the base address of the
          * specified pageCount is returned.
+         *
          * @param pageCount The amount of pages to allocate.
          * @return A pointer; either to null or the base of the allocated memory.
          */

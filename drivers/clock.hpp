@@ -2,8 +2,7 @@
 
 #include "../kernel/time/timezone.hpp"
 
-#ifndef TH_DRIVERS_CLOCK
-#define TH_DRIVERS_CLOCK
+#pragma once
 
 struct ThornhillSystemTime {
 
@@ -73,5 +72,3 @@ class ThornhillClock {
 };
 
 extern const char* MONTHS[];
-
-#endif

@@ -1,7 +1,6 @@
 #include <stdint.h>
 
-#ifndef TH_KERNEL_TIME_TIMEZONE
-#define TH_KERNEL_TIME_TIMEZONE
+#pragma once
 
 struct ThornhillTimeOffset {
     int8_t hours;
@@ -26,5 +25,3 @@ struct ThornhillTimeZone {
 
 extern const ThornhillTimeZone TH_TIMEZONE_LONDON;
 extern const ThornhillTimeZone TH_TIMEZONE_NEW_BRAUNFELS;
-
-#endif

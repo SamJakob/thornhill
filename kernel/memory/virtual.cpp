@@ -1,6 +1,7 @@
 #include <thornhill>
 
 #include "virtual.hpp"
+#include "physical.hpp"
 
 using namespace Thornhill;
 
@@ -18,6 +19,8 @@ namespace ThornhillMemory {
         if (Virtual::initialized) {
             Kernel::panic("Attempted to re-initialize VMM in initialized state.");
         }
+
+        // Set up page tables.
 
         Virtual::initialized = true;
     }

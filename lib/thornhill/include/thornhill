@@ -6,3 +6,4 @@
 // Define standard thornhill libraries.
 #include <kernel>
 #include <utilities>
+#include <enum>

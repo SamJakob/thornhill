@@ -23,7 +23,7 @@ namespace ThornhillMemory {
      * @return The base address of the page with the lowest memory address
      * still meeting the specified criteria.
      */
-    static uint64_t _firstAvailablePage(HandoffMemoryMap& bootMap, uint64_t minBaseAddress = 1) {
+    static uint64_t _bootMapFirstAvailablePage(HandoffMemoryMap& bootMap, uint64_t minBaseAddress = 1) {
         assert(minBaseAddress > 0);
         uint64_t baseAddress = null;
 
@@ -43,7 +43,7 @@ namespace ThornhillMemory {
         return baseAddress;
     }
 
-    static uint64_t _lastAvailablePage(HandoffMemoryMap& bootMap) {
+    static uint64_t _bootMapLastAvailablePage(HandoffMemoryMap& bootMap) {
         uint64_t baseAddress = null;
 
         for (uintptr_t segmentIndex = 0; segmentIndex < bootMap.mapSize; segmentIndex++) {
@@ -112,9 +112,9 @@ namespace ThornhillMemory {
             Kernel::debug("PMM", "Taking inventory of memory structures...");
 
             // Locate the first available page.
-            uint64_t firstPage = _firstAvailablePage(bootMap);
+            uint64_t firstPage = _bootMapFirstAvailablePage(bootMap);
             // ...and locate the last available page.
-            uint64_t lastPage = _lastAvailablePage(bootMap);
+            uint64_t lastPage = _bootMapLastAvailablePage(bootMap);
 
             if (firstPage == null) {
                 // If we failed to find a page (indicated by firstPage being null), we should panic
@@ -136,7 +136,7 @@ namespace ThornhillMemory {
             // page.
             auto* currentFrame = (ThornhillPhysicalFrame*)inventoryPage;
             // Now, initialize the current page as the next available page after the inventory page.
-            uint64_t currentPage = _firstAvailablePage(bootMap, inventoryPage + PAGES(1));
+            uint64_t currentPage = _bootMapFirstAvailablePage(bootMap, inventoryPage + PAGES(1));
 
             while (currentPage <= lastPage) {
 //                Kernel::debug("\n");
@@ -185,7 +185,7 @@ namespace ThornhillMemory {
                     Kernel::debugf("PMM", "Not enough room in inventory for new frame. Skipping...");
 
                     // Take the next available page as an inventory page.
-                    inventoryPage = _firstAvailablePage(bootMap, currentPage + PAGES(1));
+                    inventoryPage = _bootMapFirstAvailablePage(bootMap, currentPage + PAGES(1));
 
                     // ...and reduce one page from the segment to reflect that we took a page to
                     // use as an inventory page.
@@ -199,7 +199,7 @@ namespace ThornhillMemory {
                         break;
 
                     // Take the next page after the inventory page as the next page.
-                    currentPage = _firstAvailablePage(bootMap, inventoryPage + PAGES(1));
+                    currentPage = _bootMapFirstAvailablePage(bootMap, inventoryPage + PAGES(1));
 
                     // If a page after the inventory page couldn't be found, likewise break early
                     // as we've evidently exhausted available memory.
@@ -260,7 +260,7 @@ namespace ThornhillMemory {
                 // continue taking inventory.
                 if (willFillInventoryPage && segment->pageCount >= 2) {
                     // Take the next available page as an inventory page.
-                    inventoryPage = _firstAvailablePage(bootMap, currentPage);
+                    inventoryPage = _bootMapFirstAvailablePage(bootMap, currentPage);
                     currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(inventoryPage);
 
                     // If an inventory page couldn't be found, break early as we've exhausted
@@ -271,17 +271,17 @@ namespace ThornhillMemory {
                     segment->pageCount--;
                     segment->physicalBaseAddress += PAGES(1);
 
-                    currentPage = _firstAvailablePage(bootMap, inventoryPage + PAGES(1));
+                    currentPage = _bootMapFirstAvailablePage(bootMap, inventoryPage + PAGES(1));
                 }
                 // Otherwise, offset the inventory page.
                 else {
                     currentFrame =
                         reinterpret_cast<ThornhillPhysicalFrame*>((uint64_t) bitmap + bitmapSize);
-                    currentPage = _firstAvailablePage(bootMap, currentPage + PAGES(1));
+                    currentPage = _bootMapFirstAvailablePage(bootMap, currentPage + PAGES(1));
 
                     // TODO: check if this is ANY inventoryPage, rather than just the current one
                     if (currentPage == inventoryPage) {
-                        currentPage = _firstAvailablePage(bootMap, currentPage + PAGES(1));
+                        currentPage = _bootMapFirstAvailablePage(bootMap, currentPage + PAGES(1));
                     }
 
                     segment->physicalBaseAddress = currentPage;
