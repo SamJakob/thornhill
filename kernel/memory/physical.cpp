@@ -139,7 +139,6 @@ namespace ThornhillMemory {
             uint64_t currentPage = _bootMapFirstAvailablePage(bootMap, inventoryPage + PAGES(1));
 
             while (currentPage <= lastPage) {
-//                Kernel::debug("\n");
 
                 if (currentPage == null) {
                     Kernel::debug("PMM", "    No more usable pages.");
@@ -334,10 +333,10 @@ namespace ThornhillMemory {
                         uint64_t bitmapGroupOffset = ((baseOffset / TH_ARCH_PAGE_SIZE) + i) % 8;
 
                         currentFrame->bitmap[bitmapGroupBase] |= 1 << (7 - bitmapGroupOffset);
-                        usedMemory += TH_ARCH_PAGE_SIZE;
+                        usedMemory += PAGES(1);
                     }
 
-                    Kernel::debugf("PMM", "Allocated %u pages. (Total: %u, Used Mem: %u)", pageCount, usedMemory / TH_ARCH_PAGE_SIZE, usedMemory);
+                    Kernel::debugf("PMM", "Allocated %u pages. (Total: %u, Used Mem: %u, Base: 0x%x)", pageCount, usedMemory / TH_ARCH_PAGE_SIZE, usedMemory, base + baseOffset);
                     return (void*) (base + baseOffset);
                 }
 
@@ -379,7 +378,119 @@ namespace ThornhillMemory {
     }
 
     [[maybe_unused]] void Physical::deallocate([[maybe_unused]] void* base, [[maybe_unused]] size_t pageCount) {
-        Kernel::panic("Tried to deallocate, but wasn't yet implemented.");
+        Kernel::debugf("PMM", "Deallocating %u pages, (base address 0x%x)...", pageCount, base);
+        auto* currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(Physical::inventoryBase);
+
+        // Simple sanity check: ensure deallocating pageCount would not free more memory than was
+        // already in use.
+        if (PAGES(pageCount) > usedMemory) {
+            Kernel::panic("Attempted to free more memory than in use.");
+        }
+
+        // Save pointers as integer for easier arithmetic.
+        auto baseAddress = (uint64_t) base;
+
+        // Find the frame that the contiguous chunk of memory starts at.
+        while (currentFrame != null) {
+            // When we've found the frame exit the loop.
+            if (currentFrame->base >= baseAddress) break;
+
+            // Otherwise, keep looking.
+            currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(currentFrame->next);
+        }
+
+        if (currentFrame == null) {
+            Kernel::panic("Tried to deallocate non-existent memory. (1)");
+        }
+
+        // Floor the base address to its nearest aligned value.
+        auto bitmapEntry = ((baseAddress - (uint64_t) currentFrame->base) / 8);
+
+        // The offset from the base address (from 0 to 7) of the base of this contiguous chunk
+        // of pages.
+        uint8_t baseOffset = (baseAddress - (uint64_t) currentFrame->base) % 8;
+
+        // Special case: if the page count is less than 8 AND we can do all work in one bitmask
+        // operation, then do so and simply return straight away.
+        if (pageCount + baseOffset < 8) {
+            uint8_t mask = 0;
+
+            for (uint8_t i = baseOffset; i < pageCount + baseOffset; i++) {
+                mask |= 1 << i;
+            }
+
+            mask = ~mask;
+            currentFrame->bitmap[bitmapEntry] &= mask;
+
+            usedMemory -= PAGES(pageCount);
+            return;
+        }
+
+        // If the above is not zero, we deallocate the offset pages and increment 'bitmapEntry' to
+        // the base of the allocation bit of the next aligned page.
+        if (baseOffset > 0) {
+            // Create a bitmask, preserving only the bits leading up to the offset.
+            uint8_t mask = 0;
+            for (uint8_t i = 0; i < baseOffset; i++) {
+                mask |= 1 << i;
+            }
+
+            // Then bitwise AND the bitmap value by the created mask.
+            currentFrame->bitmap[bitmapEntry] &= mask;
+
+            // Update our 'bitmapEntry' value and the number of used pages accordingly.
+            usedMemory -= PAGES(8 - baseOffset);
+            bitmapEntry++;
+            pageCount -= 8 - baseOffset;
+        }
+
+        // Now keep looping until bitmapEntry exceeds size (select next page and rinse/repeat)
+        // or we've deallocated the total number of pages.
+        while (pageCount > 0) {
+            if (bitmapEntry >= currentFrame->count) {
+                currentFrame = reinterpret_cast<ThornhillPhysicalFrame*>(currentFrame->next);
+                bitmapEntry = 0;
+
+                if (currentFrame == null) {
+                    Kernel::panic("Tried to deallocate non-existent memory. (2)");
+                }
+            }
+
+            if (pageCount >= 8) {
+                if (currentFrame->bitmap[bitmapEntry] == 0) {
+                    Kernel::panic("Attempted to free non-allocated memory.");
+                }
+
+                // Clear the current bitmap entry (deallocate all the pages).
+                currentFrame->bitmap[bitmapEntry] = 0;
+
+                // Update our 'bitmapEntry' value and the number of used pages accordingly.
+                usedMemory -= PAGES(8);
+                bitmapEntry++;
+                pageCount -= 8;
+            } else {
+                // Create a bitmask, preserving only the bits leading up to the page count – as
+                // before with the offset.
+                uint8_t mask = 0;
+                for (uint8_t i = 0; i < pageCount; i++) {
+                    mask |= 1 << i;
+                }
+
+                // Now invert that mask such that only bits except those leading up to the page
+                // count are preserved.
+                mask = ~mask;
+
+                // Next, apply that mask to the current bitmap entry.
+                currentFrame->bitmap[bitmapEntry] &= mask;
+
+                // And lastly, update the usedMemory.
+                // We needn't update the other variables as after this we'll break out.
+                usedMemory -= PAGES(pageCount);
+                break;
+            }
+        }
+
+//        Kernel::panic("Tried to deallocate, but wasn't yet implemented.");
     }
 
 } // namespace ThornhillMemory

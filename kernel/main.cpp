@@ -42,8 +42,11 @@ void main() {
 
     Kernel::print("System is ready.");
 
-    //ThornhillMemory::Physical::allocate(5);
-    //ThornhillMemory::Physical::allocate(3);
+    void* memA = ThornhillMemory::Physical::allocate(9);
+    void* memB = ThornhillMemory::Physical::allocate(3);
+
+    ThornhillMemory::Physical::deallocate(memA, 9);
+    ThornhillMemory::Physical::deallocate(memB, 3);
 }
 
 extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {

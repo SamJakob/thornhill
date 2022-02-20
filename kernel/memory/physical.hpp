@@ -113,11 +113,23 @@ namespace ThornhillMemory {
          * If it fails, nullptr is returned, otherwise a pointer to the base address of the
          * specified pageCount is returned.
          *
+         * It is the responsibility of code using the physical memory allocator to manage the
+         * allocated pages and free them accordingly.
+         *
          * @param pageCount The amount of pages to allocate.
          * @return A pointer; either to null or the base of the allocated memory.
          */
         static void* allocate(size_t pageCount);
 
+        /**
+         * Deallocates the contiguous chunk of pages from base to base + PAGES(pageCount).
+         * (In other words frees baseCount pages after the specified base address.)
+         * If it fails, a kernel panic is thrown as this indicates an error with memory management
+         * that should not be permitted.
+         *
+         * @param base The base address of the contiguous set of pages to deallocate.
+         * @param pageCount The number of pages to deallocate.
+         */
         static void deallocate(void* base, size_t pageCount);
     };
 
