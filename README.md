@@ -15,6 +15,15 @@ These instructions are for **Ubuntu Linux** (assuming you have superuser/adminis
 - For **Ubuntu Linux *without superuser/administrator privileges***, see: [Building on Ubuntu Linux (Unprivileged User)](https://github.com/SamJakob/thornhill/wiki/Building-on-Ubuntu-Linux-(Unprivileged-User)) (*As above, for non-Ubuntu distributions of Linux, you should be able to use these instructions with minor modifications.*).
 
 ### **Step 1: Ensure the necessary compilers/dependencies are installed.**
+(!) Use of the correct cross-compiler is now enforced and MUST be used. Using system compilers often causes errors and
+even if the code compiles successfully it will likely result in a broken kernel image for reasons that are not
+immediately obvious.
+
+The build system will automatically detect if the toolchain in `toolchain/` has been built and installed to the default
+location (`toolchain/prefix`) and will automatically use it if it was. Otherwise, you will need to add the
+cross-compiler to your PATH (so that find_program can find it). If you don't want to do this you will need to make
+modifications.
+
 - You'll need the x86_64-elf cross-compiler and binutils. These can either be built from the `toolchain/`
 directory using `toolchain/build-toolchain.sh` OR some systems/distributions such as macOS or Arch Linux
 (via AUR) might provide `x86_64-elf-gcc` and `x86_64-elf-binutils`.
