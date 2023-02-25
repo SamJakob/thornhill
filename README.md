@@ -7,20 +7,26 @@
   
 
 ## Setup
-These instructions are for **Ubuntu Linux** (assuming you have superuser/administrator privileges) and/or **Windows with an up-to-date version of WSL 2**.
+These instructions are for **Ubuntu Linux** (assuming you have superuser/administrator privileges) and/or **Windows with an up-to-date version of WSL 2**. If you're running under a different distribution of Linux, you should be able to use these instructions with some minor modifications for your distro. (*I'll leave that to you - I'm sure you know what you're doing*).
+
 - For **macOS on Intel**, follow these instructions but you'll need to use `brew` to install dependencies.
 - For **macOS on Apple Silicon**, refer to [Building on M1 Mac](https://github.com/SamJakob/thornhill/wiki/Building-on-M1-Mac)
 - For **older versions of Windows and WSL**, refer to [Building on Windows (Older Versions)](https://github.com/SamJakob/thornhill/wiki/Building-on-Windows-(Older-Versions))
-- For **Ubuntu Linux *without superuser/administrator privileges***, see: [Building on Ubuntu Linux (Unprivileged User)](https://github.com/SamJakob/thornhill/wiki/Building-on-Ubuntu-Linux-(Unprivileged-User)).
+- For **Ubuntu Linux *without superuser/administrator privileges***, see: [Building on Ubuntu Linux (Unprivileged User)](https://github.com/SamJakob/thornhill/wiki/Building-on-Ubuntu-Linux-(Unprivileged-User)) (*As above, for non-Ubuntu distributions of Linux, you should be able to use these instructions with minor modifications.*).
 
 ### **Step 1: Ensure the necessary compilers/dependencies are installed.**
+- You'll need the x86_64-elf cross-compiler and binutils. These can either be built from the `toolchain/`
+directory using `toolchain/build-toolchain.sh` OR some systems/distributions such as macOS or Arch Linux
+(via AUR) might provide `x86_64-elf-gcc` and `x86_64-elf-binutils`.
+
+- Additionally, CMake >= 3.20 is required, though at this point that should be the default version installed
+from any package manager.
 
 ```bash
-# Install compilers and build tools.
-# Note that CMake >= 3.20 is required but at this point,
-# that should be the default for any package manager.
-sudo apt install gcc g++ build-essential cmake
+./toolchain/build-toolchain.sh
 ```
+
+If you would prefer to do this manually, please refer to [Building the toolchain manually](https://github.com/SamJakob/thornhill/wiki/Building-on-Ubuntu-Linux-(Unprivileged-User)#building-the-toolchain-manually).
 
 ### **Step 2: Install build dependencies**
 
