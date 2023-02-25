@@ -2,38 +2,27 @@
 
 ## Prerequisites
 
-- Node.js
-- **(Microsoft Windows only):** you will need to install [Windows Subsystem for Linux 2 (WSL 2)](https://docs.microsoft.com/en-us/windows/wsl/install-win10) **and** the [VcXsrv X server](https://sourceforge.net/projects/vcxsrv/files/latest/download) for Windows. After you’ve installed VcXsrv, double click the `wsl-vcxsrv-config.xlaunch` file in the root of the repository. All of these commands should be executed from the WSL environment (easily accessed by opening a Command Prompt / PowerShell / Windows Terminal window and typing `wsl` at the prompt).
+- Node.js (for the hot reload toolchain, currently not working)
+- **(Microsoft Windows only):** you will need to install [Windows Subsystem for Linux 2 (WSL 2)](https://learn.microsoft.com/en-us/windows/wsl/install). Then, all commands should be executed from the WSL environment (easily accessed by opening a Command Prompt / PowerShell / Windows Terminal window and typing `wsl` at the prompt).
   
 
 ## Setup
+These instructions are for **Ubuntu Linux** (assuming you have superuser/administrator privileges) and/or **Windows with an up-to-date version of WSL 2**.
+- For **macOS on Intel**, follow these instructions but you'll need to use `brew` to install dependencies.
+- For **macOS on Apple Silicon**, refer to [Building on M1 Mac](https://github.com/SamJakob/thornhill/wiki/Building-on-M1-Mac)
+- For **older versions of Windows and WSL**, refer to [Building on Windows (Older Versions)](https://github.com/SamJakob/thornhill/wiki/Building-on-Windows-(Older-Versions))
+- For **Ubuntu Linux *without superuser/administrator privileges***, see: [Building on Ubuntu Linux (Unprivileged User)](https://github.com/SamJakob/thornhill/wiki/Building-on-Ubuntu-Linux-(Unprivileged-User)).
 
-**Step 1: Ensure the necessary compilers/dependencies are installed.**
+### **Step 1: Ensure the necessary compilers/dependencies are installed.**
 
 ```bash
 # Install compilers and build tools.
-sudo apt install gcc g++ buildessentials cmake
-
-# NOTE: cmake must be version >= 3.20, if this is not yet available in your distro, you can build
-# from source. (I recommend checking GitHub releases to ensure you're getting the latest version.)
-sudo apt install libssl-dev
-wget https://github.com/Kitware/CMake/releases/download/v3.20.2/cmake-3.20.2.tar.gz
-tar -zxvf cmake-3.20.2.tar.gz
-cd cmake-3.20.2
-./bootstrap
-make -j 8
-sudo make install
+# Note that CMake >= 3.20 is required but at this point,
+# that should be the default for any package manager.
+sudo apt install gcc g++ build-essential cmake
 ```
 
-**(Windows Only): Enable Display Output for WSL**
-
-```bash
-# Enable WSL display output to X server.
-echo "export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0" >> ~/.bashrc
-source ~/.bashrc
-```
-
-**Step 2: Install build dependencies**
+### **Step 2: Install build dependencies**
 
 ```bash
 # Install build dependencies
@@ -41,13 +30,13 @@ source ~/.bashrc
 sudo apt update 
 sudo apt install gnu-efi mtools qemu-system
 
-# Install hot-reload dependencies
-cd scripts/hotreload
-yarn                  # (to install dependencies)
-cd ../..
+# Install hot-reload dependencies (skip for now)
+# cd scripts/hotreload
+# yarn                  # (to install dependencies)
+# cd ../..
 ```
 
-**Step 3: Build the system**
+### **Step 3: Build the system**
 
 ```bash
 # Build the system
@@ -60,11 +49,10 @@ make clean
 make emulator # or just `make` to build without starting emulator
 ```
 
-**Step 4: Start the hot-reload toolchain**
+### **Step 4: Start the hot-reload toolchain**
 
 The hot-reload toolchain is currently unavailable. (Not yet refactored to account for switch to cmake.)  
 It's some simple tweaks (switching out the command and checking it all works - perhaps optimizing the buildchain a little), I'm just focusing on other tasks within the OS at the moment.
-
 
 
 ## Commands
@@ -73,8 +61,3 @@ It's some simple tweaks (switching out the command and checking it all works - p
 - `make`: Builds the system.
 - `make emulator`: Runs QEMU with the built-in QEMU EFI firmware and the system image.
 - Hot-reload toolchain is currently unavailable. (Not yet refactored to account for switch to cmake.)
-
-
-## Troubleshooting
-
-If, on WSL, QEMU returns “`Unable to init server: Could not connect: Connection refused`”, hover over the taskbar icon for VcXsrv to get the precise hostname and then change the value of `DISPLAY` in `~/.bashrc` to that. You can run `source ~/.bashrc` afterwards to apply this change immediately, or just open a new terminal session.
