@@ -20,5 +20,5 @@ if [ ! -f "$OVMFLocation" ]; then
 fi
 
 echo "Starting system with image $ISOLocation..."
-# qemu-system-x86_64 -qmp tcp:localhost:4444,server,nowait -bios "$OVMFLocation" "$ISOLocation" -monitor stdio -no-reboot -no-shutdown -D ./qemu-log.txt -d int
-qemu-system-x86_64 -m 1024M -qmp tcp:localhost:4444,server,nowait -bios "$OVMFLocation" "$ISOLocation" -monitor stdio -serial tcp::6969,server,nowait
+qemu-system-x86_64 -qmp tcp:localhost:4444,server,nowait -bios "$OVMFLocation" "$ISOLocation" -monitor stdio -no-reboot -no-shutdown -D ./qemu-log.txt -d int
+# qemu-system-x86_64 -m 1024M -qmp tcp:localhost:4444,server,nowait -bios "$OVMFLocation" "$ISOLocation" -monitor stdio -serial tcp::6969,server,nowait

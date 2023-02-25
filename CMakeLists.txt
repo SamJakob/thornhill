@@ -18,16 +18,33 @@ get_filename_component(TH_OUTPUT_DIRECTORY          "./out" ABSOLUTE)
 # Set global build system properties.
 set(TH_OUTPUT_IMG "thornhill.img")
 
-message("Non-native executable environment detected. Using cross-compilers.")
-set(CMAKE_ASM_LINK_EXECUTABLE x86_64-elf-as)
-set(CMAKE_C_COMPILER x86_64-elf-gcc)
-set(CMAKE_CXX_COMPILER x86_64-elf-g++)
-set(CMAKE_C_LINK_EXECUTABLE_NAME x86_64-elf-ld)
-set(CMAKE_CXX_LINK_EXECUTABLE_NAME x86_64-elf-g++)
+# Look for cross-compiler binutils (both as and ld).
+find_program(CROSS_ASM x86_64-elf-as)
+find_program(CROSS_LDD x86_64-elf-ld)
+# Look for cross-compiler GCC.
+find_program(CROSS_GCC x86_64-elf-gcc)
 
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+# If all cross-compilers and tools were found, use them.
+# Otherwise attempt to fallback to system tools (useful for development
+# on Linux, where the triple is also x86_64-elf).
+if (CROSS_ASM AND CROSS_GCC AND CROSS_LDD)
+	message("Valid cross-compiler environment detected. Using cross-compilers.")
+	set(CMAKE_ASM_LINK_EXECUTABLE x86_64-elf-as)
+	set(CMAKE_C_COMPILER x86_64-elf-gcc)
+	set(CMAKE_CXX_COMPILER x86_64-elf-g++)
+	set(CMAKE_C_LINK_EXECUTABLE_NAME x86_64-elf-ld)
+	set(CMAKE_CXX_LINK_EXECUTABLE_NAME x86_64-elf-g++)
+
+	# Using cross-compiler, so only use host system paths and not sysroot.
+	set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+	set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+	set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+else()
+	message(FATAL_ERROR
+		"Missing cross-compiler.\n"
+		"You need freestanding versions of x86_64-elf-binutils and x86_64-elf-gcc.\n"
+		"Please refer to the wiki for more information.")
+endif()
 
 # Check dependencies and prerequisites.
 if (NOT EXISTS /usr/include/efi AND NOT EXISTS /usr/local/include/efi)

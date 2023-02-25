@@ -15,6 +15,9 @@ cmake-build*/**
 build/**
 config/version.h
 
+toolchain/toolchain-build
+toolchain/prefix
+
 #
 # macOS
 #
