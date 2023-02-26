@@ -39,15 +39,47 @@ case "$confirmation" in
 		;;
 esac
 
-echo "-- Checking toolchain build directory (./toolchain-build)"
-# [[ -d "./toolchain-build" ]] && rm -rf ./toolchain-build
-if [[ ! -d "./toolchain-build" ]]; then
-	echo "-- Creating ./toolchain-build"
-	mkdir ./toolchain-build
+[[ "$(uname -a)" == *"WSL"* ]] && (
+	echo -e "\033[0;31m[WARNING] You are building under WSL, you"
+	echo -e "probably want to use a temporary directory for this"
+	echo -e "as file system performance under WSL is horrible for"
+	echo -e "the Windows file system.\033[0m"
+)
+
+echo "-- Choosing toolchain build directory"
+echo "   (create ./toolchain-build to use in-repo directory"
+echo "    otherwise, temporary directory will be used.)"
+BUILD_DIR=./toolchain-build
+
+if [[ ! -d "$BUILD_DIR" || "$(uname -a)" == *"WSL"* ]]; then
+	BUILD_DIR="$(mktemp -d)";
+	echo "-- Created temporary directory: $BUILD_DIR"
 fi
 
-cd ./toolchain-build
-BUILD_DIR="$(pwd)"
+BUILD_DIR="$(realpath "$BUILD_DIR")"
+cd "$BUILD_DIR"
+
+[[ "$(uname -a)" == *"WSL"* && "$BUILD_DIR" == "/mnt/" ]] && (
+	echo -e "\033[0;31m[WARNING] You are building under WSL yet it seems you"
+	echo -e "have selected a directory in the Windows file system."
+	echo -e "This will likely have ABYSMAL performance. It's not too"
+	echo -e "late to cancel and choose a temporary directory for this!!!\033[0m"
+)
+
+confirmation=""
+read -r -p "-- Are you sure you want to build in $BUILD_DIR? [y/N] " confirmation
+case "$confirmation" in
+	[yY][eE][sS]|[yY])
+		echo "-- OK. Continuing..."
+		;;
+	*)
+		echo "-- User interrupted..."
+		exit 1
+		;;
+esac
+
+echo "-- Checking toolchain build directory ($BUILD_DIR)"
+# [[ -d "./toolchain-build" ]] && rm -rf ./toolchain-build
 
 echo "-- Checking/setting up directory structure"
 if [[ ! -d "$BUILD_DIR/$GCCDIR" ]]; then
@@ -109,4 +141,4 @@ make install-target-libgcc
 # Return to user's directory
 echo "-- Returning to initial directory."
 echo "-- All done!"
-popd
+cd "$(popd)"
