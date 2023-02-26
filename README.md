@@ -14,6 +14,19 @@ These instructions are for **Ubuntu Linux** (assuming you have superuser/adminis
 - For **older versions of Windows and WSL**, refer to [Building on Windows (Older Versions)](https://github.com/SamJakob/thornhill/wiki/Building-on-Windows-(Older-Versions))
 - For **Ubuntu Linux *without superuser/administrator privileges***, see: [Building on Ubuntu Linux (Unprivileged User)](https://github.com/SamJakob/thornhill/wiki/Building-on-Ubuntu-Linux-(Unprivileged-User)) (*As above, for non-Ubuntu distributions of Linux, you should be able to use these instructions with minor modifications.*).
 
+### **Step 0: Clone the repository**
+The repository has third-party modules under `third-party/`. These are submodules and are not fetched by default. To clone them as well, you'll need `--recurse-submodules`.
+```bash
+git clone -c core.autocrlf=false --recurse-submodules git@github.com:SamJakob/thornhill.git
+```
+
+**On Windows**, note that if autocrlf is enabled (as is the default), this will cause problems for all Linux scripts.
+You can turn off autocrlf for just this repository (and prevent it from running on clone) by setting `-c core.autocrlf=false` when you clone.
+
+Ideally, under Windows you'll want to clone the repository into the Windows file-system and then drop into WSL by calling `bash` from that directory.
+* **When building the toolchain under Windows (with WSL)** make sure that you use a temporary directory (which is the default if `toolchain/toolchain-build` does not exist -- so delete it if it does)
+otherwise filesystem operations will be *painfully slow*.
+
 ### **Step 1: Ensure the necessary compilers/dependencies are installed.**
 (!) Use of the correct cross-compiler is now enforced and MUST be used. Using system compilers often causes errors and
 even if the code compiles successfully it will likely result in a broken kernel image for reasons that are not
