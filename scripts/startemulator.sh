@@ -9,13 +9,21 @@ ISOLocation="$1"
 echo Locating OVMF virtual BIOS...
 # Attempt to locate OVMF at the default file location.
 OVMFLocation="/usr/share/qemu/OVMF.fd"
+
 # If it exists in /usr/local, then overwrite the path to check with that location.
 if [ -f "/usr/local/share/qemu/OVMF.fd" ]; then
   OVMFLocation="/usr/local/share/qemu/OVMF.fd"
 fi
+
+# (Arch Linux) If it exists in /usr/share/edk2/x64, then overwrite the path to check
+# with that location
+if [ -f "/usr/share/edk2/x64/OVMF.fd" ]; then
+  OVMFLocation="/usr/share/edk2/x64/OVMF.fd"
+fi
+
 # Now we'll check if we could find OVMF, halting if we couldn't.
 if [ ! -f "$OVMFLocation" ]; then
-  echo "Failed to locate OVMF!"
+  echo -e "Failed to locate OVMF\!\nYou can install this on Arch Linux with:\nsudo pacman -S edk2-ovmf\n\nOr, on Ubuntu with:\nsudo apt install ovmf"
   exit 1
 fi
 
