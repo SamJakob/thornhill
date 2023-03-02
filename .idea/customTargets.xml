@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CLionExternalBuildManager">
+    <target id="3e842347-acd6-4115-bccc-d875435154c4" name="emulator" defaultType="TOOL">
+      <configuration id="c672f9b9-3d7e-42a6-bfc8-a63decc17e35" name="emulator" toolchainName="x86_64 Cross Compiler for Thornhill">
+        <build type="TOOL">
+          <tool actionId="Tool_Thornhill Tools_make" />
+        </build>
+        <clean type="TOOL">
+          <tool actionId="Tool_Thornhill Tools_clean" />
+        </clean>
+      </configuration>
+    </target>
+  </component>
+</project>

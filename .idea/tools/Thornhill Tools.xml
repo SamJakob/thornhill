@@ -1,0 +1,16 @@
+<toolSet name="Thornhill Tools">
+  <tool name="make" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="true" showConsoleOnStdOut="false" showConsoleOnStdErr="false" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="/usr/bin/make" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Projects/thornhill/build" />
+    </exec>
+  </tool>
+  <tool name="clean" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="true" showConsoleOnStdOut="false" showConsoleOnStdErr="false" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="/usr/bin/make" />
+      <option name="PARAMETERS" value="clean" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Projects/thornhill/build" />
+    </exec>
+  </tool>
+</toolSet>
