@@ -1,5 +1,7 @@
 # Thornhill
 
+![Screenshot of Thornhill](./docs/assets/screenshot.png)
+
 ## Prerequisites
 
 - Node.js (for the hot reload toolchain, currently not working)
