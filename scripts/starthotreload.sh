@@ -1,4 +1,2 @@
-echo Running preliminary build...
-make thornhill
-echo Starting hot reload...
-node hotreload
+#!/usr/bin/env bash
+"$(dirname -- "$BASH_SOURCE")/hotreload/__main__.py"

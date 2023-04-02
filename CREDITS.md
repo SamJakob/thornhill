@@ -1,4 +1,6 @@
 # Credits
+- For hot reload toolchain
+  - https://www.geeksforgeeks.org/create-a-watchdog-in-python-to-look-for-filesystem-changes/
 - [cfenollosa's os-tutorial repo](https://github.com/cfenollosa/os-tutorial)
     - A little outdated and arguably mostly irrelevant at this point, however
     it was my first tutorial on osdev in ASM and provided a starting

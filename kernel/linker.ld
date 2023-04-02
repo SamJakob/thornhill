@@ -63,6 +63,7 @@ SECTIONS {
 	*/
 	.data ALIGN(4K) : AT(ADDR(.data) - KERNEL_VIRTUAL_BASE) {
 		*(.data*)
+		*(.note.GNU-stack)
 	}
 
 	/*

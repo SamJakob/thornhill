@@ -12,7 +12,26 @@
 #include "memory/physical.hpp"
 #include "kernel/memory/virtual.hpp"
 
+#include "config/version.h"
+#include "cstring"
+
 using namespace Thornhill;
+
+// BEGIN DEBUG
+
+extern "C" [[maybe_unused]] uint32_t TH_DEBUGGER_SENTINEL;
+[[maybe_unused]] uint32_t TH_DEBUGGER_SENTINEL = 0x534A4142;
+
+extern "C" [[maybe_unused]] uint32_t volatile TH_VERSION_IDENTIFIER_LEN;
+[[maybe_unused]] uint32_t volatile TH_VERSION_IDENTIFIER_LEN = 0;
+
+extern "C" [[maybe_unused]] uintptr_t TH_VERSION_IDENTIFIER;
+[[maybe_unused]] uintptr_t TH_VERSION_IDENTIFIER = 0;
+
+// Temporarily set here. TODO: cleanup
+const char* TH_VERSION_IDENTIFIER_STRING = "Thornhill - build " TH_GIT_REV " (built on " TH_BUILD_DATE " at " TH_BUILD_TIME ")\n";
+
+// END DEBUG
 
 bool HAS_BOOTED = false;
 
@@ -32,6 +51,10 @@ void main() {
 
     /** KERNEL **/
     HAS_BOOTED = true;
+
+    TH_VERSION_IDENTIFIER = (uintptr_t) TH_VERSION_IDENTIFIER_STRING;
+    TH_VERSION_IDENTIFIER_LEN = strlen(TH_VERSION_IDENTIFIER_STRING);
+
     ThornhillPITDriver::initialize(20, startupTime);
     ThornhillGraphicsDriver::drawTTY();
 
@@ -49,7 +72,7 @@ void main() {
     ThornhillMemory::Physical::deallocate(memB, 3);
 }
 
-extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* thornhillHandoff) {
+extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* handoff) {
 
     HAS_BOOTED = false;
     ThornhillInterrupt::setAllowInterrupts(false);
@@ -59,7 +82,7 @@ extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* thornhill
     Kernel::debug("Initializing kernel core...");
 
     // Enable the graphics driver.
-    ThornhillGraphicsDriver::initialize(thornhillHandoff->screen);
+    ThornhillGraphicsDriver::initialize(handoff->screen);
 
     // Set up the global descriptor table and interrupts.
     ThornhillGDT::setup();
@@ -67,12 +90,12 @@ extern "C" [[maybe_unused]] [[noreturn]] void _start(ThornhillHandoff* thornhill
 
     // Initialize core memory management services.
     ThornhillMemory::Physical::reset();
-    ThornhillMemory::Physical::initialize(thornhillHandoff->memoryMap);
+    ThornhillMemory::Physical::initialize(handoff->memoryMap);
     ThornhillMemory::Virtual::reset();
     ThornhillMemory::Virtual::initialize();
 
     main();
-    for (;;) {};
+    for (;;) {}
 
 }
 

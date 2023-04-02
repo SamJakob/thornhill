@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Node.js (for the hot reload toolchain, currently not working)
+- Python 3.11+ (only needed for the hot reload toolchain)
 - **(Microsoft Windows only):** you will need to install [Windows Subsystem for Linux 2 (WSL 2)](https://learn.microsoft.com/en-us/windows/wsl/install). Then, all commands should be executed from the WSL environment (easily accessed by opening a Command Prompt / PowerShell / Windows Terminal window and typing `wsl` at the prompt).
   
 
@@ -79,6 +79,16 @@ make emulator # or just `make` to build without starting emulator
 
 ### **Step 4: Start the hot-reload toolchain**
 
+Install the dependencies for the hot-reload toolchain:
+```bash
+# Requires Python 3.11+
+python3 --version
+
+# Install pip dependencies
+# (run from the root of the project)
+python3 -m pip install -r ./scripts/hotreload/requirements.txt
+```
+
 The hot-reload toolchain is currently unavailable. (Not yet refactored to account for switch to cmake.)  
 It's some simple tweaks (switching out the command and checking it all works - perhaps optimizing the buildchain a little), I'm just focusing on other tasks within the OS at the moment.
 
@@ -88,4 +98,4 @@ It's some simple tweaks (switching out the command and checking it all works - p
 - `make clean`: Cleans the build and creates the initial directory structure, intended for preparation of an initial build.
 - `make`: Builds the system.
 - `make emulator`: Runs QEMU with the built-in QEMU EFI firmware and the system image.
-- Hot-reload toolchain is currently unavailable. (Not yet refactored to account for switch to cmake.)
+- `make hot`: Compiles Thornhill, boots the emulator and starts the hot-reload toolchain.

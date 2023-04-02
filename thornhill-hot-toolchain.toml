@@ -1,0 +1,30 @@
+# Watcher configuration for the hot-reload toolchain.
+[watch]
+
+    # Directories/files to watch.
+    targets = [
+        "./boot",
+        "./config/system.h",
+        "./drivers",
+        "./font",
+        "./kernel",
+        "./lib",
+    ]
+
+    # Command to run the initial build.
+    build = "make thornhill"
+
+    # Command to run (rebuild) when change is detected.
+    rebuild = "make thornhill"
+
+# Runner settings
+[runner]
+
+    # Runner is QEMU, so connect to runner via QEMU debug protocol.
+    type = "qemu"
+
+    # The port that QEMU's QMP service is running on.
+    port = 4444
+
+    # Command to start the runner.
+    start = "make emulator_only"

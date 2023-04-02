@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-  <scope name="Thornhill" pattern="file[thornhill]:*/" />
+  <scope name="Thornhill" pattern="file[thornhill]:*/&amp;&amp;!file[thornhill]:toolchain//*&amp;&amp;!file[thornhill]:third-party//*&amp;&amp;!file[thornhill]:scripts/hotreload//*" />
 </component>

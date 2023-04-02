@@ -135,3 +135,15 @@ add_custom_command(TARGET emulator
     COMMENT "Starting QEMU..."
     COMMAND ${TH_BUILD_SCRIPTS_DIRECTORY}/startemulator.sh "${TH_OUTPUT_DIRECTORY}/thornhill.img"
 )
+
+add_custom_target(emulator_only)
+add_custom_command(TARGET emulator_only
+	COMMENT "Starting QEMU (using previous build)..."
+	COMMAND ${TH_BUILD_SCRIPTS_DIRECTORY}/startemulator.sh "${TH_OUTPUT_DIRECTORY}/thornhill.img"
+)
+
+add_custom_target(hot)
+add_custom_command(TARGET hot
+	COMMENT "Starting hot-reload toolchain..."
+	COMMAND ${TH_BUILD_SCRIPTS_DIRECTORY}/starthotreload.sh
+)
