@@ -1,5 +1,7 @@
 # Thornhill
 
+![Screenshot of Thornhill](./docs/assets/screenshot.png)
+
 ## Prerequisites
 
 - Python 3.11+ (only needed for the hot reload toolchain)

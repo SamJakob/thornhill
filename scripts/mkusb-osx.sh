@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 echo ""
 echo "Thornhill | USB Creator for Apple macOS Development Machines"
 echo "Developed by NBTX"
@@ -24,30 +24,30 @@ echo "-----------------"
 echo ""
 
 # Attempt to get the default DRIVE and VOLUME using mount information.
-DRIVE=`mount | grep THORNHILL | cut -d' ' -f1`
-VOLUME=`mount | grep THORNHILL | cut -d' ' -f3`
+DRIVE=$(mount | grep THORNHILL | cut -d' ' -f1)
+VOLUME=$(mount | grep THORNHILL | cut -d' ' -f3)
 
 # If the volume is not specified, require the user to select a disk.
-if [ -z $VOLUME ]; then
+if [ -z "$VOLUME" ]; then
   echo "Enter disk and partition:"
 # Otherwise, allow them the option of leaving the input blank to select the default.
 else
   echo "Enter disk and partition or press ENTER to select $DRIVE ($VOLUME):"
 fi
-read USER_DRIVE
+read -r USER_DRIVE
 
 # If USER_DRIVE is specified, override the drive.
 if [ -n "$USER_DRIVE" ]; then
   DRIVE="$USER_DRIVE"
 fi
 
-if [ -z $DRIVE ]; then
+if [ -z "$DRIVE" ]; then
   echo "Invalid disk."
   exit 1
 fi
 
-VOLUME=`mount | grep "$DRIVE" | cut -d' ' -f3`
-if [ -z $VOLUME ]; then
+VOLUME=$(mount | grep "$DRIVE" | cut -d' ' -f3)
+if [ -z "$VOLUME" ]; then
   echo "The specified drive ($DRIVE) does not have a valid volume."
   exit 1
 fi
@@ -72,16 +72,18 @@ if [[ $VOLUME != "/Volumes/"* ]]; then
 fi
 
 echo -n "Are you sure you wish to proceed? This will erase the current contents of $DRIVE ($VOLUME)! [y/N] "
-read response
+read -r response
 case "$response" in
     [yY][eE][sS]|[yY])
-        if [ `command -v gdd` ]; then
+        if [ "$(command -v gdd)" ]; then
           echo "Requesting system privileges to unmount and perform gdd from $KERNEL_IMG to $DRIVE..."
           sudo diskutil unmount "$DRIVE"
           sudo gdd "if=$KERNEL_IMG" "of=$DRIVE" "bs=102400" "status=progress"
           echo "Done! The drive is now safe to remove."
         else
           echo "gdd command is unavailable. Falling back to dd. Progress will be unavailable."
+          echo "Install gdd with 'brew install coreutils' to suppress this message and get progress."
+          echo ""
           echo "Requesting system privileges to unmount and perform dd from $KERNEL_IMG to $DRIVE..."
           sudo diskutil unmount "$DRIVE"
           sudo dd "if=$KERNEL_IMG" "of=$DRIVE" "bs=102400"

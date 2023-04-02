@@ -10,9 +10,6 @@ which makeinfo > /dev/null || (echo "You are missing 'makeinfo'. On Ubuntu you c
 GCCDIR="x86_64-elf-gcc"
 BINDIR="x86_64-elf-binutils"
 
-# Push current directory so we can return to it later.
-pushd "$(pwd)"
-
 # Begin build script
 echo "-- Moving to toolchain directory"
 cd "$(dirname "$0")"
@@ -138,7 +135,5 @@ make install-target-libgcc
 # echo "-- Type 'exit' when done."
 # $USER_SHELL
 
-# Return to user's directory
-echo "-- Returning to initial directory."
+# All done!
 echo "-- All done!"
-cd "$(popd)"

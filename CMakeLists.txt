@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 # Suppress compiler checks.
 set(CMAKE_C_COMPILER_WORKS TRUE)
 set(CMAKE_CXX_COMPILER_WORKS TRUE)
+set(CMAKE_SYSTEM_NAME Generic CACHE STRING "" FORCE)
 
 # Project details.
 project(thornhill)
@@ -35,6 +36,7 @@ if(EXISTS "${TH_TOOLCHAIN_DIRECTORY}" AND EXISTS "${TH_TOOLCHAIN_DIRECTORY}/pref
 	set(CMAKE_CXX_COMPILER "${TH_TOOLCHAIN_DIRECTORY}/prefix/bin/x86_64-elf-g++")
 	set(CMAKE_C_LINK_EXECUTABLE_NAME "${TH_TOOLCHAIN_DIRECTORY}/prefix/bin/x86_64-elf-ld")
 	set(CMAKE_CXX_LINK_EXECUTABLE_NAME "${TH_TOOLCHAIN_DIRECTORY}/prefix/bin/x86_64-elf-g++")
+	set(OBJCOPY "${TH_TOOLCHAIN_DIRECTORY}/prefix/bin/x86_64-elf-objcopy")
 
 	# Using cross-compiler, so only use host system paths and not sysroot.
 	set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
