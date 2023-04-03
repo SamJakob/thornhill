@@ -42,8 +42,8 @@ def main():
 
     print(f"\033[1;92m(\u2714) Found CMake build directory. ({cmake_root})\033[0m")
 
-    # Builder(command=config['watch']['build'], working_dir=cmake_root)\
-    #     .run_and_wait("Performing initial build...")
+    Builder(command=config['watch']['build'], working_dir=cmake_root)\
+        .run_and_wait("Performing initial build...")
 
     # Identify the TH_DEBUGGER_SENTINEL and HAS_BOOTED memory locations.
     def locate_kernel_symbol(name: str):

@@ -28,7 +28,7 @@ void ThornhillGraphicsDriver::initialize(Screen screen) {
     Kernel::debugf("Graphics", "\tFramebuffer Base: 0x%x", screen.frame_buffer_base);
 
     ThornhillGraphicsDriver::screen = screen;
-    ThornhillGraphicsDriver::clear(rgb(0, 128, 128));
+    ThornhillGraphicsDriver::clear(rgb(0, 255, 128));
 }
 
 Screen* ThornhillGraphicsDriver::getScreen() { return &screen; }
