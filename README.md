@@ -79,7 +79,7 @@ make clean
 make emulator # or just `make` to build without starting emulator
 ```
 
-### **Step 4: Start the hot-reload toolchain**
+### **Step 4: Start the [hot-reload toolchain](https://github.com/SamJakob/thornhill/wiki/Hot-Reload-Toolchain)**
 
 Install the dependencies for the hot-reload toolchain:
 ```bash
@@ -89,10 +89,10 @@ python3 --version
 # Install pip dependencies
 # (run from the root of the project)
 python3 -m pip install -r ./scripts/hotreload/requirements.txt
-```
 
-The hot-reload toolchain is currently unavailable. (Not yet refactored to account for switch to cmake.)  
-It's some simple tweaks (switching out the command and checking it all works - perhaps optimizing the buildchain a little), I'm just focusing on other tasks within the OS at the moment.
+# Start the hot-reload toolchain
+make hot
+```
 
 
 ## Commands
