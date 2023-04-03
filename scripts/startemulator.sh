@@ -38,7 +38,7 @@ fi
 
 # If debug mode is set, add the debug flags.
 if [ "$Debug" -eq 1 ]; then
-  debugFlags="-D ./qemu-log.txt -d int"
+  debugFlags="-D ./qemu-log.txt -d int -no-reboot -no-shutdown"
 fi
 
 echo "Starting system with image $ISOLocation..."
@@ -46,11 +46,10 @@ echo "Starting system with image $ISOLocation..."
 # shellcheck disable=SC2086
 # (globbing/splitting is desired)
 qemu-system-x86_64 \
-  -m "$Memory"                              \
-  -qmp tcp:localhost:4444,server,nowait     \
-  -bios "$OVMFLocation"                     \
-  -drive "format=raw,file=$ISOLocation"     \
-  -serial stdio                             \
-  -monitor tcp::6969,server,nowait          \
-  -no-reboot -no-shutdown                   \
+  -m "$Memory"                                                                                         \
+  -qmp tcp:localhost:4444,server,nowait                                                                \
+  -bios "$OVMFLocation"                                                                                \
+  -drive "file=$ISOLocation,if=virtio,format=raw,cache=none,aio=threads,discard=unmap,readonly=on"     \
+  -serial stdio                                                                                        \
+  -monitor tcp::6969,server,nowait                                                                     \
   $debugFlags

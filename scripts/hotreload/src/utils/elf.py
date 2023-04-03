@@ -1,3 +1,4 @@
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -12,6 +13,10 @@ def locate_elf_symbol(file: Path, symbol_name: str) -> Optional[str]:
 
     # Attempt to locate readelf.
     readelf = shutil.which('readelf')
+
+    if readelf is None:
+        readelf = shutil.which('readelf', path=os.environ.get('TH_TC_PATH'))
+
     if readelf is None:
         return None
 
@@ -19,9 +24,9 @@ def locate_elf_symbol(file: Path, symbol_name: str) -> Optional[str]:
     if not file.exists():
         return None
 
-    # Attempt to call readelf and get the address.
+    # Attempt to call 'readelf' and get the address.
     result = subprocess.check_output(
-        f"readelf -s {file} --wide | grep \"" + symbol_name + "$\" | awk '{print $2}'",
+        f"{readelf} -s {file} --wide | grep \"" + symbol_name + "$\" | awk '{print $2}'",
         shell=True
     ).decode('utf-8')
 

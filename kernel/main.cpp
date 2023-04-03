@@ -25,11 +25,12 @@ extern "C" [[maybe_unused]] uint32_t TH_DEBUGGER_SENTINEL;
 extern "C" [[maybe_unused]] uint32_t volatile TH_VERSION_IDENTIFIER_LEN;
 [[maybe_unused]] uint32_t volatile TH_VERSION_IDENTIFIER_LEN = 0;
 
-extern "C" [[maybe_unused]] uintptr_t TH_VERSION_IDENTIFIER;
-[[maybe_unused]] uintptr_t TH_VERSION_IDENTIFIER = 0;
+//extern "C" [[maybe_unused]] uintptr_t TH_VERSION_IDENTIFIER;
+//[[maybe_unused]] uintptr_t TH_VERSION_IDENTIFIER = 0;
 
 // Temporarily set here. TODO: cleanup
-const char* TH_VERSION_IDENTIFIER_STRING = "Thornhill - build " TH_GIT_REV " (built on " TH_BUILD_DATE " at " TH_BUILD_TIME ")\n";
+extern "C" const char* TH_VERSION_IDENTIFIER;
+const char* TH_VERSION_IDENTIFIER = "Thornhill - build " TH_GIT_REV " (built on " TH_BUILD_DATE " at " TH_BUILD_TIME ")";
 
 // END DEBUG
 
@@ -50,10 +51,10 @@ void main() {
     ThornhillKeyboardDriver::initialize();
 
     /** KERNEL **/
-    HAS_BOOTED = true;
+//    TH_VERSION_IDENTIFIER = (uintptr_t) TH_VERSION_IDENTIFIER_STRING;
+    TH_VERSION_IDENTIFIER_LEN = strlen(TH_VERSION_IDENTIFIER);
 
-    TH_VERSION_IDENTIFIER = (uintptr_t) TH_VERSION_IDENTIFIER_STRING;
-    TH_VERSION_IDENTIFIER_LEN = strlen(TH_VERSION_IDENTIFIER_STRING);
+    HAS_BOOTED = true;
 
     ThornhillPITDriver::initialize(20, startupTime);
     ThornhillGraphicsDriver::drawTTY();
@@ -62,6 +63,7 @@ void main() {
 
     ThornhillSKI::initialize();
     ThornhillPITDriver::setOnTimerCallback(ThornhillSKI::handleTimer);
+
 
     Kernel::print("System is ready.");
 

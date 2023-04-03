@@ -47,7 +47,7 @@ class Builder:
             self.interrupt()
 
         self.started = True
-        self.__invocation = self.__invocation + 1
+        self.__invocation += 1
 
         self.__build_loader = Loader(loader_style).start(message)
 
