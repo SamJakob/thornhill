@@ -180,6 +180,8 @@ class QEMURunner(BaseRunner):
         while recv is None or "event" not in recv or recv["event"] != "BLOCK_JOB_COMPLETED":
             recv = self.recv_command()
 
+        self.flush_queue()
+
         self.send_command({"execute": "system_reset"})
 
     def send_command(self, payload: dict):
