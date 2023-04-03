@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 import time
@@ -7,7 +8,7 @@ from json import JSONDecodeError
 from pathlib import Path
 from subprocess import Popen
 from threading import Thread
-from typing import Self, Optional, Literal
+from typing import Self, Optional, Literal, Callable
 from socket import socket, AF_INET, SOCK_STREAM
 
 from . import BaseRunner
@@ -45,6 +46,48 @@ class QEMURunner(BaseRunner):
         self.__symbols = _symbols
         self.__queue = []
 
+        self.__threads = []
+
+    def __start_qemu_delegate(self):
+        # Start watcher thread to notify THRT when QEMU exits.
+        def wait_for_exit_delegate():
+            self.await_exit()
+            print("\033[1;93m(!) QEMU exit detected. Shutting down...\033[0m")
+            os._exit(0)
+
+        Thread(target=wait_for_exit_delegate, daemon=True).start()
+
+        # Start communication delegate to forward messages when appropriate.
+        def communication_delegate():
+            def pipe_output(source, sink, sink_writeable: Optional[Callable] = None):
+                def do_pipe_output():
+                    for line in iter(source.readline, ""):
+                        if sink_writeable is not None:
+                            while not sink_writeable():
+                                time.sleep(0.0001)
+
+                        sink.write(line.decode())
+                        time.sleep(0.0001)
+
+                thread = Thread(target=do_pipe_output, daemon=True)
+                thread.start()
+                return thread
+
+            self.__threads = [pipe_output(self.__qemu_process.stdout,
+                                          sys.__stdout__,
+                                          lambda: sys.__stdout__ == sys.stdout),
+
+                              pipe_output(self.__qemu_process.stderr,
+                                          sys.__stderr__,
+                                          lambda: sys.__stdout__ == sys.stdout),
+
+                              # Thornhill's Serial Console does not take input.
+                              # This is not needed and probably won't work.
+                              # pipe_output(sys.__stdin__, self.__qemu_process.stdin)
+                              ]
+
+        communication_delegate()
+
     def start(self) -> Self:
         start_loader = Loader(LoaderStyle.SPINNER).start("Booting QEMU runner...")
 
@@ -53,6 +96,8 @@ class QEMURunner(BaseRunner):
                                                      stdout=subprocess.PIPE,
                                                      stderr=subprocess.PIPE,
                                                      cwd=self.working_dir)
+
+        self.__start_qemu_delegate()
 
         # ATTEMPT TO CONNECT TO QMP SOCKET.
 
@@ -104,9 +149,10 @@ class QEMURunner(BaseRunner):
                 attempts += 1
 
         # ATTEMPT TO LOCATE DEBUG SENTINEL AND WAIT FOR HAS_BOOTED TO BECOME TRUE.
-        start_loader.stop()
-
-        boot_loader = Loader(LoaderStyle.INDETERMINATE_BAR).start("Locating debugging region...")
+        start_loader.set_style_and_message(
+            style=LoaderStyle.INDETERMINATE_BAR,
+            message="Locating debugging region..."
+        )
 
         enhanced_debugging = False
         enhanced_debugging_guest = None
@@ -129,7 +175,7 @@ class QEMURunner(BaseRunner):
             if debugger_sentinel_response is not None and debugger_sentinel_response == MAGIC_TH_DEBUGGER_SENTINEL:
                 enhanced_debugging = True
 
-        boot_loader.message = "Waiting for Thornhill to boot..."
+        start_loader.message = "Waiting for Thornhill to boot..."
 
         # Next, wait for HAS_BOOTED to be set.
         if enhanced_debugging:
@@ -149,7 +195,9 @@ class QEMURunner(BaseRunner):
         else:
             time.sleep(5)
 
-        boot_loader.stop()
+        start_loader.stop()
+
+        time.sleep(0.01)
 
         if enhanced_debugging:
             print()
@@ -183,6 +231,10 @@ class QEMURunner(BaseRunner):
         self.flush_queue()
 
         self.send_command({"execute": "system_reset"})
+
+    def await_exit(self):
+        if self.__qemu_process is not None:
+            self.__qemu_process.wait()
 
     def send_command(self, payload: dict):
         if self.__qmp_socket is None:

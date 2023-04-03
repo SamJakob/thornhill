@@ -47,11 +47,24 @@ class Loader:
     def get_message(self) -> Optional[str]:
         return self._message
 
-    def set_message(self, message: str) -> None:
+    def set_message(self, message: Optional[str]) -> None:
+        self._message = message
+        self.__render_frame()
+
+    def get_style(self) -> LoaderStyle:
+        return self._style
+
+    def set_style(self, style: LoaderStyle):
+        self._style = style
+        self.__render_frame()
+
+    def set_style_and_message(self, style: LoaderStyle, message: Optional[str]):
+        self._style = self.__styles[style]
         self._message = message
         self.__render_frame()
 
     message = property(get_message, set_message)
+    style = property(get_style, set_style)
 
     def __init__(self,
                  style: LoaderStyle = LoaderStyle.SPINNER,
@@ -61,7 +74,7 @@ class Loader:
         if style not in self.__styles:
             raise KeyError(f"{style} is not a valid Loader style. Valid styles are: {self.__styles.keys()}")
 
-        self.style = self.__styles[style]
+        self._style = self.__styles[style]
         """The current loader style."""
 
         self.refresh_interval_ms = refresh_interval_ms
@@ -117,7 +130,7 @@ class Loader:
         self.__flush_proxy(proxy=self.__stderr_proxy, stream=sys.__stderr__)
 
         # Render new frame.
-        self.__frame = next(self.style)
+        self.__frame = next(self._style)
         self.__frame += (f' {self._message}' if self._message is not None else '')
         self.__frame += (f' ({int(time.time()) - self.__start_time}s)'
                                        if self.__start_time is not None and self.show_timer
